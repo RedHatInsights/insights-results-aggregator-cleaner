@@ -16,6 +16,15 @@ limitations under the License.
 
 package main
 
+// This source file contains an implementation of interface between Go code and
+// (almost any) SQL database like PostgreSQL, SQLite, or MariaDB.
+//
+// It is possible to configure connection to selected database by using
+// StorageConfiguration structure. Currently that structure contains two
+// configurable parameter:
+//
+// Driver - a SQL driver, like "sqlite3", "pq" etc.
+// DataSource - specification of data source. The content of this parameter depends on the database used.
 import (
 	"fmt"
 	"math"
@@ -41,8 +50,11 @@ const (
 	DBDriverGeneral
 )
 
+// Error messages
 const canNotConnectToDataStorageMessage = "Can not connect to data storage"
 
+// initDatabaseConnection initializes driver, checks if it's supported and
+// initializes connection to the storage.
 func initDatabaseConnection(configuration StorageConfiguration) (*sql.DB, error) {
 	driverName := configuration.Driver
 	dataSource := ""
@@ -71,6 +83,7 @@ func initDatabaseConnection(configuration StorageConfiguration) (*sql.DB, error)
 		return nil, err
 	}
 
+	// try to initialize connection to the storage
 	connection, err := sql.Open(driverName, dataSource)
 
 	if err != nil {
@@ -81,6 +94,8 @@ func initDatabaseConnection(configuration StorageConfiguration) (*sql.DB, error)
 	return connection, nil
 }
 
+// displayAllOldRecords functions read all old records, ie. records that are
+// older than the specified time duration. Those records are simply displayed.
 func displayAllOldRecords(connection *sql.DB, maxAge string) error {
 	query := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW() - $1::INTERVAL ORDER BY reported_at"
 	rows, err := connection.Query(query, maxAge)
@@ -105,7 +120,15 @@ func displayAllOldRecords(connection *sql.DB, maxAge string) error {
 		}
 
 		age := int(math.Ceil(now.Sub(reported).Hours() / 24)) // in days
-		log.Info().Str("cluster", clusterName).Str("reported", reported.Format(time.RFC3339)).Str("lastChecked", lastChecked.Format(time.RFC3339)).Int("age", age).Msg("Old report")
+
+		// prepare for the report
+		reportedF := reported.Format(time.RFC3339)
+		lastCheckedF := lastChecked.Format(time.RFC3339)
+		log.Info().Str("cluster", clusterName).
+			Str("reported", reportedF).
+			Str("lastChecked", lastCheckedF).
+			Int("age", age).
+			Msg("Old report")
 	}
 	return nil
 }
