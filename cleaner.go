@@ -26,6 +26,10 @@ func main() {
 	log.Debug().Msg("Started")
 
 	connection, err := initDatabaseConnection(config.Storage)
+	if err != nil {
+		log.Err(err).Msg("Connection to database not established")
+	}
+
 	err = displayAllOldRecords(connection, config.Cleaner.MaxAge)
 	if err != nil {
 		log.Err(err).Msg("Selecting records from database")

@@ -25,6 +25,8 @@ const (
 	DBDriverGeneral
 )
 
+const canNotConnectToDataStorageMessage = "Can not connect to data storage"
+
 func initDatabaseConnection(configuration StorageConfiguration) (*sql.DB, error) {
 	driverName := configuration.Driver
 	dataSource := ""
@@ -49,14 +51,14 @@ func initDatabaseConnection(configuration StorageConfiguration) (*sql.DB, error)
 		)
 	default:
 		err := fmt.Errorf("driver %v is not supported", driverName)
-		log.Err(err).Msg("Can not connect to data storage")
+		log.Err(err).Msg(canNotConnectToDataStorageMessage)
 		return nil, err
 	}
 
 	connection, err := sql.Open(driverName, dataSource)
 
 	if err != nil {
-		log.Err(err).Msg("Can not connect to data storage")
+		log.Err(err).Msg(canNotConnectToDataStorageMessage)
 		return nil, err
 	}
 
