@@ -16,6 +16,15 @@ limitations under the License.
 
 package main
 
+// This source file contains definition of data type named ConfigStruct that
+// represents configuration of Insights Results Aggregator Cleaner. This source
+// file also contains function named LoadConfiguration that can be used to load
+// configuration from provided configuration file and/or from environment
+// variables. Additionally several specific functions named
+// GetStorageConfiguration, GetLoggingConfiguration, and
+// GetCleanerConfiguration are to be used to return specific configuration
+// options.
+
 import (
 	"bytes"
 	"fmt"
@@ -128,4 +137,19 @@ func LoadConfiguration(configFileEnvVariableName string, defaultConfigFile strin
 
 	err = viper.Unmarshal(&config)
 	return config, err
+}
+
+// GetStorageConfiguration returns storage configuration
+func GetStorageConfiguration(config ConfigStruct) StorageConfiguration {
+	return config.Storage
+}
+
+// GetLoggingConfiguration returns logging configuration
+func GetLoggingConfiguration(config ConfigStruct) LoggingConfiguration {
+	return config.Logging
+}
+
+// GetCleanerConfiguration returns cloudwatch configuration
+func GetCleanerConfiguration(config ConfigStruct) CleanerConfiguration {
+	return config.Cleaner
 }
