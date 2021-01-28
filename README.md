@@ -3,7 +3,7 @@
 [![GoDoc](https://godoc.org/github.com/RedHatInsights/insights-results-aggregator-cleaner?status.svg)](https://godoc.org/github.com/RedHatInsights/insights-results-aggregator-cleaner)
 [![GitHub Pages](https://img.shields.io/badge/%20-GitHub%20Pages-informational)](https://redhatinsights.github.io/insights-results-aggregator-cleaner/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/RedHatInsights/insights-results-aggregator-cleaner)](https://goreportcard.com/report/github.com/RedHatInsights/insights-results-aggregator-cleaner)
-[![Build Status](https://travis-ci.org/RedHatInsights/insights-results-aggregator-cleaner.svg?branch=master)](https://travis-ci.org/RedHatInsights/insights-results-aggregator-cleaner)
+[![Build Status](https://travis-ci.com/RedHatInsights/insights-results-aggregator-cleaner.svg?branch=master)](https://travis-ci.com/RedHatInsights/insights-results-aggregator-cleaner)
 
 ## Description
 
