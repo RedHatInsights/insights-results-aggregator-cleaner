@@ -29,7 +29,7 @@ package main
 // https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner
 
 // Default name of configuration file is config.toml
-// It can be change via environment variable INSIGHTS_RESULTS_CLEANER_CONFIG_FILE
+// It can be changed via environment variable INSIGHTS_RESULTS_CLEANER_CONFIG_FILE
 
 // An example of configuration file that can be used in devel environment:
 //

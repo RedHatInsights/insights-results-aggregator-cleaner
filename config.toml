@@ -8,7 +8,7 @@ pg_db_name = "aggregator"
 pg_params = "sslmode=disable"
 
 [logging]
-debug = true
+debug = false
 log_level = ""
 
 [cleaner]
