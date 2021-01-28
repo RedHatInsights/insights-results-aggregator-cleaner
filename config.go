@@ -25,6 +25,43 @@ package main
 // GetCleanerConfiguration are to be used to return specific configuration
 // options.
 
+// Generated documentation is available at:
+// https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner
+
+// Default name of configuration file is config.toml
+// It can be change via environment variable INSIGHTS_RESULTS_CLEANER_CONFIG_FILE
+
+// An example of configuration file that can be used in devel environment:
+//
+// [storage]
+// db_driver = "postgres"
+// pg_username = "postgres"
+// pg_password = "postgres"
+// pg_host = "localhost"
+// pg_port = 5432
+// pg_db_name = "aggregator"
+// pg_params = "sslmode=disable"
+//
+// [logging]
+// debug = true
+// log_level = ""
+//
+// [cleaner]
+// max_age = "90 days"
+//
+//
+// Environment variables that can be used to override configuration file settings:
+// INSIGHTS_RESULTS_CLEANER__STORAGE__DB_DRIVER
+// INSIGHTS_RESULTS_CLEANER__STORAGE__PG_USERNAME
+// INSIGHTS_RESULTS_CLEANER__STORAGE__PG_PASSWORD
+// INSIGHTS_RESULTS_CLEANER__STORAGE__PG_HOST
+// INSIGHTS_RESULTS_CLEANER__STORAGE__PG_PORT
+// INSIGHTS_RESULTS_CLEANER__STORAGE__PG_DB_NAME
+// INSIGHTS_RESULTS_CLEANER__STORAGE__PG_PARAMS
+// INSIGHTS_RESULTS_CLEANER__LOGGING__DEBUG
+// INSIGHTS_RESULTS_CLEANER__LOGGING__LOG_DEVEL
+// INSIGHTS_RESULTS_CLEANER__CLEANER__MAX_AGE
+
 import (
 	"bytes"
 	"fmt"

@@ -25,6 +25,10 @@ package main
 //
 // Driver - a SQL driver, like "sqlite3", "pq" etc.
 // DataSource - specification of data source. The content of this parameter depends on the database used.
+
+// Generated documentation is available at:
+// https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner
+
 import (
 	"fmt"
 	"math"
@@ -86,6 +90,7 @@ func initDatabaseConnection(configuration StorageConfiguration) (*sql.DB, error)
 	// try to initialize connection to the storage
 	connection, err := sql.Open(driverName, dataSource)
 
+	// check if establishing a connection was successful
 	if err != nil {
 		log.Err(err).Msg(canNotConnectToDataStorageMessage)
 		return nil, err
@@ -103,6 +108,7 @@ func displayAllOldRecords(connection *sql.DB, maxAge string) error {
 		return err
 	}
 
+	// used to compute a real record age
 	now := time.Now()
 
 	for rows.Next() {
@@ -112,18 +118,23 @@ func displayAllOldRecords(connection *sql.DB, maxAge string) error {
 			lastChecked time.Time
 		)
 
+		// read one old record from the report table
 		if err := rows.Scan(&clusterName, &reported, &lastChecked); err != nil {
+			// close the result set in case of any error
 			if closeErr := rows.Close(); closeErr != nil {
 				log.Error().Err(closeErr).Msg("Unable to close the DB rows handle")
 			}
 			return err
 		}
 
+		// compute the real record age
 		age := int(math.Ceil(now.Sub(reported).Hours() / 24)) // in days
 
 		// prepare for the report
 		reportedF := reported.Format(time.RFC3339)
 		lastCheckedF := lastChecked.Format(time.RFC3339)
+
+		// just print the report
 		log.Info().Str("cluster", clusterName).
 			Str("reported", reportedF).
 			Str("lastChecked", lastCheckedF).
