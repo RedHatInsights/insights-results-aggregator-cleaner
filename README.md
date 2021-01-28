@@ -14,7 +14,7 @@ either way it means that these data are no longer relevant to us and should be
 pruned.
 
 Such clusters can be detected very easily by checking the timestamps stored
-(along other information) in the `result` table in Insights Results Aggregator
+(along other information) in the `report` table in Insights Results Aggregator
 database.
 
 Currently this service just displays such clusters (cluster IDs) and do nothing
