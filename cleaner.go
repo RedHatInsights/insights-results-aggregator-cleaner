@@ -61,6 +61,8 @@ func readClusterList(filename string) (ClusterList, error) {
 
 	var clusterList = make([]ClusterName, 0)
 
+	// disable "G304 (CWE-22): Potential file inclusion via variable"
+	// #nosec G304
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, err
