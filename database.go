@@ -152,6 +152,9 @@ func deleteRecordFromTable(connection *sql.DB, table string, key string, cluster
 		return 0, err
 	}
 	affected, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
 	return int(affected), nil
 }
 
