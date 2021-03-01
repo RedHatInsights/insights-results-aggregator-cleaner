@@ -106,6 +106,8 @@ type LoggingConfiguration struct {
 type CleanerConfiguration struct {
 	// MaxAge is specification of max age for records to be cleaned
 	MaxAge string `mapstructure:"max_age" toml:"max_age"`
+	// ClusterListFile contains file name with list of clusters to delete
+	ClusterListFile string `mapstructure:"cluster_list_file" toml:"cluster_list_file"`
 }
 
 // StorageConfiguration represents configuration of data storage
@@ -186,7 +188,7 @@ func GetLoggingConfiguration(config ConfigStruct) LoggingConfiguration {
 	return config.Logging
 }
 
-// GetCleanerConfiguration returns cloudwatch configuration
+// GetCleanerConfiguration returns cleaner configuration
 func GetCleanerConfiguration(config ConfigStruct) CleanerConfiguration {
 	return config.Cleaner
 }
