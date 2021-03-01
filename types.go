@@ -23,3 +23,16 @@ type ClusterName string
 
 // ClusterList represents a list of cluster names/ids (see ClusterName)
 type ClusterList []ClusterName
+
+// TableAndKey represents a key for given table used by cleanup process
+type TableAndKey struct {
+	TableName string
+	KeyName   string
+}
+
+// Summary represents summary info to be displayed after cleanup part
+type Summary struct {
+	ProperClusterEntries   int
+	ImproperClusterEntries int
+	DeletionsForTable      map[string]int
+}

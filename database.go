@@ -144,8 +144,73 @@ func displayAllOldRecords(connection *sql.DB, maxAge string) error {
 	return nil
 }
 
-func performCleanupInDB(connection *sql.DB, clusterList ClusterList) error {
+func deleteRecordFromTable(connection *sql.DB, table string, key string, clusterName ClusterName) (int, error) {
+	sqlStatement := "DELETE FROM " + table + " WHERE " + key + " = $1;"
+	println(sqlStatement)
+	result, err := connection.Exec(sqlStatement, clusterName)
+	if err != nil {
+		return 0, err
+	}
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	return int(affected), nil
+}
+
+var tablesAndKeys = [...]TableAndKey{
+	TableAndKey{
+		TableName: "report",
+		KeyName:   "cluster",
+	},
+	TableAndKey{
+		TableName: "cluster_rule_toggle",
+		KeyName:   "cluster_id",
+	},
+	TableAndKey{
+		TableName: "cluster_rule_user_feedback",
+		KeyName:   "cluster_id",
+	},
+	TableAndKey{
+		TableName: "cluster_user_rule_disable_feedback",
+		KeyName:   "cluster_id",
+	},
+	TableAndKey{
+		TableName: "rule_hit",
+		KeyName:   "cluster_id",
+	},
+}
+
+func performCleanupInDB(connection *sql.DB,
+	clusterList ClusterList) (map[string]int, error) {
+
+	deletionsForTable := make(map[string]int)
+	for _, tableAndKey := range tablesAndKeys {
+		deletionsForTable[tableAndKey.TableName] = 0
+	}
+
 	log.Info().Msg("Cleanup started")
+	for _, clusterName := range clusterList {
+		for _, tableAndKey := range tablesAndKeys {
+			affected, err := deleteRecordFromTable(connection,
+				tableAndKey.TableName,
+				tableAndKey.KeyName,
+				clusterName)
+			if err != nil {
+				log.Error().
+					Err(err).
+					Str("table", tableAndKey.TableName).
+					Msg("Unable to delete record")
+			} else {
+				log.Info().
+					Int("Affected", affected).
+					Str("table", tableAndKey.TableName).
+					Str("cluster", string(clusterName)).
+					Msg("Delete record")
+				deletionsForTable[tableAndKey.TableName] += affected
+			}
+		}
+	}
 	log.Info().Msg("Cleanup finished")
-	return nil
+	return deletionsForTable, nil
 }
