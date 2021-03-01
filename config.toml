@@ -8,8 +8,9 @@ pg_db_name = "aggregator"
 pg_params = "sslmode=disable"
 
 [logging]
-debug = false
+debug = true
 log_level = ""
 
 [cleaner]
 max_age = "90 days"
+cluster_list_file = "cluster_list.txt"

@@ -32,7 +32,14 @@ package main
 // https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner
 
 import (
+	"bufio"
+	"flag"
 	"os"
+	"strings"
+
+	"database/sql"
+
+	"github.com/google/uuid"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -43,7 +50,80 @@ const (
 	defaultConfigFileName     = "config"
 )
 
+// IsValidUUID function checks if provided string contains a correct UUID.
+func IsValidUUID(input string) bool {
+	_, err := uuid.Parse(input)
+	return err == nil
+}
+
+func readClusterList(filename string) (ClusterList, error) {
+	log.Debug().Msg("Cluster list read")
+
+	var clusterList = make([]ClusterName, 0)
+
+	// disable "G304 (CWE-22): Potential file inclusion via variable"
+	// #nosec G304
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		err := file.Close()
+		if err != nil {
+			log.Err(err).Msg("File close failed")
+		}
+	}()
+
+	// start reading from the file with a reader
+	reader := bufio.NewReader(file)
+	var line string
+	for {
+		line, err = reader.ReadString('\n')
+		if err != nil {
+			break
+		}
+		line = strings.Trim(line, "\n")
+		if IsValidUUID(line) {
+			clusterList = append(clusterList, ClusterName(line))
+			log.Info().Str("input", line).Msg("Proper cluster ID")
+		} else {
+			log.Error().Str("input", line).Msg("Not a proper cluster ID")
+		}
+	}
+	log.Info().Int("number of clusters to delete", len(clusterList)).Msg("Cluster list finished")
+
+	return clusterList, nil
+}
+
+func doSelectedOperation(config ConfigStruct, connection *sql.DB, performCleanup bool) error {
+	if performCleanup {
+		clusterList, err := readClusterList(config.Cleaner.ClusterListFile)
+		if err != nil {
+			log.Err(err).Msg("Read cluster list")
+			return err
+		}
+		err = performCleanupInDB(connection, clusterList)
+		if err != nil {
+			log.Err(err).Msg("Performing cleanup")
+			return err
+		}
+	} else {
+		err := displayAllOldRecords(connection, config.Cleaner.MaxAge)
+		if err != nil {
+			log.Err(err).Msg("Selecting records from database")
+			return err
+		}
+	}
+	// everything seems to be fine
+	return nil
+}
+
 func main() {
+	var performCleanup bool
+
+	flag.BoolVar(&performCleanup, "cleanup", false, "perform database cleanup")
+	flag.Parse()
+
 	// config has exactly the same structure as *.toml file
 	config, err := LoadConfiguration(configFileEnvVariableName, defaultConfigFileName)
 	if err != nil {
@@ -61,9 +141,9 @@ func main() {
 		log.Err(err).Msg("Connection to database not established")
 	}
 
-	err = displayAllOldRecords(connection, config.Cleaner.MaxAge)
+	err = doSelectedOperation(config, connection, performCleanup)
 	if err != nil {
-		log.Err(err).Msg("Selecting records from database")
+		log.Err(err).Msg("Operation failed")
 	}
 
 	log.Debug().Msg("Finished")

@@ -143,3 +143,9 @@ func displayAllOldRecords(connection *sql.DB, maxAge string) error {
 	}
 	return nil
 }
+
+func performCleanupInDB(connection *sql.DB, clusterList ClusterList) error {
+	log.Info().Msg("Cleanup started")
+	log.Info().Msg("Cleanup finished")
+	return nil
+}

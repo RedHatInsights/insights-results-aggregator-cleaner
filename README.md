@@ -65,6 +65,7 @@ INSIGHTS_RESULTS_CLEANER__LOGGING__DEBUG
 INSIGHTS_RESULTS_CLEANER__LOGGING__LOG_DEVEL
 INSIGHTS_RESULTS_CLEANER__CLEANER__MAX_AGE
 ```
+
 ### Usage
 
 Just the service needs to be started:
@@ -112,3 +113,143 @@ Just the service needs to be started:
 {"level":"info","cluster":"abaaaaaa-bbbb-cccc-dddd-ffffffffffff","reported":"2020-10-01T00:00:00Z","lastChecked":"2020-01-23T16:15:59Z","age":120,"time":"2021-01-28T10:09:49+01:00","message":"Old report"}
 {"level":"debug","time":"2021-01-28T10:09:49+01:00","message":"Finished"}
 ```
+
+## Database structure
+
+List of tables:
+
+```
+                       List of relations
+ Schema |                Name                | Type  |  Owner
+--------+------------------------------------+-------+----------
+ public | cluster_rule_toggle                | table | postgres
+ public | cluster_rule_user_feedback         | table | postgres
+ public | cluster_user_rule_disable_feedback | table | postgres
+ public | consumer_error                     | table | postgres
+ public | migration_info                     | table | postgres
+ public | report                             | table | postgres
+ public | rule_hit                           | table | postgres
+```
+
+### Table `report`
+
+```
+     Column      |            Type             |     Modifiers
+-----------------+-----------------------------+--------------------
+ org_id          | integer                     | not null
+ cluster         | character varying           | not null
+ report          | character varying           | not null
+ reported_at     | timestamp without time zone |
+ last_checked_at | timestamp without time zone |
+ kafka_offset    | bigint                      | not null default 0
+Indexes:
+    "report_pkey" PRIMARY KEY, btree (org_id, cluster)
+    "report_cluster_key" UNIQUE CONSTRAINT, btree (cluster)
+    "report_kafka_offset_btree_idx" btree (kafka_offset)
+Referenced by:
+    TABLE "cluster_rule_user_feedback" CONSTRAINT "cluster_rule_user_feedback_cluster_id_fkey" FOREIGN KEY (cluster_id) REFERENCES report(cluster) ON DELETE CASCADE
+```
+
+### Table `cluster_rule_toggle`
+
+```
+   Column    |            Type             | Modifiers
+-------------+-----------------------------+-----------
+ cluster_id  | character varying           | not null
+ rule_id     | character varying           | not null
+ user_id     | character varying           | not null
+ disabled    | smallint                    | not null
+ disabled_at | timestamp without time zone |
+ enabled_at  | timestamp without time zone |
+ updated_at  | timestamp without time zone | not null
+Indexes:
+    "cluster_rule_toggle_pkey" PRIMARY KEY, btree (cluster_id, rule_id, user_id)
+Check constraints:
+    "cluster_rule_toggle_disabled_check" CHECK (disabled >= 0 AND disabled <= 1)
+```
+
+### Table `cluster_rule_user_feedback`
+
+```
+   Column   |            Type             | Modifiers
+------------+-----------------------------+-----------
+ cluster_id | character varying           | not null
+ rule_id    | character varying           | not null
+ user_id    | character varying           | not null
+ message    | character varying           | not null
+ user_vote  | smallint                    | not null
+ added_at   | timestamp without time zone | not null
+ updated_at | timestamp without time zone | not null
+Indexes:
+    "cluster_rule_user_feedback_pkey1" PRIMARY KEY, btree (cluster_id, rule_id, user_id)
+Foreign-key constraints:
+    "cluster_rule_user_feedback_cluster_id_fkey" FOREIGN KEY (cluster_id) REFERENCES report(cluster) ON DELETE CASCADE
+```
+
+### Table `cluster_user_rule_disable_feedback`
+
+```
+   Column   |            Type             | Modifiers
+------------+-----------------------------+-----------
+ cluster_id | character varying           | not null
+ user_id    | character varying           | not null
+ rule_id    | character varying           | not null
+ message    | character varying           | not null
+ added_at   | timestamp without time zone | not null
+ updated_at | timestamp without time zone | not null
+Indexes:
+    "cluster_user_rule_disable_feedback_pkey" PRIMARY KEY, btree (cluster_id, user_id, rule_id)
+```
+
+### Table `consumer_error`
+
+```
+             Table "public.consumer_error"
+    Column    |            Type             | Modifiers
+--------------+-----------------------------+-----------
+ topic        | character varying           | not null
+ partition    | integer                     | not null
+ topic_offset | integer                     | not null
+ key          | character varying           |
+ produced_at  | timestamp without time zone | not null
+ consumed_at  | timestamp without time zone | not null
+ message      | character varying           |
+ error        | character varying           | not null
+Indexes:
+    "consumer_error_pkey" PRIMARY KEY, btree (topic, partition, topic_offset)
+```
+
+### Table `migration_info `
+
+```
+ Column  |  Type   | Modifiers
+---------+---------+-----------
+ version | integer | not null
+```
+
+### Table `rule_hit`
+
+```
+    Column     |       Type        | Modifiers
+---------------+-------------------+-----------
+ org_id        | integer           | not null
+ cluster_id    | character varying | not null
+ rule_fqdn     | character varying | not null
+ error_key     | character varying | not null
+ template_data | character varying | not null
+Indexes:
+    "rule_hit_pkey" PRIMARY KEY, btree (cluster_id, org_id, rule_fqdn, error_key)
+```
+
+### Database tables affected by this service
+
+Figuring out which reports are older than the specified time:
+* `report`
+
+Actually cleaning the data for given cluster:
+
+* `report` by `cluster`
+* `cluster_rule_toggle` by `cluster_id`
+* `cluster_rule_user_feedback` by `cluster_id`
+* `cluster_user_rule_disable_feedback` by `cluster_id`
+* `rule_hit` by `cluster_id`
