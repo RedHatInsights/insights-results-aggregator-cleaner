@@ -50,6 +50,7 @@ const (
 	defaultConfigFileName     = "config"
 )
 
+// IsValidUUID function checks if provided string contains a correct UUID.
 func IsValidUUID(input string) bool {
 	_, err := uuid.Parse(input)
 	return err == nil
