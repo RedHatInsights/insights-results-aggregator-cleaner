@@ -35,6 +35,7 @@ import (
 	"bufio"
 	"flag"
 	"os"
+	"strconv"
 	"strings"
 
 	"database/sql"
@@ -43,6 +44,8 @@ import (
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+
+	"github.com/olekukonko/tablewriter"
 )
 
 const (
@@ -56,8 +59,10 @@ func IsValidUUID(input string) bool {
 	return err == nil
 }
 
-func readClusterList(filename string) (ClusterList, error) {
+func readClusterList(filename string) (ClusterList, int, error) {
 	log.Debug().Msg("Cluster list read")
+
+	improperClusterCounter := 0
 
 	var clusterList = make([]ClusterName, 0)
 
@@ -65,7 +70,7 @@ func readClusterList(filename string) (ClusterList, error) {
 	// #nosec G304
 	file, err := os.Open(filename)
 	if err != nil {
-		return nil, err
+		return nil, improperClusterCounter, err
 	}
 	defer func() {
 		err := file.Close()
@@ -88,24 +93,60 @@ func readClusterList(filename string) (ClusterList, error) {
 			log.Info().Str("input", line).Msg("Proper cluster ID")
 		} else {
 			log.Error().Str("input", line).Msg("Not a proper cluster ID")
+			improperClusterCounter++
 		}
 	}
 	log.Info().Int("number of clusters to delete", len(clusterList)).Msg("Cluster list finished")
+	log.Info().Int("improper cluster entries", improperClusterCounter).Msg("Cluster list finished")
 
-	return clusterList, nil
+	return clusterList, improperClusterCounter, nil
 }
 
-func doSelectedOperation(config ConfigStruct, connection *sql.DB, performCleanup bool) error {
+// PrintSummaryTable function displays a table with summary information about
+// cleanup step.
+func PrintSummaryTable(summary Summary) {
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetColWidth(60)
+
+	table.SetHeader([]string{"Summary", "Count"})
+
+	table.Append([]string{"Proper cluster entries",
+		strconv.Itoa(summary.ProperClusterEntries)})
+	table.Append([]string{"Improper cluster entries",
+		strconv.Itoa(summary.ImproperClusterEntries)})
+
+	totalDeletions := 0
+	for tableName, deletions := range summary.DeletionsForTable {
+		totalDeletions += deletions
+		table.Append([]string{"Deletions from table '" + tableName + "'",
+			strconv.Itoa(deletions)})
+	}
+
+	table.SetFooter([]string{"Total deletions",
+		strconv.Itoa(totalDeletions)})
+
+	table.Render()
+}
+
+func doSelectedOperation(config ConfigStruct, connection *sql.DB,
+	performCleanup bool, printSummaryTable bool) error {
 	if performCleanup {
-		clusterList, err := readClusterList(config.Cleaner.ClusterListFile)
+		clusterList, improperClusterCounter, err := readClusterList(config.Cleaner.ClusterListFile)
 		if err != nil {
 			log.Err(err).Msg("Read cluster list")
 			return err
 		}
-		err = performCleanupInDB(connection, clusterList)
+		deletionsForTable, err := performCleanupInDB(connection, clusterList)
 		if err != nil {
 			log.Err(err).Msg("Performing cleanup")
 			return err
+		}
+		if printSummaryTable {
+			var summary Summary
+			summary.ProperClusterEntries = len(clusterList)
+			summary.ImproperClusterEntries = improperClusterCounter
+			summary.DeletionsForTable = deletionsForTable
+			PrintSummaryTable(summary)
 		}
 	} else {
 		err := displayAllOldRecords(connection, config.Cleaner.MaxAge)
@@ -120,8 +161,10 @@ func doSelectedOperation(config ConfigStruct, connection *sql.DB, performCleanup
 
 func main() {
 	var performCleanup bool
+	var printSummaryTable bool
 
 	flag.BoolVar(&performCleanup, "cleanup", false, "perform database cleanup")
+	flag.BoolVar(&printSummaryTable, "summary", false, "print summary table after cleanup")
 	flag.Parse()
 
 	// config has exactly the same structure as *.toml file
@@ -141,7 +184,7 @@ func main() {
 		log.Err(err).Msg("Connection to database not established")
 	}
 
-	err = doSelectedOperation(config, connection, performCleanup)
+	err = doSelectedOperation(config, connection, performCleanup, printSummaryTable)
 	if err != nil {
 		log.Err(err).Msg("Operation failed")
 	}
