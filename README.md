@@ -17,8 +17,33 @@ Such clusters can be detected very easily by checking the timestamps stored
 (along other information) in the `report` table in Insights Results Aggregator
 database.
 
+### Usage
+
+```
+Usage of cleaner:
+  -cleanup
+        perform database cleanup
+  -fill-in-db
+        fill-in database by test data
+  -summary
+        print summary table after cleanup
+```
+
+### Default operation
+
 Currently this service just displays such clusters (cluster IDs) and do nothing
-else - i.e. the results are not deleted.
+else - i.e. the results are not deleted by default.
+
+### Data cleanup
+
+In order to delete data, the `-cleanup` command line option needs to be used.
+In this case the file `cluster_list.txt` should contain list of clusters to be
+deleted.
+
+### Test data generation
+
+Command line option `-fill-in-db` can be used to insert some test data into
+database. Don't use it on production, of course.
 
 ### Building
 

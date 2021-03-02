@@ -64,6 +64,7 @@ func initDatabaseConnection(configuration StorageConfiguration) (*sql.DB, error)
 	dataSource := ""
 	log.Info().Str("driverName", configuration.Driver).Msg("DB connection configuration")
 
+	// initialize connection into selected database using the right driver
 	switch driverName {
 	case "sqlite3":
 		//driverType := DBDriverSQLite3
@@ -111,6 +112,7 @@ func displayAllOldRecords(connection *sql.DB, maxAge string) error {
 	// used to compute a real record age
 	now := time.Now()
 
+	// iterate over all old records
 	for rows.Next() {
 		var (
 			clusterName string
@@ -144,13 +146,20 @@ func displayAllOldRecords(connection *sql.DB, maxAge string) error {
 	return nil
 }
 
+// deleteRecordFromTable function deletes selected records (identified by
+// cluster name) from database
 func deleteRecordFromTable(connection *sql.DB, table string, key string, clusterName ClusterName) (int, error) {
+	// it is not possible to use parameter for table name or a key
 	sqlStatement := "DELETE FROM " + table + " WHERE " + key + " = $1;"
-	println(sqlStatement)
+	// println(sqlStatement)
+
+	// perform the SQL statement
 	result, err := connection.Exec(sqlStatement, clusterName)
 	if err != nil {
 		return 0, err
 	}
+
+	// read number of affected (deleted) rows
 	affected, err := result.RowsAffected()
 	if err != nil {
 		return 0, err
@@ -158,11 +167,9 @@ func deleteRecordFromTable(connection *sql.DB, table string, key string, cluster
 	return int(affected), nil
 }
 
+// tablesAndKeys contains list of all tables together with keys used to select
+// records to be deleted
 var tablesAndKeys = [...]TableAndKey{
-	TableAndKey{
-		TableName: "report",
-		KeyName:   "cluster",
-	},
 	TableAndKey{
 		TableName: "cluster_rule_toggle",
 		KeyName:   "cluster_id",
@@ -179,19 +186,28 @@ var tablesAndKeys = [...]TableAndKey{
 		TableName: "rule_hit",
 		KeyName:   "cluster_id",
 	},
+	// must be at the end due to constraints
+	TableAndKey{
+		TableName: "report",
+		KeyName:   "cluster",
+	},
 }
 
+// performCleanupInDB function cleans up all data for selected cluster names
 func performCleanupInDB(connection *sql.DB,
 	clusterList ClusterList) (map[string]int, error) {
 
+	// initialize counters
 	deletionsForTable := make(map[string]int)
 	for _, tableAndKey := range tablesAndKeys {
 		deletionsForTable[tableAndKey.TableName] = 0
 	}
 
+	// perform cleanup for selected cluster names
 	log.Info().Msg("Cleanup started")
 	for _, clusterName := range clusterList {
 		for _, tableAndKey := range tablesAndKeys {
+			// try to delete record from selected table
 			affected, err := deleteRecordFromTable(connection,
 				tableAndKey.TableName,
 				tableAndKey.KeyName,
@@ -213,4 +229,48 @@ func performCleanupInDB(connection *sql.DB,
 	}
 	log.Info().Msg("Cleanup finished")
 	return deletionsForTable, nil
+}
+
+// fillInDatabaseByTestData function fill-in database by test data (not to be
+// used against production database)
+func fillInDatabaseByTestData(connection *sql.DB) error {
+	log.Info().Msg("Fill-in database started")
+	var lastError error = nil
+
+	clusterNames := [...]string{
+		"00000000-0000-0000-0000-000000000000",
+		"11111111-1111-1111-1111-111111111111",
+		"5d5892d4-1f74-4ccf-91af-548dfc9767aa"}
+
+	sqlStatements := [...]string{
+		"INSERT INTO report (org_id, cluster, report, reported_at, last_checked_at, kafka_offset) values(1, $1, '', '2021-01-01', '2021-01-01', 10)",
+		"INSERT INTO cluster_rule_toggle (cluster_id, rule_id, user_id, disabled, disabled_at, enabled_at, updated_at) values($1, 1, 1, 0, '2021-01-01', '2021-01-01', '2021-01-01')",
+		"INSERT INTO cluster_rule_user_feedback (cluster_id, rule_id, user_id, message, user_vote, added_at, updated_at) values($1, 1, 1, 'foobar', 1, '2021-01-01', '2021-01-01')",
+		"INSERT INTO cluster_user_rule_disable_feedback (cluster_id, user_id, rule_id, message, added_at, updated_at) values($1, 1, 1, 'foobar', '2021-01-01', '2021-01-01')",
+		"INSERT INTO rule_hit (org_id, cluster_id, rule_fqdn, error_key, template_data) values(1, $1, 'foo', 'bar', '')",
+	}
+
+	for _, clusterName := range clusterNames {
+		log.Info().
+			Str("cluster name", clusterName).
+			Msg("data for new cluster")
+
+		for _, sqlStatement := range sqlStatements {
+			log.Info().
+				Str("SQL statement", sqlStatement).
+				Msg("inserting")
+			// perform the SQL statement
+			_, err := connection.Exec(sqlStatement, clusterName)
+			if err != nil {
+				// failure is usually ok - it might mean that
+				// the record with given cluster name already
+				// exists
+				log.Err(err).Msg("Insert error")
+				lastError = err
+			}
+		}
+
+	}
+	log.Info().Msg("Fill-in database finished")
+	return lastError
 }

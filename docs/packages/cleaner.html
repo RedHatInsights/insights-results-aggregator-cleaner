@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<!--
+ Copyright 2021 Red Hat, Inc
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<html>
+<head>
+<title>cleaner.go</title>
+<meta charset="utf-8"/>
+<style type="text/css">body {
+    background: rgb(225, 225, 225);
+    margin: 0px;
+    padding: 0px;
+}
+
+#docgo p {
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 15px;
+    margin-left: 0px;
+}
+
+#docgo div {
+    display: inline;
+}
+
+#docgo #background {
+    position: fixed;
+    top: 0; left: 525px; right: 0; bottom: 0;
+    background: rgb(47, 47, 47);
+    border-left: 1px solid #e5e5ee;
+    z-index: -1;
+}
+
+#docgo .keyword {
+    color: rgb(250, 200, 100);
+}
+
+#docgo .literal {
+    color: rgb(140, 190, 100);
+}
+
+#docgo .ident {
+    color: white;
+}
+
+#docgo .operator {
+    color: white;
+}
+
+#docgo .comment {
+}
+
+#docgo h1, h2, h3, h4, h5 {
+    text-align: left;
+    margin-top: 0px;
+    margin-right: 0px;
+    margin-bottom: 15px;
+    margin-left: 0px;
+}
+
+#docgo h1 {
+    margin-top: 40px;
+}
+
+#docgo .doc {
+    vertical-align: top;
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
+    font-size: 15px;
+    line-height: 22px;
+    color: black;
+    min-width: 450px;
+    max-width: 450px;
+    padding-top: 10px;
+    padding-right: 25px;
+    padding-bottom: 1px;
+    padding-left: 50px;
+    overflow-x: hidden;
+}
+
+#docgo .code {
+    min-width: 650px;
+    max-width: 650px;
+    padding-left: 25px;
+    padding-right: 15px;
+    border-left: 1px;
+    overflow-x: hidden;
+    vertical-align: top;
+}
+
+#docgo .code pre code  {
+    font-size: 12px;
+    line-height: 18px;
+    font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
+    color: rgb(120, 120, 120);
+}
+</style>
+</head>
+<body>
+<div id="docgo">
+  <div id="background"></div>
+  <table>
+    <thead><tr><th class="doc"><h1>cleaner.go</h1></th><th class="code"></th></tr></thead>
+    <tbody>
+      
+      <tr class="section">
+	<td class="doc"></td>
+	<td class="code"><pre><code><div class="comment">/*
+Copyright © 2021 Red Hat, Inc.
+
+Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &#34;AS IS&#34; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/</div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>Simple service that can be used to identify clusters, for which we are
+keeping very old data (&gt;30 days) in the database. This means that the
+cluster is no longer available or that the customer has disabled the
+Insights Operator, either way it means that these data are no longer
+relevant to us and should be pruned.</p>
+
+<p>Such clusters can be detected very easily by checking the timestamps stored
+(along other information) in the <code>report</code> table in Insights Results
+Aggregator database.</p>
+
+<p>Currently this service just displays such clusters (cluster IDs) and do
+nothing else - i.e. the results are not deleted.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">package</div> <div class="ident">main</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>Generated documentation is available at:
+https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner</p>
+</td>
+	<td class="code"><pre><code>
+<div class="keyword">import</div> <div class="operator">(</div>
+	<div class="literal">&#34;bufio&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;flag&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;os&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;strconv&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;strings&#34;</div><div class="operator"></div>
+
+	<div class="literal">&#34;database/sql&#34;</div><div class="operator"></div>
+
+	<div class="literal">&#34;github.com/google/uuid&#34;</div><div class="operator"></div>
+
+	<div class="literal">&#34;github.com/rs/zerolog&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;github.com/rs/zerolog/log&#34;</div><div class="operator"></div>
+
+	<div class="literal">&#34;github.com/olekukonko/tablewriter&#34;</div><div class="operator"></div>
+<div class="operator">)</div><div class="operator"></div>
+
+<div class="keyword">const</div> <div class="operator">(</div>
+	<div class="ident">configFileEnvVariableName</div> <div class="operator">=</div> <div class="literal">&#34;INSIGHTS_RESULTS_CLEANER_CONFIG_FILE&#34;</div><div class="operator"></div>
+	<div class="ident">defaultConfigFileName</div>     <div class="operator">=</div> <div class="literal">&#34;config&#34;</div><div class="operator"></div>
+<div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>IsValidUUID function checks if provided string contains a correct UUID.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">IsValidUUID</div><div class="operator">(</div><div class="ident">input</div> <div class="ident">string</div><div class="operator">)</div> <div class="ident">bool</div> <div class="operator">{</div>
+	<div class="ident">_</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">uuid</div><div class="operator">.</div><div class="ident">Parse</div><div class="operator">(</div><div class="ident">input</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">return</div> <div class="ident">err</div> <div class="operator">==</div> <div class="ident">nil</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>readClusterList function reads list of clusters from provided text file.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">readClusterList</div><div class="operator">(</div><div class="ident">filename</div> <div class="ident">string</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">ClusterList</div><div class="operator">,</div> <div class="ident">int</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Debug</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Cluster list read&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">improperClusterCounter</div> <div class="operator">:=</div> <div class="literal">0</div><div class="operator"></div>
+
+	<div class="keyword">var</div> <div class="ident">clusterList</div> <div class="operator">=</div> <div class="ident">make</div><div class="operator">(</div><div class="operator">[</div><div class="operator">]</div><div class="ident">ClusterName</div><div class="operator">,</div> <div class="literal">0</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>disable &quot;G304 (CWE-22): Potential file inclusion via variable&quot;</p>
+
+<h1>nosec G304</h1>
+</td>
+	<td class="code"><pre><code>	<div class="ident">file</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">os</div><div class="operator">.</div><div class="ident">Open</div><div class="operator">(</div><div class="ident">filename</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="keyword">return</div> <div class="ident">nil</div><div class="operator">,</div> <div class="ident">improperClusterCounter</div><div class="operator">,</div> <div class="ident">err</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">defer</div> <div class="keyword">func</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+		<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">file</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+			<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;File close failed&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>start reading from the file with a reader</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">reader</div> <div class="operator">:=</div> <div class="ident">bufio</div><div class="operator">.</div><div class="ident">NewReader</div><div class="operator">(</div><div class="ident">file</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">var</div> <div class="ident">line</div> <div class="ident">string</div><div class="operator"></div>
+	<div class="keyword">for</div> <div class="operator">{</div>
+		<div class="ident">line</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">=</div> <div class="ident">reader</div><div class="operator">.</div><div class="ident">ReadString</div><div class="operator">(</div><div class="literal">&#39;\n&#39;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+			<div class="keyword">break</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+		<div class="ident">line</div> <div class="operator">=</div> <div class="ident">strings</div><div class="operator">.</div><div class="ident">Trim</div><div class="operator">(</div><div class="ident">line</div><div class="operator">,</div> <div class="literal">&#34;\n&#34;</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if line contains proper cluster ID (as UUID)</p>
+</td>
+	<td class="code"><pre><code>		<div class="keyword">if</div> <div class="ident">IsValidUUID</div><div class="operator">(</div><div class="ident">line</div><div class="operator">)</div> <div class="operator">{</div>
+			<div class="ident">clusterList</div> <div class="operator">=</div> <div class="ident">append</div><div class="operator">(</div><div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">ClusterName</div><div class="operator">(</div><div class="ident">line</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+			<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Str</div><div class="operator">(</div><div class="literal">&#34;input&#34;</div><div class="operator">,</div> <div class="ident">line</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Proper cluster ID&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
+			<div class="ident">log</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Str</div><div class="operator">(</div><div class="literal">&#34;input&#34;</div><div class="operator">,</div> <div class="ident">line</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Not a proper cluster ID&#34;</div><div class="operator">)</div><div class="operator"></div>
+			<div class="ident">improperClusterCounter</div><div class="operator">&#43;&#43;</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Int</div><div class="operator">(</div><div class="literal">&#34;number of clusters to delete&#34;</div><div class="operator">,</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">clusterList</div><div class="operator">)</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Cluster list finished&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Int</div><div class="operator">(</div><div class="literal">&#34;improper cluster entries&#34;</div><div class="operator">,</div> <div class="ident">improperClusterCounter</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Cluster list finished&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="keyword">return</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">improperClusterCounter</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>PrintSummaryTable function displays a table with summary information about
+cleanup step.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">PrintSummaryTable</div><div class="operator">(</div><div class="ident">summary</div> <div class="ident">Summary</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">table</div> <div class="operator">:=</div> <div class="ident">tablewriter</div><div class="operator">.</div><div class="ident">NewWriter</div><div class="operator">(</div><div class="ident">os</div><div class="operator">.</div><div class="ident">Stdout</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">table</div><div class="operator">.</div><div class="ident">SetColWidth</div><div class="operator">(</div><div class="literal">60</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>table header</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">table</div><div class="operator">.</div><div class="ident">SetHeader</div><div class="operator">(</div><div class="operator">[</div><div class="operator">]</div><div class="ident">string</div><div class="operator">{</div><div class="literal">&#34;Summary&#34;</div><div class="operator">,</div> <div class="literal">&#34;Count&#34;</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">table</div><div class="operator">.</div><div class="ident">Append</div><div class="operator">(</div><div class="operator">[</div><div class="operator">]</div><div class="ident">string</div><div class="operator">{</div><div class="literal">&#34;Proper cluster entries&#34;</div><div class="operator">,</div>
+		<div class="ident">strconv</div><div class="operator">.</div><div class="ident">Itoa</div><div class="operator">(</div><div class="ident">summary</div><div class="operator">.</div><div class="ident">ProperClusterEntries</div><div class="operator">)</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">table</div><div class="operator">.</div><div class="ident">Append</div><div class="operator">(</div><div class="operator">[</div><div class="operator">]</div><div class="ident">string</div><div class="operator">{</div><div class="literal">&#34;Improper cluster entries&#34;</div><div class="operator">,</div>
+		<div class="ident">strconv</div><div class="operator">.</div><div class="ident">Itoa</div><div class="operator">(</div><div class="ident">summary</div><div class="operator">.</div><div class="ident">ImproperClusterEntries</div><div class="operator">)</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">table</div><div class="operator">.</div><div class="ident">Append</div><div class="operator">(</div><div class="operator">[</div><div class="operator">]</div><div class="ident">string</div><div class="operator">{</div><div class="literal">&#34;&#34;</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">totalDeletions</div> <div class="operator">:=</div> <div class="literal">0</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>prepare rows with info about deletions</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">for</div> <div class="ident">tableName</div><div class="operator">,</div> <div class="ident">deletions</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">summary</div><div class="operator">.</div><div class="ident">DeletionsForTable</div> <div class="operator">{</div>
+		<div class="ident">totalDeletions</div> <div class="operator">&#43;=</div> <div class="ident">deletions</div><div class="operator"></div>
+		<div class="ident">table</div><div class="operator">.</div><div class="ident">Append</div><div class="operator">(</div><div class="operator">[</div><div class="operator">]</div><div class="ident">string</div><div class="operator">{</div><div class="literal">&#34;Deletions from table &#39;&#34;</div> <div class="operator">&#43;</div> <div class="ident">tableName</div> <div class="operator">&#43;</div> <div class="literal">&#34;&#39;&#34;</div><div class="operator">,</div>
+			<div class="ident">strconv</div><div class="operator">.</div><div class="ident">Itoa</div><div class="operator">(</div><div class="ident">deletions</div><div class="operator">)</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>table footer</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">table</div><div class="operator">.</div><div class="ident">SetFooter</div><div class="operator">(</div><div class="operator">[</div><div class="operator">]</div><div class="ident">string</div><div class="operator">{</div><div class="literal">&#34;Total deletions&#34;</div><div class="operator">,</div>
+		<div class="ident">strconv</div><div class="operator">.</div><div class="ident">Itoa</div><div class="operator">(</div><div class="ident">totalDeletions</div><div class="operator">)</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>display the whole table</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">table</div><div class="operator">.</div><div class="ident">Render</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>doSelectedOperation function performs selected operation: check data
+retention, cleanup selected data, or fill-id database by test data</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">doSelectedOperation</div><div class="operator">(</div><div class="ident">config</div> <div class="ident">ConfigStruct</div><div class="operator">,</div> <div class="ident">connection</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">,</div>
+	<div class="ident">performCleanup</div> <div class="ident">bool</div><div class="operator">,</div> <div class="ident">fillInDatabase</div> <div class="ident">bool</div><div class="operator">,</div> <div class="ident">printSummaryTable</div> <div class="ident">bool</div><div class="operator">)</div> <div class="ident">error</div> <div class="operator">{</div>
+	<div class="keyword">if</div> <div class="ident">performCleanup</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>cleanup operation</p>
+</td>
+	<td class="code"><pre><code>		<div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">improperClusterCounter</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">readClusterList</div><div class="operator">(</div><div class="ident">config</div><div class="operator">.</div><div class="ident">Cleaner</div><div class="operator">.</div><div class="ident">ClusterListFile</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+			<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Read cluster list&#34;</div><div class="operator">)</div><div class="operator"></div>
+			<div class="keyword">return</div> <div class="ident">err</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+		<div class="ident">deletionsForTable</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">performCleanupInDB</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+			<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Performing cleanup&#34;</div><div class="operator">)</div><div class="operator"></div>
+			<div class="keyword">return</div> <div class="ident">err</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+		<div class="keyword">if</div> <div class="ident">printSummaryTable</div> <div class="operator">{</div>
+			<div class="keyword">var</div> <div class="ident">summary</div> <div class="ident">Summary</div><div class="operator"></div>
+			<div class="ident">summary</div><div class="operator">.</div><div class="ident">ProperClusterEntries</div> <div class="operator">=</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">clusterList</div><div class="operator">)</div><div class="operator"></div>
+			<div class="ident">summary</div><div class="operator">.</div><div class="ident">ImproperClusterEntries</div> <div class="operator">=</div> <div class="ident">improperClusterCounter</div><div class="operator"></div>
+			<div class="ident">summary</div><div class="operator">.</div><div class="ident">DeletionsForTable</div> <div class="operator">=</div> <div class="ident">deletionsForTable</div><div class="operator"></div>
+			<div class="ident">PrintSummaryTable</div><div class="operator">(</div><div class="ident">summary</div><div class="operator">)</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="keyword">if</div> <div class="ident">fillInDatabase</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>fill-in database by test data</p>
+</td>
+	<td class="code"><pre><code>		<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">fillInDatabaseByTestData</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+			<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Fill-in database by test data&#34;</div><div class="operator">)</div><div class="operator"></div>
+			<div class="keyword">return</div> <div class="ident">err</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+	<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>display old records in database</p>
+</td>
+	<td class="code"><pre><code>		<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">displayAllOldRecords</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">,</div> <div class="ident">config</div><div class="operator">.</div><div class="ident">Cleaner</div><div class="operator">.</div><div class="ident">MaxAge</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+			<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Selecting records from database&#34;</div><div class="operator">)</div><div class="operator"></div>
+			<div class="keyword">return</div> <div class="ident">err</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>everything seems to be fine</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">return</div> <div class="ident">nil</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+<div class="keyword">func</div> <div class="ident">main</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="keyword">var</div> <div class="ident">performCleanup</div> <div class="ident">bool</div><div class="operator"></div>
+	<div class="keyword">var</div> <div class="ident">printSummaryTable</div> <div class="ident">bool</div><div class="operator"></div>
+	<div class="keyword">var</div> <div class="ident">fillInDatabase</div> <div class="ident">bool</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>define and parse all command line options</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">flag</div><div class="operator">.</div><div class="ident">BoolVar</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">performCleanup</div><div class="operator">,</div> <div class="literal">&#34;cleanup&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="literal">&#34;perform database cleanup&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">flag</div><div class="operator">.</div><div class="ident">BoolVar</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">printSummaryTable</div><div class="operator">,</div> <div class="literal">&#34;summary&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="literal">&#34;print summary table after cleanup&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">flag</div><div class="operator">.</div><div class="ident">BoolVar</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">fillInDatabase</div><div class="operator">,</div> <div class="literal">&#34;fill-in-db&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="literal">&#34;fill-in database by test data&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">flag</div><div class="operator">.</div><div class="ident">Parse</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>config has exactly the same structure as *.toml file</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">config</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">LoadConfiguration</div><div class="operator">(</div><div class="ident">configFileEnvVariableName</div><div class="operator">,</div> <div class="ident">defaultConfigFileName</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Load configuration&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="keyword">if</div> <div class="ident">config</div><div class="operator">.</div><div class="ident">Logging</div><div class="operator">.</div><div class="ident">Debug</div> <div class="operator">{</div>
+		<div class="ident">log</div><div class="operator">.</div><div class="ident">Logger</div> <div class="operator">=</div> <div class="ident">log</div><div class="operator">.</div><div class="ident">Output</div><div class="operator">(</div><div class="ident">zerolog</div><div class="operator">.</div><div class="ident">ConsoleWriter</div><div class="operator">{</div><div class="ident">Out</div><div class="operator">:</div> <div class="ident">os</div><div class="operator">.</div><div class="ident">Stderr</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Debug</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Started&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>initialize connection to database</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">connection</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">initDatabaseConnection</div><div class="operator">(</div><div class="ident">config</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Connection to database not established&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>perform selected operation</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">doSelectedOperation</div><div class="operator">(</div><div class="ident">config</div><div class="operator">,</div> <div class="ident">connection</div><div class="operator">,</div> <div class="ident">performCleanup</div><div class="operator">,</div> <div class="ident">fillInDatabase</div><div class="operator">,</div> <div class="ident">printSummaryTable</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Operation failed&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Debug</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Finished&#34;</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

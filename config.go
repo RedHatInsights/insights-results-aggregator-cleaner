@@ -48,6 +48,7 @@ package main
 //
 // [cleaner]
 // max_age = "90 days"
+// cluster_list_file = "cluster_list.txt"
 //
 //
 // Environment variables that can be used to override configuration file settings:
@@ -127,6 +128,7 @@ type StorageConfiguration struct {
 func LoadConfiguration(configFileEnvVariableName string, defaultConfigFile string) (ConfigStruct, error) {
 	var config ConfigStruct
 
+	// env. variable holding name of configuration file
 	configFile, specified := os.LookupEnv(configFileEnvVariableName)
 	if specified {
 		// we need to separate the directory name and filename without
@@ -143,6 +145,7 @@ func LoadConfiguration(configFileEnvVariableName string, defaultConfigFile strin
 		viper.AddConfigPath(".")
 	}
 
+	// try to read the whole configuration
 	err := viper.ReadInConfig()
 	if _, isNotFoundError := err.(viper.ConfigFileNotFoundError); !specified && isNotFoundError {
 		// viper is not smart enough to understand the structure of
