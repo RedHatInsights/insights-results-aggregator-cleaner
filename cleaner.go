@@ -129,7 +129,7 @@ func PrintSummaryTable(summary Summary) {
 }
 
 func doSelectedOperation(config ConfigStruct, connection *sql.DB,
-	performCleanup bool, printSummaryTable bool) error {
+	performCleanup bool, fillInDatabase bool, printSummaryTable bool) error {
 	if performCleanup {
 		clusterList, improperClusterCounter, err := readClusterList(config.Cleaner.ClusterListFile)
 		if err != nil {
@@ -148,6 +148,12 @@ func doSelectedOperation(config ConfigStruct, connection *sql.DB,
 			summary.DeletionsForTable = deletionsForTable
 			PrintSummaryTable(summary)
 		}
+	} else if fillInDatabase {
+		err := fillInDatabaseByTestData(connection)
+		if err != nil {
+			log.Err(err).Msg("Fill-in database by test data")
+			return err
+		}
 	} else {
 		err := displayAllOldRecords(connection, config.Cleaner.MaxAge)
 		if err != nil {
@@ -162,9 +168,11 @@ func doSelectedOperation(config ConfigStruct, connection *sql.DB,
 func main() {
 	var performCleanup bool
 	var printSummaryTable bool
+	var fillInDatabase bool
 
 	flag.BoolVar(&performCleanup, "cleanup", false, "perform database cleanup")
 	flag.BoolVar(&printSummaryTable, "summary", false, "print summary table after cleanup")
+	flag.BoolVar(&fillInDatabase, "fill-in-db", false, "fill-in database by test data")
 	flag.Parse()
 
 	// config has exactly the same structure as *.toml file
@@ -184,7 +192,7 @@ func main() {
 		log.Err(err).Msg("Connection to database not established")
 	}
 
-	err = doSelectedOperation(config, connection, performCleanup, printSummaryTable)
+	err = doSelectedOperation(config, connection, performCleanup, fillInDatabase, printSummaryTable)
 	if err != nil {
 		log.Err(err).Msg("Operation failed")
 	}
