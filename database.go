@@ -170,24 +170,24 @@ func deleteRecordFromTable(connection *sql.DB, table string, key string, cluster
 // tablesAndKeys contains list of all tables together with keys used to select
 // records to be deleted
 var tablesAndKeys = [...]TableAndKey{
-	TableAndKey{
+	{
 		TableName: "cluster_rule_toggle",
 		KeyName:   "cluster_id",
 	},
-	TableAndKey{
+	{
 		TableName: "cluster_rule_user_feedback",
 		KeyName:   "cluster_id",
 	},
-	TableAndKey{
+	{
 		TableName: "cluster_user_rule_disable_feedback",
 		KeyName:   "cluster_id",
 	},
-	TableAndKey{
+	{
 		TableName: "rule_hit",
 		KeyName:   "cluster_id",
 	},
 	// must be at the end due to constraints
-	TableAndKey{
+	{
 		TableName: "report",
 		KeyName:   "cluster",
 	},
