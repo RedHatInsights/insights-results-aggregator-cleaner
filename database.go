@@ -145,12 +145,17 @@ func displayAllOldRecords(connection *sql.DB, maxAge string) error {
 }
 
 func deleteRecordFromTable(connection *sql.DB, table string, key string, clusterName ClusterName) (int, error) {
+	// it is not possible to use parameter for table name or a key
 	sqlStatement := "DELETE FROM " + table + " WHERE " + key + " = $1;"
-	println(sqlStatement)
+	// println(sqlStatement)
+
+	// perform the SQL statement
 	result, err := connection.Exec(sqlStatement, clusterName)
 	if err != nil {
 		return 0, err
 	}
+
+	// read number of affected (deleted) rows
 	affected, err := result.RowsAffected()
 	if err != nil {
 		return 0, err
@@ -159,10 +164,6 @@ func deleteRecordFromTable(connection *sql.DB, table string, key string, cluster
 }
 
 var tablesAndKeys = [...]TableAndKey{
-	TableAndKey{
-		TableName: "report",
-		KeyName:   "cluster",
-	},
 	TableAndKey{
 		TableName: "cluster_rule_toggle",
 		KeyName:   "cluster_id",
@@ -178,6 +179,11 @@ var tablesAndKeys = [...]TableAndKey{
 	TableAndKey{
 		TableName: "rule_hit",
 		KeyName:   "cluster_id",
+	},
+	// must be at the end due to constraints
+	TableAndKey{
+		TableName: "report",
+		KeyName:   "cluster",
 	},
 }
 
@@ -213,4 +219,39 @@ func performCleanupInDB(connection *sql.DB,
 	}
 	log.Info().Msg("Cleanup finished")
 	return deletionsForTable, nil
+}
+
+func fillInDatabaseByTestData(connection *sql.DB) error {
+	log.Info().Msg("Fill-in database started")
+	var lastError error = nil
+
+	clusterNames := [...]string{
+		"00000000-0000-0000-0000-000000000000",
+		"11111111-1111-1111-1111-111111111111",
+		"5d5892d4-1f74-4ccf-91af-548dfc9767aa"}
+
+	sqlStatements := [...]string{
+		"INSERT INTO report (org_id, cluster, report, reported_at, last_checked_at, kafka_offset) values(1, $1, '', '2021-01-01', '2021-01-01', 10)",
+		"INSERT INTO cluster_rule_toggle (cluster_id, rule_id, user_id, disabled, disabled_at, enabled_at, updated_at) values($1, 1, 1, 0, '2021-01-01', '2021-01-01', '2021-01-01')",
+		"INSERT INTO cluster_rule_user_feedback (cluster_id, rule_id, user_id, message, user_vote, added_at, updated_at) values($1, 1, 1, 'foobar', 1, '2021-01-01', '2021-01-01')",
+		"INSERT INTO cluster_user_rule_disable_feedback (cluster_id, user_id, rule_id, message, added_at, updated_at) values($1, 1, 1, 'foobar', '2021-01-01', '2021-01-01')",
+		"INSERT INTO rule_hit (org_id, cluster_id, rule_fqdn, error_key, template_data) values(1, $1, 'foo', 'bar', '')",
+	}
+
+	for _, clusterName := range clusterNames {
+		log.Info().Str("cluster name", clusterName).Msg("data for new cluster")
+
+		for _, sqlStatement := range sqlStatements {
+			log.Info().Str("SQL statement", sqlStatement).Msg("inserting")
+			// perform the SQL statement
+			_, err := connection.Exec(sqlStatement, clusterName)
+			if err != nil {
+				log.Err(err).Msg("Insert error")
+				lastError = err
+			}
+		}
+
+	}
+	log.Info().Msg("Fill-in database finished")
+	return lastError
 }
