@@ -59,6 +59,7 @@ func IsValidUUID(input string) bool {
 	return err == nil
 }
 
+// readClusterList function reads list of clusters from provided text file.
 func readClusterList(filename string) (ClusterList, int, error) {
 	log.Debug().Msg("Cluster list read")
 
@@ -88,6 +89,7 @@ func readClusterList(filename string) (ClusterList, int, error) {
 			break
 		}
 		line = strings.Trim(line, "\n")
+		// check if line contains proper cluster ID (as UUID)
 		if IsValidUUID(line) {
 			clusterList = append(clusterList, ClusterName(line))
 			log.Info().Str("input", line).Msg("Proper cluster ID")
@@ -108,29 +110,38 @@ func PrintSummaryTable(summary Summary) {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetColWidth(60)
 
+	// table header
 	table.SetHeader([]string{"Summary", "Count"})
 
 	table.Append([]string{"Proper cluster entries",
 		strconv.Itoa(summary.ProperClusterEntries)})
 	table.Append([]string{"Improper cluster entries",
 		strconv.Itoa(summary.ImproperClusterEntries)})
+	table.Append([]string{"", ""})
 
 	totalDeletions := 0
+
+	// prepare rows with info about deletions
 	for tableName, deletions := range summary.DeletionsForTable {
 		totalDeletions += deletions
 		table.Append([]string{"Deletions from table '" + tableName + "'",
 			strconv.Itoa(deletions)})
 	}
 
+	// table footer
 	table.SetFooter([]string{"Total deletions",
 		strconv.Itoa(totalDeletions)})
 
+	// display the whole table
 	table.Render()
 }
 
+// doSelectedOperation function performs selected operation: check data
+// retention, cleanup selected data, or fill-id database by test data
 func doSelectedOperation(config ConfigStruct, connection *sql.DB,
 	performCleanup bool, fillInDatabase bool, printSummaryTable bool) error {
 	if performCleanup {
+		// cleanup operation
 		clusterList, improperClusterCounter, err := readClusterList(config.Cleaner.ClusterListFile)
 		if err != nil {
 			log.Err(err).Msg("Read cluster list")
@@ -149,12 +160,14 @@ func doSelectedOperation(config ConfigStruct, connection *sql.DB,
 			PrintSummaryTable(summary)
 		}
 	} else if fillInDatabase {
+		// fill-in database by test data
 		err := fillInDatabaseByTestData(connection)
 		if err != nil {
 			log.Err(err).Msg("Fill-in database by test data")
 			return err
 		}
 	} else {
+		// display old records in database
 		err := displayAllOldRecords(connection, config.Cleaner.MaxAge)
 		if err != nil {
 			log.Err(err).Msg("Selecting records from database")
@@ -170,6 +183,7 @@ func main() {
 	var printSummaryTable bool
 	var fillInDatabase bool
 
+	// define and parse all command line options
 	flag.BoolVar(&performCleanup, "cleanup", false, "perform database cleanup")
 	flag.BoolVar(&printSummaryTable, "summary", false, "print summary table after cleanup")
 	flag.BoolVar(&fillInDatabase, "fill-in-db", false, "fill-in database by test data")
@@ -187,11 +201,13 @@ func main() {
 
 	log.Debug().Msg("Started")
 
+	// initialize connection to database
 	connection, err := initDatabaseConnection(config.Storage)
 	if err != nil {
 		log.Err(err).Msg("Connection to database not established")
 	}
 
+	// perform selected operation
 	err = doSelectedOperation(config, connection, performCleanup, fillInDatabase, printSummaryTable)
 	if err != nil {
 		log.Err(err).Msg("Operation failed")
