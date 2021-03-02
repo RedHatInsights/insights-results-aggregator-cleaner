@@ -64,6 +64,7 @@ func initDatabaseConnection(configuration StorageConfiguration) (*sql.DB, error)
 	dataSource := ""
 	log.Info().Str("driverName", configuration.Driver).Msg("DB connection configuration")
 
+	// initialize connection into selected database using the right driver
 	switch driverName {
 	case "sqlite3":
 		//driverType := DBDriverSQLite3
@@ -111,6 +112,7 @@ func displayAllOldRecords(connection *sql.DB, maxAge string) error {
 	// used to compute a real record age
 	now := time.Now()
 
+	// iterate over all old records
 	for rows.Next() {
 		var (
 			clusterName string
@@ -144,6 +146,8 @@ func displayAllOldRecords(connection *sql.DB, maxAge string) error {
 	return nil
 }
 
+// deleteRecordFromTable function deletes selected records (identified by
+// cluster name) from database
 func deleteRecordFromTable(connection *sql.DB, table string, key string, clusterName ClusterName) (int, error) {
 	// it is not possible to use parameter for table name or a key
 	sqlStatement := "DELETE FROM " + table + " WHERE " + key + " = $1;"
@@ -163,6 +167,8 @@ func deleteRecordFromTable(connection *sql.DB, table string, key string, cluster
 	return int(affected), nil
 }
 
+// tablesAndKeys contains list of all tables together with keys used to select
+// records to be deleted
 var tablesAndKeys = [...]TableAndKey{
 	TableAndKey{
 		TableName: "cluster_rule_toggle",
@@ -187,17 +193,21 @@ var tablesAndKeys = [...]TableAndKey{
 	},
 }
 
+// performCleanupInDB function cleans up all data for selected cluster names
 func performCleanupInDB(connection *sql.DB,
 	clusterList ClusterList) (map[string]int, error) {
 
+	// initialize counters
 	deletionsForTable := make(map[string]int)
 	for _, tableAndKey := range tablesAndKeys {
 		deletionsForTable[tableAndKey.TableName] = 0
 	}
 
+	// perform cleanup for selected cluster names
 	log.Info().Msg("Cleanup started")
 	for _, clusterName := range clusterList {
 		for _, tableAndKey := range tablesAndKeys {
+			// try to delete record from selected table
 			affected, err := deleteRecordFromTable(connection,
 				tableAndKey.TableName,
 				tableAndKey.KeyName,
@@ -221,6 +231,8 @@ func performCleanupInDB(connection *sql.DB,
 	return deletionsForTable, nil
 }
 
+// fillInDatabaseByTestData function fill-in database by test data (not to be
+// used against production database)
 func fillInDatabaseByTestData(connection *sql.DB) error {
 	log.Info().Msg("Fill-in database started")
 	var lastError error = nil
@@ -239,13 +251,20 @@ func fillInDatabaseByTestData(connection *sql.DB) error {
 	}
 
 	for _, clusterName := range clusterNames {
-		log.Info().Str("cluster name", clusterName).Msg("data for new cluster")
+		log.Info().
+			Str("cluster name", clusterName).
+			Msg("data for new cluster")
 
 		for _, sqlStatement := range sqlStatements {
-			log.Info().Str("SQL statement", sqlStatement).Msg("inserting")
+			log.Info().
+				Str("SQL statement", sqlStatement).
+				Msg("inserting")
 			// perform the SQL statement
 			_, err := connection.Exec(sqlStatement, clusterName)
 			if err != nil {
+				// failure is usually ok - it might mean that
+				// the record with given cluster name already
+				// exists
 				log.Err(err).Msg("Insert error")
 				lastError = err
 			}
