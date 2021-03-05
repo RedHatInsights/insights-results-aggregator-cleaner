@@ -20,5 +20,5 @@ import (
 	"testing"
 )
 
-func TestX(t *testing.T) {
+func TestZ(t *testing.T) {
 }
