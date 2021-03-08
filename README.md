@@ -47,6 +47,8 @@ database. Don't use it on production, of course.
 
 ### Building
 
+Go version 1.14 or newer is required to build this tool.
+
 ```
 make build
 ```
