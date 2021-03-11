@@ -16,6 +16,7 @@ Feature: Basic set of smoke tests
 
 
   Scenario Outline: Check if the test database does not contain tables to be created by tests
+    Given the system is in default state
      When I connect to database named test as user postgres with password postgres
      Then I should be able to connect to such database
      When I look for the table <table> in database
