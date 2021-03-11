@@ -181,7 +181,7 @@ func PrintSummaryTable(summary Summary) {
 // retention, cleanup selected data, or fill-id database by test data
 func doSelectedOperation(config ConfigStruct, connection *sql.DB,
 	performCleanup bool, fillInDatabase bool, printSummaryTable bool,
-	clusters string) error {
+	clusters string, output string) error {
 	if performCleanup {
 		// cleanup operation
 		clusterList, improperClusterCounter, err := readClusterList(config.Cleaner.ClusterListFile, clusters)
@@ -210,7 +210,7 @@ func doSelectedOperation(config ConfigStruct, connection *sql.DB,
 		}
 	} else {
 		// display old records in database
-		err := displayAllOldRecords(connection, config.Cleaner.MaxAge)
+		err := displayAllOldRecords(connection, config.Cleaner.MaxAge, output)
 		if err != nil {
 			log.Err(err).Msg("Selecting records from database")
 			return err
@@ -226,6 +226,7 @@ func main() {
 	var fillInDatabase bool
 	var maxAge string
 	var clusters string
+	var output string
 
 	// define and parse all command line options
 	flag.BoolVar(&performCleanup, "cleanup", false, "perform database cleanup")
@@ -233,6 +234,7 @@ func main() {
 	flag.BoolVar(&fillInDatabase, "fill-in-db", false, "fill-in database by test data")
 	flag.StringVar(&maxAge, "max-age", "", "max age for displaying old records")
 	flag.StringVar(&clusters, "clusters", "", "list of clusters to cleanup")
+	flag.StringVar(&output, "output", "", "filename for old cluster listing")
 	flag.Parse()
 
 	// config has exactly the same structure as *.toml file
@@ -259,7 +261,9 @@ func main() {
 	}
 
 	// perform selected operation
-	err = doSelectedOperation(config, connection, performCleanup, fillInDatabase, printSummaryTable, clusters)
+	err = doSelectedOperation(config, connection, performCleanup,
+		fillInDatabase, printSummaryTable, clusters,
+		output)
 	if err != nil {
 		log.Err(err).Msg("Operation failed")
 	}
