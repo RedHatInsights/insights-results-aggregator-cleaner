@@ -193,6 +193,8 @@ func performListOfOldReports(connection *sql.DB, maxAge string, writer *bufio.Wr
 // cluster name) from database
 func deleteRecordFromTable(connection *sql.DB, table string, key string, clusterName ClusterName) (int, error) {
 	// it is not possible to use parameter for table name or a key
+	// disable "G202 (CWE-89): SQL string concatenation (Confidence: HIGH, Severity: MEDIUM)"
+	// #nosec G202
 	sqlStatement := "DELETE FROM " + table + " WHERE " + key + " = $1;"
 	// println(sqlStatement)
 
