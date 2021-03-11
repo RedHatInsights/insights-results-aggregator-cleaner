@@ -59,9 +59,47 @@ func IsValidUUID(input string) bool {
 	return err == nil
 }
 
-// readClusterList function reads list of clusters from provided text file.
-func readClusterList(filename string) (ClusterList, int, error) {
-	log.Debug().Msg("Cluster list read")
+// readClusterList function reads list of clusters from provided text file or
+// from CLI argument.
+func readClusterList(filename string, clusters string) (ClusterList, int, error) {
+	if clusters == "" {
+		return readClusterListFromFile(filename)
+	} else {
+		return readClusterListFromCLIArgument(clusters)
+	}
+}
+
+// readClusterListFromCLIArgument reads list of clusters from CLI argument
+func readClusterListFromCLIArgument(clusters string) (ClusterList, int, error) {
+	log.Debug().Msg("Cluster list read from CLI argument")
+
+	improperClusterCounter := 0
+
+	var clusterList = make([]ClusterName, 0)
+
+	v := strings.Split(clusters, ",")
+
+	for _, cluster := range v {
+		cluster := strings.Trim(cluster, " ")
+		// check if line contains proper cluster ID (as UUID)
+		if IsValidUUID(cluster) {
+			clusterList = append(clusterList, ClusterName(cluster))
+			log.Info().Str("input", cluster).Msg("Proper cluster ID")
+		} else {
+			log.Error().Str("input", cluster).Msg("Not a proper cluster ID")
+			improperClusterCounter++
+		}
+	}
+	log.Info().Int("number of clusters to delete", len(clusterList)).Msg("Cluster list finished")
+	log.Info().Int("improper cluster entries", improperClusterCounter).Msg("Cluster list finished")
+
+	return clusterList, improperClusterCounter, nil
+}
+
+// readClusterListFromFile function reads list of clusters from provided text
+// file.
+func readClusterListFromFile(filename string) (ClusterList, int, error) {
+	log.Debug().Msg("Cluster list read from file")
 
 	improperClusterCounter := 0
 
@@ -139,10 +177,11 @@ func PrintSummaryTable(summary Summary) {
 // doSelectedOperation function performs selected operation: check data
 // retention, cleanup selected data, or fill-id database by test data
 func doSelectedOperation(config ConfigStruct, connection *sql.DB,
-	performCleanup bool, fillInDatabase bool, printSummaryTable bool) error {
+	performCleanup bool, fillInDatabase bool, printSummaryTable bool,
+	clusters string) error {
 	if performCleanup {
 		// cleanup operation
-		clusterList, improperClusterCounter, err := readClusterList(config.Cleaner.ClusterListFile)
+		clusterList, improperClusterCounter, err := readClusterList(config.Cleaner.ClusterListFile, clusters)
 		if err != nil {
 			log.Err(err).Msg("Read cluster list")
 			return err
@@ -183,12 +222,14 @@ func main() {
 	var printSummaryTable bool
 	var fillInDatabase bool
 	var maxAge string
+	var clusters string
 
 	// define and parse all command line options
 	flag.BoolVar(&performCleanup, "cleanup", false, "perform database cleanup")
 	flag.BoolVar(&printSummaryTable, "summary", false, "print summary table after cleanup")
 	flag.BoolVar(&fillInDatabase, "fill-in-db", false, "fill-in database by test data")
 	flag.StringVar(&maxAge, "max-age", "", "max age for displaying old records")
+	flag.StringVar(&clusters, "clusters", "", "list of clusters to cleanup")
 	flag.Parse()
 
 	// config has exactly the same structure as *.toml file
@@ -215,7 +256,7 @@ func main() {
 	}
 
 	// perform selected operation
-	err = doSelectedOperation(config, connection, performCleanup, fillInDatabase, printSummaryTable)
+	err = doSelectedOperation(config, connection, performCleanup, fillInDatabase, printSummaryTable, clusters)
 	if err != nil {
 		log.Err(err).Msg("Operation failed")
 	}
