@@ -1,11 +1,11 @@
 # Copyright © 2021 Pavel Tisnovsky, Red Hat, Inc.
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,15 +38,3 @@ def file_was_found(context):
     """Check if the file was found on PATH."""
     assert context.found is not None, \
         "executable filaname '{}' is not on PATH".format(context.filename)
-
-
-
-
-@when(u"I run the cleaner to display all records older than {age}")
-def run_cleaner_for_older_records(context, age):
-    raise NotImplementedError(u'STEP: When I run the cleaner to display all records older than 90 days')
-
-
-@then(u"I should see empty list of records")
-def check_empty_list_of_records(context):
-    raise NotImplementedError(u'STEP: Then I should see empty list of records')

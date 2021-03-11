@@ -21,6 +21,66 @@ from psycopg2.errors import UndefinedTable
 from behave import given, then, when
 
 
+CREATE_TABLE_REPORT = """
+CREATE TABLE report (
+                                org_id          INTEGER NOT NULL,
+                                cluster         VARCHAR NOT NULL UNIQUE,
+                                report          VARCHAR NOT NULL,
+                                reported_at     TIMESTAMP,
+                                last_checked_at TIMESTAMP,
+                                kafka_offset    BIGINT NOT NULL DEFAULT 0,
+                                PRIMARY KEY(org_id, cluster)
+                        );
+
+"""
+
+CREATE_TABLE_CLUSTER_RULE_TOGGLE = """
+CREATE TABLE cluster_rule_toggle (
+                                cluster_id  VARCHAR NOT NULL,
+                                rule_id     VARCHAR NOT NULL,
+                                user_id     VARCHAR NOT NULL,
+                                disabled    SMALLINT NOT NULL,
+                                disabled_at TIMESTAMP NULL,
+                                enabled_at  TIMESTAMP NULL,
+                                updated_at  TIMESTAMP NOT NULL
+                        );
+"""
+
+CREATE_TABLE_CLUSTER_RULE_USER_FEEDBACK = """
+CREATE TABLE cluster_rule_user_feedback (
+                                        cluster_id VARCHAR NOT NULL,
+                                        rule_id    VARCHAR NOT NULL,
+                                        user_id    VARCHAR NOT NULL,
+                                        message    VARCHAR NOT NULL,
+                                        user_vote  SMALLINT NOT NULL,
+                                        added_at   TIMESTAMP NOT NULL,
+                                        updated_at TIMESTAMP NOT NULL
+                        );
+"""
+
+CREATE_TABLE_CLUSTER_USER_RULE_DISABLE_FEEDBACK = """
+CREATE TABLE cluster_user_rule_disable_feedback (
+                                cluster_id VARCHAR NOT NULL,
+                                user_id    VARCHAR NOT NULL,
+                                rule_id    VARCHAR NOT NULL,
+                                message    VARCHAR NOT NULL,
+                                added_at   TIMESTAMP NOT NULL,
+                                updated_at TIMESTAMP NOT NULL
+                        );
+"""
+
+CREATE_TABLE_RULE_HIT = """
+CREATE TABLE rule_hit (
+                        org_id          INTEGER NOT NULL,
+                        cluster_id      VARCHAR NOT NULL,
+                        rule_fqdn       VARCHAR NOT NULL,
+                        error_key       VARCHAR NOT NULL,
+                        template_data   VARCHAR NOT NULL,
+                        PRIMARY KEY(cluster_id, org_id, rule_fqdn, error_key)
+                        );
+"""
+
+
 @when(u"I connect to database named {database} as user {user} with password {password}")
 def connect_to_database(context, database, user, password):
     """Perform connection to selected database."""
@@ -102,6 +162,7 @@ def establish_connection_to_database(context):
 
 
 @given(u"the database is empty")
+@then(u"I should find that the database is empty")
 def ensure_database_emptiness(context):
     """Perform check if the database is empty."""
     # at least following tables should not exists
@@ -117,14 +178,14 @@ def ensure_database_emptiness(context):
             cursor.execute("SELECT 1 from {}".format(table))
             v = cursor.fetchone()
             context.connection.commit()
-            raise "Table {} exists".format(table)
+            raise Exception("Table '{}' exists".format(table))
         except UndefinedTable as e:
             # exception means that the table does not exists
             context.connection.rollback()
             pass
 
 
-@given(u"all tables are empty")
+@then(u"I should find that all tables are empty")
 def ensure_data_tables_emptiness(context):
     """Perform check if data tables are empty."""
     # following tables should be empty
@@ -139,7 +200,47 @@ def ensure_data_tables_emptiness(context):
         try:
             cursor.execute("SELECT count(*) as cnt from {}".format(table))
             results = cursor.fetchone()
-            count = results["cnt"]
-            assert count == 0, "Table {} is not empty".format(table)
-        except UndefinedTable as e:
+            assert len(results) == 1, "Wrong number of records returned: {}".format(len(results))
+            assert results[0] == 0, "Table '{}' is not empty as expected".format(table)
+        except Exception as e:
+            raise e
+
+
+@when(u"I prepare database schema")
+def prepare_database_schema(context):
+    """Prepare database schema."""
+    cursor = context.connection.cursor()
+    try:
+        cursor.execute(CREATE_TABLE_REPORT)
+        context.connection.commit()
+        cursor.execute(CREATE_TABLE_CLUSTER_RULE_TOGGLE)
+        context.connection.commit()
+        cursor.execute(CREATE_TABLE_CLUSTER_RULE_USER_FEEDBACK)
+        context.connection.commit()
+        cursor.execute(CREATE_TABLE_CLUSTER_USER_RULE_DISABLE_FEEDBACK)
+        context.connection.commit()
+        cursor.execute(CREATE_TABLE_RULE_HIT)
+        context.connection.commit()
+    except Exception as e:
+        context.connection.rollback()
+        raise e
+
+
+@when(u"I delete all tables from database")
+def delete_all_tables(context):
+    """Delete all relevant tables from database."""
+    # following tables should be deleted
+    tables = ("report",
+              "cluster_rule_toggle",
+              "cluster_rule_user_feedback",
+              "cluster_user_rule_disable_feedback",
+              "rule_hit")
+
+    for table in tables:
+        cursor = context.connection.cursor()
+        try:
+            cursor.execute("DROP TABLE {}".format(table))
+            context.connection.commit()
+        except Exception as e:
+            context.connection.rollback()
             raise e
