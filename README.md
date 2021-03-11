@@ -31,6 +31,8 @@ Usage of cleaner:
         fill-in database by test data
   -max-age string
         max age for displaying old records
+  -output string
+        filename for old cluster listing
   -summary
         print summary table after cleanup
 ```
