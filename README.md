@@ -25,6 +25,8 @@ database.
 Usage of cleaner:
   -cleanup
         perform database cleanup
+  -clusters string
+        list of clusters to cleanup
   -fill-in-db
         fill-in database by test data
   -max-age string
