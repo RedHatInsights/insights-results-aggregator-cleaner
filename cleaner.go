@@ -182,11 +182,13 @@ func main() {
 	var performCleanup bool
 	var printSummaryTable bool
 	var fillInDatabase bool
+	var maxAge string
 
 	// define and parse all command line options
 	flag.BoolVar(&performCleanup, "cleanup", false, "perform database cleanup")
 	flag.BoolVar(&printSummaryTable, "summary", false, "print summary table after cleanup")
 	flag.BoolVar(&fillInDatabase, "fill-in-db", false, "fill-in database by test data")
+	flag.StringVar(&maxAge, "max-age", "", "max age for displaying old records")
 	flag.Parse()
 
 	// config has exactly the same structure as *.toml file
@@ -200,6 +202,11 @@ func main() {
 	}
 
 	log.Debug().Msg("Started")
+
+	// override default value read from configuration file
+	if maxAge != "" {
+		config.Cleaner.MaxAge = maxAge
+	}
 
 	// initialize connection to database
 	connection, err := initDatabaseConnection(config.Storage)
