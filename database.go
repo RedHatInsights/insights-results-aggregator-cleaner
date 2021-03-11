@@ -30,8 +30,10 @@ package main
 // https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner
 
 import (
+	"bufio"
 	"fmt"
 	"math"
+	"os"
 	"time"
 
 	"database/sql"
@@ -102,7 +104,41 @@ func initDatabaseConnection(configuration StorageConfiguration) (*sql.DB, error)
 
 // displayAllOldRecords functions read all old records, ie. records that are
 // older than the specified time duration. Those records are simply displayed.
-func displayAllOldRecords(connection *sql.DB, maxAge string) error {
+func displayAllOldRecords(connection *sql.DB, maxAge string, output string) error {
+	var fout *os.File = nil
+	var writer *bufio.Writer = nil
+
+	if output != "" {
+		fout, err := os.Create(output)
+		if err != nil {
+			log.Error().Err(err).Msg("File open")
+		}
+		writer = bufio.NewWriter(fout)
+
+	}
+
+	defer func() {
+		if writer != nil {
+			err := writer.Flush()
+			if err != nil {
+				log.Error().Err(err).Msg("Flush writer")
+			}
+		}
+	}()
+
+	defer func() {
+		if fout != nil {
+			err := fout.Close()
+			if err != nil {
+				log.Error().Err(err).Msg("File close")
+			}
+		}
+	}()
+
+	return performListOfOldReports(connection, maxAge, writer)
+}
+
+func performListOfOldReports(connection *sql.DB, maxAge string, writer *bufio.Writer) error {
 	query := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW() - $1::INTERVAL ORDER BY reported_at"
 	rows, err := connection.Query(query, maxAge)
 	if err != nil {
@@ -142,6 +178,13 @@ func displayAllOldRecords(connection *sql.DB, maxAge string) error {
 			Str("lastChecked", lastCheckedF).
 			Int("age", age).
 			Msg("Old report")
+
+		if writer != nil {
+			_, err := fmt.Fprintf(writer, "%s,%s,%s,%d\n", clusterName, reportedF, lastCheckedF, age)
+			if err != nil {
+				log.Error().Err(err).Msg("write to file")
+			}
+		}
 	}
 	return nil
 }
