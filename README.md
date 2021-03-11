@@ -27,6 +27,8 @@ Usage of cleaner:
         perform database cleanup
   -fill-in-db
         fill-in database by test data
+  -max-age string
+        max age for displaying old records
   -summary
         print summary table after cleanup
 ```
