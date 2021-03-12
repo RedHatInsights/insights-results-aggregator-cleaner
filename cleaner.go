@@ -59,6 +59,7 @@ const (
 	notProperClusterID       = "Not a proper cluster ID"
 	improperClusterEntries   = "improper cluster entries"
 	numberOfClustersToDelete = "number of clusters to delete"
+	clusterListFinished      = "Cluster list finished"
 )
 
 // IsValidUUID function checks if provided string contains a correct UUID.
@@ -147,8 +148,8 @@ func readClusterListFromFile(filename string) (ClusterList, int, error) {
 			improperClusterCounter++
 		}
 	}
-	log.Info().Int(numberOfClustersToDelete, len(clusterList)).Msg("Cluster list finished")
-	log.Info().Int(improperClusterEntries, improperClusterCounter).Msg("Cluster list finished")
+	log.Info().Int(numberOfClustersToDelete, len(clusterList)).Msg(clusterListFinished)
+	log.Info().Int(improperClusterEntries, improperClusterCounter).Msg(clusterListFinished)
 
 	return clusterList, improperClusterCounter, nil
 }
