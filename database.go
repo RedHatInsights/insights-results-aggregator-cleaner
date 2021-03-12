@@ -59,6 +59,11 @@ const (
 // Error messages
 const canNotConnectToDataStorageMessage = "Can not connect to data storage"
 
+// Other messages
+const (
+	tableName = "table"
+)
+
 // initDatabaseConnection initializes driver, checks if it's supported and
 // initializes connection to the storage.
 func initDatabaseConnection(configuration StorageConfiguration) (*sql.DB, error) {
@@ -260,12 +265,12 @@ func performCleanupInDB(connection *sql.DB,
 			if err != nil {
 				log.Error().
 					Err(err).
-					Str("table", tableAndKey.TableName).
+					Str(tableName, tableAndKey.TableName).
 					Msg("Unable to delete record")
 			} else {
 				log.Info().
 					Int("Affected", affected).
-					Str("table", tableAndKey.TableName).
+					Str(tableName, tableAndKey.TableName).
 					Str("cluster", string(clusterName)).
 					Msg("Delete record")
 				deletionsForTable[tableAndKey.TableName] += affected
