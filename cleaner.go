@@ -55,7 +55,8 @@ const (
 
 // Messages
 const (
-	properClusterID = "Proper cluster ID"
+	properClusterID    = "Proper cluster ID"
+	notProperClusterID = "Not a proper cluster ID"
 )
 
 // IsValidUUID function checks if provided string contains a correct UUID.
@@ -94,7 +95,7 @@ func readClusterListFromCLIArgument(clusters string) (ClusterList, int, error) {
 			clusterList = append(clusterList, ClusterName(cluster))
 			log.Info().Str("input", cluster).Msg(properClusterID)
 		} else {
-			log.Error().Str("input", cluster).Msg("Not a proper cluster ID")
+			log.Error().Str("input", cluster).Msg(notProperClusterID)
 			improperClusterCounter++
 		}
 	}
@@ -140,7 +141,7 @@ func readClusterListFromFile(filename string) (ClusterList, int, error) {
 			clusterList = append(clusterList, ClusterName(line))
 			log.Info().Str("input", line).Msg(properClusterID)
 		} else {
-			log.Error().Str("input", line).Msg("Not a proper cluster ID")
+			log.Error().Str("input", line).Msg(notProperClusterID)
 			improperClusterCounter++
 		}
 	}
