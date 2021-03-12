@@ -35,6 +35,8 @@ Usage of cleaner:
         filename for old cluster listing
   -summary
         print summary table after cleanup
+  -version
+        show cleaner version
 ```
 
 ### Default operation
