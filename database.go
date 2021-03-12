@@ -61,7 +61,8 @@ const canNotConnectToDataStorageMessage = "Can not connect to data storage"
 
 // Other messages
 const (
-	tableName = "table"
+	tableName      = "table"
+	clusterNameMsg = "cluster"
 )
 
 // initDatabaseConnection initializes driver, checks if it's supported and
@@ -178,7 +179,7 @@ func performListOfOldReports(connection *sql.DB, maxAge string, writer *bufio.Wr
 		lastCheckedF := lastChecked.Format(time.RFC3339)
 
 		// just print the report
-		log.Info().Str("cluster", clusterName).
+		log.Info().Str(clusterNameMsg, clusterName).
 			Str("reported", reportedF).
 			Str("lastChecked", lastCheckedF).
 			Int("age", age).
@@ -271,7 +272,7 @@ func performCleanupInDB(connection *sql.DB,
 				log.Info().
 					Int("Affected", affected).
 					Str(tableName, tableAndKey.TableName).
-					Str("cluster", string(clusterName)).
+					Str(clusterNameMsg, string(clusterName)).
 					Msg("Delete record")
 				deletionsForTable[tableAndKey.TableName] += affected
 			}
