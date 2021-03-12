@@ -7,6 +7,12 @@ Feature: Basic set of smoke tests
      Then I should find that file on PATH
 
 
+  Scenario: Check if cleaner displays help message
+    Given the system is in default state
+     When I run the cleaner with the --help command line flag
+     Then I should see help displayed on standard output
+
+
   Scenario: Check if Postgres database is available
     Given the system is in default state
      When I connect to database named test as user postgres with password postgres
