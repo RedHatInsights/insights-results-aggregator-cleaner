@@ -34,6 +34,7 @@ package main
 import (
 	"bufio"
 	"flag"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -55,6 +56,7 @@ const (
 
 // Messages
 const (
+	version                  = "Insights Results Aggregator Cleaner version 1.0"
 	properClusterID          = "Proper cluster ID"
 	notProperClusterID       = "Not a proper cluster ID"
 	improperClusterEntries   = "improper cluster entries"
@@ -190,9 +192,12 @@ func PrintSummaryTable(summary Summary) {
 // doSelectedOperation function performs selected operation: check data
 // retention, cleanup selected data, or fill-id database by test data
 func doSelectedOperation(config ConfigStruct, connection *sql.DB,
-	performCleanup bool, fillInDatabase bool, printSummaryTable bool,
-	clusters string, output string) error {
-	if performCleanup {
+	showVersion bool, performCleanup bool, fillInDatabase bool,
+	printSummaryTable bool, clusters string, output string) error {
+	if showVersion {
+		fmt.Println(version)
+		return nil
+	} else if performCleanup {
 		// cleanup operation
 		clusterList, improperClusterCounter, err := readClusterList(config.Cleaner.ClusterListFile, clusters)
 		if err != nil {
@@ -234,6 +239,7 @@ func main() {
 	var performCleanup bool
 	var printSummaryTable bool
 	var fillInDatabase bool
+	var showVersion bool
 	var maxAge string
 	var clusters string
 	var output string
@@ -242,6 +248,7 @@ func main() {
 	flag.BoolVar(&performCleanup, "cleanup", false, "perform database cleanup")
 	flag.BoolVar(&printSummaryTable, "summary", false, "print summary table after cleanup")
 	flag.BoolVar(&fillInDatabase, "fill-in-db", false, "fill-in database by test data")
+	flag.BoolVar(&showVersion, "version", false, "show cleaner version")
 	flag.StringVar(&maxAge, "max-age", "", "max age for displaying old records")
 	flag.StringVar(&clusters, "clusters", "", "list of clusters to cleanup")
 	flag.StringVar(&output, "output", "", "filename for old cluster listing")
@@ -271,8 +278,8 @@ func main() {
 	}
 
 	// perform selected operation
-	err = doSelectedOperation(config, connection, performCleanup,
-		fillInDatabase, printSummaryTable, clusters,
+	err = doSelectedOperation(config, connection, showVersion,
+		performCleanup, fillInDatabase, printSummaryTable, clusters,
 		output)
 	if err != nil {
 		log.Err(err).Msg("Operation failed")

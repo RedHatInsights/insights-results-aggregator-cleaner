@@ -62,7 +62,7 @@ def run_cleaner_with_flag(context, flag):
     process_cleaner_output(context, out, 2)
 
 
-@then(u"I should see help displayed on standard output")
+@then(u"I should see help messages displayed on standard output")
 def check_help_from_cleaner(context):
     """Check if help is displayed by cleaner."""
     expected_output = """
@@ -78,10 +78,18 @@ Usage of insights-results-aggregator-cleaner:
   -output string
         filename for old cluster listing
   -summary
-        print summary table after cleanup"""
+        print summary table after cleanup
+  -version
+        show cleaner version"""
 
     stdout = context.stdout.decode("utf-8").replace("\t", "    ")
     assert stdout.strip() == expected_output.strip(), "{} != {}".format(stdout, expected_output)
+
+
+@then(u"I should see version info displayed on standard output")
+def check_version_from_cleaner(context):
+    """Check if version info is displayed by cleaner."""
+    assert "Insights Results Aggregator Cleaner version 1.0" in context.output 
 
 
 @then(u"I should see empty list of records")
