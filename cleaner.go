@@ -102,8 +102,8 @@ func readClusterListFromCLIArgument(clusters string) (ClusterList, int, error) {
 			improperClusterCounter++
 		}
 	}
-	log.Info().Int(numberOfClustersToDelete, len(clusterList)).Msg("Cluster list finished")
-	log.Info().Int(improperClusterEntries, improperClusterCounter).Msg("Cluster list finished")
+	log.Info().Int(numberOfClustersToDelete, len(clusterList)).Msg(clusterListFinished)
+	log.Info().Int(improperClusterEntries, improperClusterCounter).Msg(clusterListFinished)
 
 	return clusterList, improperClusterCounter, nil
 }
