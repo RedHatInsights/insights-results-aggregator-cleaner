@@ -97,9 +97,9 @@ func readClusterListFromCLIArgument(clusters string) (ClusterList, int, error) {
 		// check if line contains proper cluster ID (as UUID)
 		if IsValidUUID(cluster) {
 			clusterList = append(clusterList, ClusterName(cluster))
-			log.Info().Str("input", cluster).Msg(properClusterID)
+			log.Info().Str(inputWithClusterID, cluster).Msg(properClusterID)
 		} else {
-			log.Error().Str("input", cluster).Msg(notProperClusterID)
+			log.Error().Str(inputWithClusterID, cluster).Msg(notProperClusterID)
 			improperClusterCounter++
 		}
 	}
