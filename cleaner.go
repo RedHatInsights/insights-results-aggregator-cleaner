@@ -55,8 +55,9 @@ const (
 
 // Messages
 const (
-	properClusterID    = "Proper cluster ID"
-	notProperClusterID = "Not a proper cluster ID"
+	properClusterID        = "Proper cluster ID"
+	notProperClusterID     = "Not a proper cluster ID"
+	improperClusterEntries = "improper cluster entries"
 )
 
 // IsValidUUID function checks if provided string contains a correct UUID.
@@ -100,7 +101,7 @@ func readClusterListFromCLIArgument(clusters string) (ClusterList, int, error) {
 		}
 	}
 	log.Info().Int("number of clusters to delete", len(clusterList)).Msg("Cluster list finished")
-	log.Info().Int("improper cluster entries", improperClusterCounter).Msg("Cluster list finished")
+	log.Info().Int(improperClusterEntries, improperClusterCounter).Msg("Cluster list finished")
 
 	return clusterList, improperClusterCounter, nil
 }
@@ -146,7 +147,7 @@ func readClusterListFromFile(filename string) (ClusterList, int, error) {
 		}
 	}
 	log.Info().Int("number of clusters to delete", len(clusterList)).Msg("Cluster list finished")
-	log.Info().Int("improper cluster entries", improperClusterCounter).Msg("Cluster list finished")
+	log.Info().Int(improperClusterEntries, improperClusterCounter).Msg("Cluster list finished")
 
 	return clusterList, improperClusterCounter, nil
 }
