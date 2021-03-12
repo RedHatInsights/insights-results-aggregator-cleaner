@@ -53,6 +53,11 @@ const (
 	defaultConfigFileName     = "config"
 )
 
+// Messages
+const (
+	properClusterID = "Proper cluster ID"
+)
+
 // IsValidUUID function checks if provided string contains a correct UUID.
 func IsValidUUID(input string) bool {
 	_, err := uuid.Parse(input)
@@ -87,7 +92,7 @@ func readClusterListFromCLIArgument(clusters string) (ClusterList, int, error) {
 		// check if line contains proper cluster ID (as UUID)
 		if IsValidUUID(cluster) {
 			clusterList = append(clusterList, ClusterName(cluster))
-			log.Info().Str("input", cluster).Msg("Proper cluster ID")
+			log.Info().Str("input", cluster).Msg(properClusterID)
 		} else {
 			log.Error().Str("input", cluster).Msg("Not a proper cluster ID")
 			improperClusterCounter++
@@ -133,7 +138,7 @@ func readClusterListFromFile(filename string) (ClusterList, int, error) {
 		// check if line contains proper cluster ID (as UUID)
 		if IsValidUUID(line) {
 			clusterList = append(clusterList, ClusterName(line))
-			log.Info().Str("input", line).Msg("Proper cluster ID")
+			log.Info().Str("input", line).Msg(properClusterID)
 		} else {
 			log.Error().Str("input", line).Msg("Not a proper cluster ID")
 			improperClusterCounter++
