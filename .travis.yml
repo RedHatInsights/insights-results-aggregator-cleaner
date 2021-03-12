@@ -28,6 +28,7 @@ jobs:
         - ./golint.sh
         - ./gocyclo.sh
         - ./goerrcheck.sh
+        - ./goconst.sh
         - ./gosec.sh
         - ./abcgo.sh
         - ./ineffassign.sh
