@@ -78,7 +78,9 @@ Usage of insights-results-aggregator-cleaner:
   -output string
         filename for old cluster listing
   -summary
-        print summary table after cleanup"""
+        print summary table after cleanup
+  -version
+        show cleaner version"""
 
     stdout = context.stdout.decode("utf-8").replace("\t", "    ")
     assert stdout.strip() == expected_output.strip(), "{} != {}".format(stdout, expected_output)
