@@ -244,3 +244,32 @@ def delete_all_tables(context):
         except Exception as e:
             context.connection.rollback()
             raise e
+
+
+@when(u"I insert following records into database")
+def insert_records_into_database(context):
+    """Insert provided records into database."""
+
+    cursor = context.connection.cursor()
+
+    try:
+        for row in context.table:
+            org_id = int(row["org id"])
+            cluster_name = row["cluster name"]
+            timestamp = row["timestamp"]
+
+            # check the input table
+            assert org_id is not None, "Organization ID should be set"
+            assert cluster_name is not None, "Cluster name should be set"
+            assert timestamp is not None, "Timestamp should be set"
+
+            assert type(org_id) is int, type(org_id)
+
+            # try to perform insert statement
+            insertStatement = "INSERT INTO report(org_id, cluster, report, reported_at, last_checked_at, kafka_offset) VALUES(%s, %s, '', %s, %s, 1);"
+            cursor.execute(insertStatement, (org_id, cluster_name, timestamp, timestamp))
+
+        context.connection.commit()
+    except Exception as e:
+        context.connection.rollback()
+        raise e
