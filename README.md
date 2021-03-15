@@ -23,6 +23,8 @@ database.
 
 ```
 Usage of cleaner:
+  -authors
+        show authors
   -cleanup
         perform database cleanup
   -clusters string
