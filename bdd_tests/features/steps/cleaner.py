@@ -109,7 +109,20 @@ def check_version_from_cleaner(context):
     assert type(context.output) is list, "wrong type of output"
 
     # check the output
-    assert "Insights Results Aggregator Cleaner version 1.0" in context.output
+    assert "Insights Results Aggregator Cleaner version 1.0" in context.output, \
+        "Caught output: {}".format(context.output)
+
+
+@then(u"I should see info about authors displayed on standard output")
+def check_authors_info_from_cleaner(context):
+    """Check if information about authors is displayed by cleaner."""
+    # preliminary checks
+    assert context.output is not None
+    assert type(context.output) is list, "wrong type of output"
+
+    # check the output
+    assert "Pavel Tisnovsky, Red Hat Inc." in context.output, \
+       "Caught output: {}".format(context.output)
 
 
 @then(u"I should see empty list of records")
