@@ -57,6 +57,7 @@ const (
 // Messages
 const (
 	version                  = "Insights Results Aggregator Cleaner version 1.0"
+	authors                  = "Pavel Tisnovsky, Red Hat Inc."
 	properClusterID          = "Proper cluster ID"
 	notProperClusterID       = "Not a proper cluster ID"
 	improperClusterEntries   = "improper cluster entries"
@@ -192,10 +193,14 @@ func PrintSummaryTable(summary Summary) {
 // doSelectedOperation function performs selected operation: check data
 // retention, cleanup selected data, or fill-id database by test data
 func doSelectedOperation(config ConfigStruct, connection *sql.DB,
-	showVersion bool, performCleanup bool, fillInDatabase bool,
-	printSummaryTable bool, clusters string, output string) error {
+	showVersion bool, showAuthors bool, performCleanup bool,
+	fillInDatabase bool, printSummaryTable bool, clusters string,
+	output string) error {
 	if showVersion {
 		fmt.Println(version)
+		return nil
+	} else if showAuthors {
+		fmt.Println(authors)
 		return nil
 	} else if performCleanup {
 		// cleanup operation
@@ -240,6 +245,7 @@ func main() {
 	var printSummaryTable bool
 	var fillInDatabase bool
 	var showVersion bool
+	var showAuthors bool
 	var maxAge string
 	var clusters string
 	var output string
@@ -249,6 +255,7 @@ func main() {
 	flag.BoolVar(&printSummaryTable, "summary", false, "print summary table after cleanup")
 	flag.BoolVar(&fillInDatabase, "fill-in-db", false, "fill-in database by test data")
 	flag.BoolVar(&showVersion, "version", false, "show cleaner version")
+	flag.BoolVar(&showAuthors, "authors", false, "show authors")
 	flag.StringVar(&maxAge, "max-age", "", "max age for displaying old records")
 	flag.StringVar(&clusters, "clusters", "", "list of clusters to cleanup")
 	flag.StringVar(&output, "output", "", "filename for old cluster listing")
@@ -278,7 +285,7 @@ func main() {
 	}
 
 	// perform selected operation
-	err = doSelectedOperation(config, connection, showVersion,
+	err = doSelectedOperation(config, connection, showVersion, showAuthors,
 		performCleanup, fillInDatabase, printSummaryTable, clusters,
 		output)
 	if err != nil {
