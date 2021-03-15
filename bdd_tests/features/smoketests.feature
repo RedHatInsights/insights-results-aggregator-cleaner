@@ -19,6 +19,12 @@ Feature: Basic set of smoke tests
      Then I should see version info displayed on standard output
 
 
+  Scenario: Check if cleaner displays authors
+    Given the system is in default state
+     When I run the cleaner with the --authors command line flag
+     Then I should see info about authors displayed on standard output
+
+
   Scenario: Check if Postgres database is available
     Given the system is in default state
      When I connect to database named test as user postgres with password postgres
