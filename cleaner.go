@@ -196,13 +196,14 @@ func doSelectedOperation(config ConfigStruct, connection *sql.DB,
 	showVersion bool, showAuthors bool, performCleanup bool,
 	fillInDatabase bool, printSummaryTable bool, clusters string,
 	output string) error {
-	if showVersion {
+	switch {
+	case showVersion:
 		fmt.Println(version)
 		return nil
-	} else if showAuthors {
+	case showAuthors:
 		fmt.Println(authors)
 		return nil
-	} else if performCleanup {
+	case performCleanup:
 		// cleanup operation
 		clusterList, improperClusterCounter, err := readClusterList(config.Cleaner.ClusterListFile, clusters)
 		if err != nil {
@@ -221,22 +222,26 @@ func doSelectedOperation(config ConfigStruct, connection *sql.DB,
 			summary.DeletionsForTable = deletionsForTable
 			PrintSummaryTable(summary)
 		}
-	} else if fillInDatabase {
+	case fillInDatabase:
 		// fill-in database by test data
 		err := fillInDatabaseByTestData(connection)
 		if err != nil {
 			log.Err(err).Msg("Fill-in database by test data")
 			return err
 		}
-	} else {
+		// everything seems to be fine
+		return nil
+	default:
 		// display old records in database
 		err := displayAllOldRecords(connection, config.Cleaner.MaxAge, output)
 		if err != nil {
 			log.Err(err).Msg("Selecting records from database")
 			return err
 		}
+		// everything seems to be fine
+		return nil
 	}
-	// everything seems to be fine
+	// we should not end there
 	return nil
 }
 
