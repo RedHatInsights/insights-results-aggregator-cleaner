@@ -70,6 +70,18 @@ def run_cleaner_with_flag(context, flag):
     process_cleaner_output(context, out, 2)
 
 
+@when(u"I run the cleaner with command to delete cluster {cluster}")
+def run_cleaner_to_cleanup_cluster(context, cluster):
+    """Start the cleaner clean up given cluster."""
+    out = subprocess.Popen(["insights-results-aggregator-cleaner", "--cleanup",
+                            "--clusters", cluster],
+                           stdout=subprocess.PIPE,
+                           stderr=subprocess.STDOUT)
+
+    assert out is not None
+    process_cleaner_output(context, out, 0)
+
+
 @then(u"I should see help messages displayed on standard output")
 def check_help_from_cleaner(context):
     """Check if help is displayed by cleaner."""
