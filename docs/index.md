@@ -17,12 +17,22 @@ database.
 
 ```
 Usage of cleaner:
+  -authors
+        show authors
   -cleanup
         perform database cleanup
+  -clusters string
+        list of clusters to cleanup
   -fill-in-db
         fill-in database by test data
+  -max-age string
+        max age for displaying old records
+  -output string
+        filename for old cluster listing
   -summary
         print summary table after cleanup
+  -version
+        show cleaner version
 ```
 
 ### Default operation
@@ -42,6 +52,8 @@ Command line option `-fill-in-db` can be used to insert some test data into
 database. Don't use it on production, of course.
 
 ### Building
+
+Go version 1.14 or newer is required to build this tool.
 
 ```
 make build
