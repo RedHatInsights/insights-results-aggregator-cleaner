@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: default clean build fmt lint vet cyclo ineffassign shellcheck errcheck goconst gosec abcgo json-check openapi-check style run test test-postgres cover integration_tests rest_api_tests sqlite_db license before_commit help godoc install_docgo install_addlicense
+.PHONY: default clean build fmt lint vet cyclo ineffassign shellcheck errcheck goconst gosec abcgo json-check openapi-check style run test test-postgres cover integration_tests rest_api_tests sqlite_db license before_commit bdd_tests help godoc install_docgo install_addlicense
 
 SOURCES:=$(shell find . -name '*.go')
 BINARY:=insights-results-aggregator-cleaner
@@ -75,6 +75,10 @@ cover: test
 
 license: install_addlicense
 	addlicense -c "Red Hat, Inc" -l "apache" -v ./
+
+bdd_tests: ## Run BDD tests
+	@echo "Run BDD tests"
+	pushd bdd_tests/ && ./run_tests.sh && popd
 
 before_commit: style test test-postgres integration_tests openapi-check license ## Checks done before commit
 	./check_coverage.sh
