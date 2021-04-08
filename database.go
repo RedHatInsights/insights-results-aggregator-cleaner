@@ -108,22 +108,25 @@ func initDatabaseConnection(configuration StorageConfiguration) (*sql.DB, error)
 	return connection, nil
 }
 
-// displayAllOldRecords functions read all old records, ie. records that are
-// older than the specified time duration. Those records are simply displayed.
-func displayAllOldRecords(connection *sql.DB, maxAge string, output string) error {
+// displayMultipleRuleDisable function read and displays clusters where
+// multiple users have disabled some rules.
+func displayMultipleRuleDisable(connection *sql.DB, output string) error {
 	var fout *os.File = nil
 	var writer *bufio.Writer = nil
 
 	if output != "" {
+		// create output file
 		fout, err := os.Create(output)
 		if err != nil {
 			log.Error().Err(err).Msg("File open")
 		}
+		// an object used to write to file
 		writer = bufio.NewWriter(fout)
 
 	}
 
 	defer func() {
+		// output needs to be flushed at the end
 		if writer != nil {
 			err := writer.Flush()
 			if err != nil {
@@ -133,6 +136,165 @@ func displayAllOldRecords(connection *sql.DB, maxAge string, output string) erro
 	}()
 
 	defer func() {
+		// file needs to be closed at the end
+		if fout != nil {
+			err := fout.Close()
+			if err != nil {
+				log.Error().Err(err).Msg("File close")
+			}
+		}
+	}()
+
+	// first query to be performed
+	query1 := `
+                select cluster_id, rule_id, count(*) as cnt
+                  from cluster_rule_toggle
+                 group by cluster_id, rule_id
+                having count(*)>1
+                 order by cnt desc;
+`
+	// second query to be performed
+	query2 := `
+                select cluster_id, rule_id, count(*) as cnt
+                  from cluster_user_rule_disable_feedback
+                 group by cluster_id, rule_id
+                having count(*)>1
+                 order by cnt desc;
+`
+
+	// perform the first query and display results
+	err := performDisplayMultipleRuleDisable(connection, writer, query1,
+		"cluster_rule_toggle")
+	// the first query+display function might throw some error
+	if err != nil {
+		return err
+	}
+
+	// perform second query and display results
+	err = performDisplayMultipleRuleDisable(connection, writer, query2,
+		"cluster_user_rule_disable_feedback")
+	// second query+display function might throw some error
+	return err
+}
+
+// performDisplayMultipleRuleDisable function displays cluster names and org
+// ids where multiple users disabled any rule
+func performDisplayMultipleRuleDisable(connection *sql.DB,
+	writer *bufio.Writer, query string, tableName string) error {
+
+	// perform given query to database
+	rows, err := connection.Query(query)
+	if err != nil {
+		return err
+	}
+
+	// iterate over all records that has been found
+	for rows.Next() {
+		var (
+			clusterName string
+			ruleID      string
+			count       int
+		)
+
+		// read one report
+		if err := rows.Scan(&clusterName, &ruleID, &count); err != nil {
+			// close the result set in case of any error
+			if closeErr := rows.Close(); closeErr != nil {
+				log.Error().Err(closeErr).Msg("Unable to close the DB rows handle")
+			}
+			return err
+		}
+
+		// try to read organization ID for given cluster name
+		orgID, err := readOrgID(connection, clusterName)
+		if err != nil {
+			log.Error().Err(err).Msg("readOrgID")
+			return err
+		}
+
+		// just print the report, including organization ID
+		log.Info().Str("table", tableName).
+			Int("org ID", orgID).
+			Str(clusterNameMsg, clusterName).
+			Str("rule ID", ruleID).
+			Int("count", count).
+			Msg("Multiple rule disable")
+
+		// export to file (if enabled)
+		if writer != nil {
+			_, err := fmt.Fprintf(writer, "%d,%s,%s,%d\n", orgID, clusterName, ruleID, count)
+			if err != nil {
+				log.Error().Err(err).Msg("write to file")
+			}
+		}
+	}
+	return nil
+}
+
+// readOrgID function tries to read organization ID for given cluster name
+func readOrgID(connection *sql.DB, clusterName string) (int, error) {
+	query := "select org_id from report where cluster = $1"
+
+	// perform the query
+	rows, err := connection.Query(query, clusterName)
+	if err != nil {
+		log.Debug().Msg("query")
+		return -1, err
+	}
+
+	// and check the result (if any)
+	if rows.Next() {
+		var orgID int
+
+		// read one organization ID returned in query result
+		if err := rows.Scan(&orgID); err != nil {
+			// proper error logging will be performed elsewhere
+			log.Debug().Str("cluster", clusterName).Msg("scan")
+
+			// close the result set in case of any error
+			if closeErr := rows.Close(); closeErr != nil {
+				log.Error().Err(closeErr).Msg("Unable to close the DB rows handle")
+			}
+			return -1, err
+		}
+
+		return orgID, nil
+	}
+
+	// no result?
+	log.Debug().Str("cluster", clusterName).Msg("no org_id for cluster")
+	return -1, nil
+}
+
+// displayAllOldRecords function read all old records, ie. records that are
+// older than the specified time duration. Those records are simply displayed.
+func displayAllOldRecords(connection *sql.DB, maxAge string, output string) error {
+	var fout *os.File = nil
+	var writer *bufio.Writer = nil
+
+	if output != "" {
+		// create output file
+		fout, err := os.Create(output)
+		if err != nil {
+			log.Error().Err(err).Msg("File open")
+		}
+		// an object used to write to file
+		writer = bufio.NewWriter(fout)
+
+	}
+
+	defer func() {
+		// output needs to be flushed at the end
+		if writer != nil {
+			err := writer.Flush()
+			if err != nil {
+				log.Error().Err(err).Msg("Flush writer")
+			}
+		}
+	}()
+
+	defer func() {
+		// file needs to be closed at the end
 		if fout != nil {
 			err := fout.Close()
 			if err != nil {
