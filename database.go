@@ -57,12 +57,19 @@ const (
 )
 
 // Error messages
-const canNotConnectToDataStorageMessage = "Can not connect to data storage"
+const (
+	canNotConnectToDataStorageMessage = "Can not connect to data storage"
+	unableToCloseDBRowsHandle         = "Unable to close the DB rows handle"
+)
 
 // Other messages
 const (
 	tableName      = "table"
 	clusterNameMsg = "cluster"
+	fileOpenMsg    = "File open"
+	fileCloseMsg   = "File close"
+	flushWriterMsg = "Flush writer"
+	writeToFileMsg = "Write to file"
 )
 
 // initDatabaseConnection initializes driver, checks if it's supported and
@@ -118,7 +125,7 @@ func displayMultipleRuleDisable(connection *sql.DB, output string) error {
 		// create output file
 		fout, err := os.Create(output)
 		if err != nil {
-			log.Error().Err(err).Msg("File open")
+			log.Error().Err(err).Msg(fileOpenMsg)
 		}
 		// an object used to write to file
 		writer = bufio.NewWriter(fout)
@@ -130,7 +137,7 @@ func displayMultipleRuleDisable(connection *sql.DB, output string) error {
 		if writer != nil {
 			err := writer.Flush()
 			if err != nil {
-				log.Error().Err(err).Msg("Flush writer")
+				log.Error().Err(err).Msg(flushWriterMsg)
 			}
 		}
 	}()
@@ -140,7 +147,7 @@ func displayMultipleRuleDisable(connection *sql.DB, output string) error {
 		if fout != nil {
 			err := fout.Close()
 			if err != nil {
-				log.Error().Err(err).Msg("File close")
+				log.Error().Err(err).Msg(fileCloseMsg)
 			}
 		}
 	}()
@@ -200,7 +207,7 @@ func performDisplayMultipleRuleDisable(connection *sql.DB,
 		if err := rows.Scan(&clusterName, &ruleID, &count); err != nil {
 			// close the result set in case of any error
 			if closeErr := rows.Close(); closeErr != nil {
-				log.Error().Err(closeErr).Msg("Unable to close the DB rows handle")
+				log.Error().Err(closeErr).Msg(unableToCloseDBRowsHandle)
 			}
 			return err
 		}
@@ -224,7 +231,7 @@ func performDisplayMultipleRuleDisable(connection *sql.DB,
 		if writer != nil {
 			_, err := fmt.Fprintf(writer, "%d,%s,%s,%d\n", orgID, clusterName, ruleID, count)
 			if err != nil {
-				log.Error().Err(err).Msg("write to file")
+				log.Error().Err(err).Msg(writeToFileMsg)
 			}
 		}
 	}
@@ -249,11 +256,11 @@ func readOrgID(connection *sql.DB, clusterName string) (int, error) {
 		// read one organization ID returned in query result
 		if err := rows.Scan(&orgID); err != nil {
 			// proper error logging will be performed elsewhere
-			log.Debug().Str("cluster", clusterName).Msg("scan")
+			log.Debug().Str(clusterNameMsg, clusterName).Msg("scan")
 
 			// close the result set in case of any error
 			if closeErr := rows.Close(); closeErr != nil {
-				log.Error().Err(closeErr).Msg("Unable to close the DB rows handle")
+				log.Error().Err(closeErr).Msg(unableToCloseDBRowsHandle)
 			}
 			return -1, err
 		}
@@ -262,7 +269,7 @@ func readOrgID(connection *sql.DB, clusterName string) (int, error) {
 	}
 
 	// no result?
-	log.Debug().Str("cluster", clusterName).Msg("no org_id for cluster")
+	log.Debug().Str(clusterNameMsg, clusterName).Msg("no org_id for cluster")
 	return -1, nil
 }
 
@@ -276,7 +283,7 @@ func displayAllOldRecords(connection *sql.DB, maxAge string, output string) erro
 		// create output file
 		fout, err := os.Create(output)
 		if err != nil {
-			log.Error().Err(err).Msg("File open")
+			log.Error().Err(err).Msg(fileOpenMsg)
 		}
 		// an object used to write to file
 		writer = bufio.NewWriter(fout)
@@ -288,7 +295,7 @@ func displayAllOldRecords(connection *sql.DB, maxAge string, output string) erro
 		if writer != nil {
 			err := writer.Flush()
 			if err != nil {
-				log.Error().Err(err).Msg("Flush writer")
+				log.Error().Err(err).Msg(flushWriterMsg)
 			}
 		}
 	}()
@@ -298,7 +305,7 @@ func displayAllOldRecords(connection *sql.DB, maxAge string, output string) erro
 		if fout != nil {
 			err := fout.Close()
 			if err != nil {
-				log.Error().Err(err).Msg("File close")
+				log.Error().Err(err).Msg(fileCloseMsg)
 			}
 		}
 	}()
@@ -328,7 +335,7 @@ func performListOfOldReports(connection *sql.DB, maxAge string, writer *bufio.Wr
 		if err := rows.Scan(&clusterName, &reported, &lastChecked); err != nil {
 			// close the result set in case of any error
 			if closeErr := rows.Close(); closeErr != nil {
-				log.Error().Err(closeErr).Msg("Unable to close the DB rows handle")
+				log.Error().Err(closeErr).Msg(unableToCloseDBRowsHandle)
 			}
 			return err
 		}
@@ -350,7 +357,7 @@ func performListOfOldReports(connection *sql.DB, maxAge string, writer *bufio.Wr
 		if writer != nil {
 			_, err := fmt.Fprintf(writer, "%s,%s,%s,%d\n", clusterName, reportedF, lastCheckedF, age)
 			if err != nil {
-				log.Error().Err(err).Msg("write to file")
+				log.Error().Err(err).Msg(writeToFileMsg)
 			}
 		}
 	}

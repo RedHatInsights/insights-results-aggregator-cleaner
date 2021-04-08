@@ -194,14 +194,15 @@ https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner
 	<td class="doc"><p>Messages</p>
 </td>
 	<td class="code"><pre><code><div class="keyword">const</div> <div class="operator">(</div>
-	<div class="ident">version</div>                  <div class="operator">=</div> <div class="literal">&#34;Insights Results Aggregator Cleaner version 1.0&#34;</div><div class="operator"></div>
-	<div class="ident">authors</div>                  <div class="operator">=</div> <div class="literal">&#34;Pavel Tisnovsky, Red Hat Inc.&#34;</div><div class="operator"></div>
-	<div class="ident">properClusterID</div>          <div class="operator">=</div> <div class="literal">&#34;Proper cluster ID&#34;</div><div class="operator"></div>
-	<div class="ident">notProperClusterID</div>       <div class="operator">=</div> <div class="literal">&#34;Not a proper cluster ID&#34;</div><div class="operator"></div>
-	<div class="ident">improperClusterEntries</div>   <div class="operator">=</div> <div class="literal">&#34;improper cluster entries&#34;</div><div class="operator"></div>
-	<div class="ident">numberOfClustersToDelete</div> <div class="operator">=</div> <div class="literal">&#34;number of clusters to delete&#34;</div><div class="operator"></div>
-	<div class="ident">clusterListFinished</div>      <div class="operator">=</div> <div class="literal">&#34;Cluster list finished&#34;</div><div class="operator"></div>
-	<div class="ident">inputWithClusterID</div>       <div class="operator">=</div> <div class="literal">&#34;input&#34;</div><div class="operator"></div>
+	<div class="ident">version</div>                      <div class="operator">=</div> <div class="literal">&#34;Insights Results Aggregator Cleaner version 1.0&#34;</div><div class="operator"></div>
+	<div class="ident">authors</div>                      <div class="operator">=</div> <div class="literal">&#34;Pavel Tisnovsky, Red Hat Inc.&#34;</div><div class="operator"></div>
+	<div class="ident">properClusterID</div>              <div class="operator">=</div> <div class="literal">&#34;Proper cluster ID&#34;</div><div class="operator"></div>
+	<div class="ident">notProperClusterID</div>           <div class="operator">=</div> <div class="literal">&#34;Not a proper cluster ID&#34;</div><div class="operator"></div>
+	<div class="ident">improperClusterEntries</div>       <div class="operator">=</div> <div class="literal">&#34;improper cluster entries&#34;</div><div class="operator"></div>
+	<div class="ident">numberOfClustersToDelete</div>     <div class="operator">=</div> <div class="literal">&#34;number of clusters to delete&#34;</div><div class="operator"></div>
+	<div class="ident">clusterListFinished</div>          <div class="operator">=</div> <div class="literal">&#34;Cluster list finished&#34;</div><div class="operator"></div>
+	<div class="ident">inputWithClusterID</div>           <div class="operator">=</div> <div class="literal">&#34;input&#34;</div><div class="operator"></div>
+	<div class="ident">selectingRecordsFromDatabase</div> <div class="operator">=</div> <div class="literal">&#34;Selecting records from database&#34;</div><div class="operator"></div>
 <div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
@@ -457,7 +458,7 @@ retention, cleanup selected data, or fill-id database by test data</p>
 </td>
 	<td class="code"><pre><code>		<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">displayMultipleRuleDisable</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">,</div> <div class="ident">output</div><div class="operator">)</div><div class="operator"></div>
 		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
-			<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Selecting records from database&#34;</div><div class="operator">)</div><div class="operator"></div>
+			<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">selectingRecordsFromDatabase</div><div class="operator">)</div><div class="operator"></div>
 			<div class="keyword">return</div> <div class="ident">err</div><div class="operator"></div>
 		<div class="operator">}</div><div class="operator"></div>
 </code></pre></td>
@@ -495,7 +496,7 @@ retention, cleanup selected data, or fill-id database by test data</p>
 </td>
 	<td class="code"><pre><code>		<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">displayAllOldRecords</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">,</div> <div class="ident">config</div><div class="operator">.</div><div class="ident">Cleaner</div><div class="operator">.</div><div class="ident">MaxAge</div><div class="operator">,</div> <div class="ident">output</div><div class="operator">)</div><div class="operator"></div>
 		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
-			<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Selecting records from database&#34;</div><div class="operator">)</div><div class="operator"></div>
+			<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">selectingRecordsFromDatabase</div><div class="operator">)</div><div class="operator"></div>
 			<div class="keyword">return</div> <div class="ident">err</div><div class="operator"></div>
 		<div class="operator">}</div><div class="operator"></div>
 </code></pre></td>

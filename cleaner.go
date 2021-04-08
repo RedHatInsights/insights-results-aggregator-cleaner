@@ -60,14 +60,15 @@ const (
 
 // Messages
 const (
-	version                  = "Insights Results Aggregator Cleaner version 1.0"
-	authors                  = "Pavel Tisnovsky, Red Hat Inc."
-	properClusterID          = "Proper cluster ID"
-	notProperClusterID       = "Not a proper cluster ID"
-	improperClusterEntries   = "improper cluster entries"
-	numberOfClustersToDelete = "number of clusters to delete"
-	clusterListFinished      = "Cluster list finished"
-	inputWithClusterID       = "input"
+	version                      = "Insights Results Aggregator Cleaner version 1.0"
+	authors                      = "Pavel Tisnovsky, Red Hat Inc."
+	properClusterID              = "Proper cluster ID"
+	notProperClusterID           = "Not a proper cluster ID"
+	improperClusterEntries       = "improper cluster entries"
+	numberOfClustersToDelete     = "number of clusters to delete"
+	clusterListFinished          = "Cluster list finished"
+	inputWithClusterID           = "input"
+	selectingRecordsFromDatabase = "Selecting records from database"
 )
 
 // IsValidUUID function checks if provided string contains a correct UUID.
@@ -232,7 +233,7 @@ func doSelectedOperation(config ConfigStruct, connection *sql.DB,
 		// detect clusters that have the same rule(s) disabled by different users
 		err := displayMultipleRuleDisable(connection, output)
 		if err != nil {
-			log.Err(err).Msg("Selecting records from database")
+			log.Err(err).Msg(selectingRecordsFromDatabase)
 			return err
 		}
 		// everything seems to be fine
@@ -250,7 +251,7 @@ func doSelectedOperation(config ConfigStruct, connection *sql.DB,
 		// display old records in database
 		err := displayAllOldRecords(connection, config.Cleaner.MaxAge, output)
 		if err != nil {
-			log.Err(err).Msg("Selecting records from database")
+			log.Err(err).Msg(selectingRecordsFromDatabase)
 			return err
 		}
 		// everything seems to be fine
