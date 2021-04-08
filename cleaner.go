@@ -257,7 +257,6 @@ func doSelectedOperation(config ConfigStruct, connection *sql.DB,
 		return nil
 	}
 	// we should not end there
-	return nil
 }
 
 func main() {
