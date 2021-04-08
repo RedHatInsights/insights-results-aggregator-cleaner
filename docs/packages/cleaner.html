@@ -148,7 +148,11 @@ relevant to us and should be pruned.</p>
 Aggregator database.</p>
 
 <p>Currently this service just displays such clusters (cluster IDs) and do
-nothing else - i.e. the results are not deleted.</p>
+nothing else - i.e. the results are not deleted by default.</p>
+
+<p>Additionally it is possible to detect and displays clusters where any rule
+have been disabled by multiple users at the same time. Such records might
+have to be deleted in order to maintain database consistency.</p>
 </td>
 	<td class="code"><pre><code><div class="keyword">package</div> <div class="ident">main</div><div class="operator"></div>
 
@@ -163,6 +167,7 @@ https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner
 <div class="keyword">import</div> <div class="operator">(</div>
 	<div class="literal">&#34;bufio&#34;</div><div class="operator"></div>
 	<div class="literal">&#34;flag&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;fmt&#34;</div><div class="operator"></div>
 	<div class="literal">&#34;os&#34;</div><div class="operator"></div>
 	<div class="literal">&#34;strconv&#34;</div><div class="operator"></div>
 	<div class="literal">&#34;strings&#34;</div><div class="operator"></div>
@@ -186,6 +191,24 @@ https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner
       </tr>
       
       <tr class="section">
+	<td class="doc"><p>Messages</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">const</div> <div class="operator">(</div>
+	<div class="ident">version</div>                      <div class="operator">=</div> <div class="literal">&#34;Insights Results Aggregator Cleaner version 1.0&#34;</div><div class="operator"></div>
+	<div class="ident">authors</div>                      <div class="operator">=</div> <div class="literal">&#34;Pavel Tisnovsky, Red Hat Inc.&#34;</div><div class="operator"></div>
+	<div class="ident">properClusterID</div>              <div class="operator">=</div> <div class="literal">&#34;Proper cluster ID&#34;</div><div class="operator"></div>
+	<div class="ident">notProperClusterID</div>           <div class="operator">=</div> <div class="literal">&#34;Not a proper cluster ID&#34;</div><div class="operator"></div>
+	<div class="ident">improperClusterEntries</div>       <div class="operator">=</div> <div class="literal">&#34;improper cluster entries&#34;</div><div class="operator"></div>
+	<div class="ident">numberOfClustersToDelete</div>     <div class="operator">=</div> <div class="literal">&#34;number of clusters to delete&#34;</div><div class="operator"></div>
+	<div class="ident">clusterListFinished</div>          <div class="operator">=</div> <div class="literal">&#34;Cluster list finished&#34;</div><div class="operator"></div>
+	<div class="ident">inputWithClusterID</div>           <div class="operator">=</div> <div class="literal">&#34;input&#34;</div><div class="operator"></div>
+	<div class="ident">selectingRecordsFromDatabase</div> <div class="operator">=</div> <div class="literal">&#34;Selecting records from database&#34;</div><div class="operator"></div>
+<div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
 	<td class="doc"><p>IsValidUUID function checks if provided string contains a correct UUID.</p>
 </td>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">IsValidUUID</div><div class="operator">(</div><div class="ident">input</div> <div class="ident">string</div><div class="operator">)</div> <div class="ident">bool</div> <div class="operator">{</div>
@@ -197,10 +220,76 @@ https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner
       </tr>
       
       <tr class="section">
-	<td class="doc"><p>readClusterList function reads list of clusters from provided text file.</p>
+	<td class="doc"><p>readClusterList function reads list of clusters from provided text file or
+from CLI argument.</p>
 </td>
-	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">readClusterList</div><div class="operator">(</div><div class="ident">filename</div> <div class="ident">string</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">ClusterList</div><div class="operator">,</div> <div class="ident">int</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
-	<div class="ident">log</div><div class="operator">.</div><div class="ident">Debug</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Cluster list read&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">readClusterList</div><div class="operator">(</div><div class="ident">filename</div> <div class="ident">string</div><div class="operator">,</div> <div class="ident">clusters</div> <div class="ident">string</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">ClusterList</div><div class="operator">,</div> <div class="ident">int</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>if clusters are not specified on command line, read list of clusters
+from file</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">clusters</div> <div class="operator">==</div> <div class="literal">&#34;&#34;</div> <div class="operator">{</div>
+		<div class="keyword">return</div> <div class="ident">readClusterListFromFile</div><div class="operator">(</div><div class="ident">filename</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>apparently list of clusters is specified on command line, so let's
+use it properly</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">return</div> <div class="ident">readClusterListFromCLIArgument</div><div class="operator">(</div><div class="ident">clusters</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>readClusterListFromCLIArgument reads list of clusters from CLI argument</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">readClusterListFromCLIArgument</div><div class="operator">(</div><div class="ident">clusters</div> <div class="ident">string</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">ClusterList</div><div class="operator">,</div> <div class="ident">int</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Debug</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Cluster list read from CLI argument&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">improperClusterCounter</div> <div class="operator">:=</div> <div class="literal">0</div><div class="operator"></div>
+
+	<div class="keyword">var</div> <div class="ident">clusterList</div> <div class="operator">=</div> <div class="ident">make</div><div class="operator">(</div><div class="operator">[</div><div class="operator">]</div><div class="ident">ClusterName</div><div class="operator">,</div> <div class="literal">0</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">v</div> <div class="operator">:=</div> <div class="ident">strings</div><div class="operator">.</div><div class="ident">Split</div><div class="operator">(</div><div class="ident">clusters</div><div class="operator">,</div> <div class="literal">&#34;,&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="keyword">for</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">cluster</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">v</div> <div class="operator">{</div>
+		<div class="ident">cluster</div> <div class="operator">:=</div> <div class="ident">strings</div><div class="operator">.</div><div class="ident">Trim</div><div class="operator">(</div><div class="ident">cluster</div><div class="operator">,</div> <div class="literal">&#34; &#34;</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if line contains proper cluster ID (as UUID)</p>
+</td>
+	<td class="code"><pre><code>		<div class="keyword">if</div> <div class="ident">IsValidUUID</div><div class="operator">(</div><div class="ident">cluster</div><div class="operator">)</div> <div class="operator">{</div>
+			<div class="ident">clusterList</div> <div class="operator">=</div> <div class="ident">append</div><div class="operator">(</div><div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">ClusterName</div><div class="operator">(</div><div class="ident">cluster</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+			<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Str</div><div class="operator">(</div><div class="ident">inputWithClusterID</div><div class="operator">,</div> <div class="ident">cluster</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">properClusterID</div><div class="operator">)</div><div class="operator"></div>
+		<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
+			<div class="ident">log</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Str</div><div class="operator">(</div><div class="ident">inputWithClusterID</div><div class="operator">,</div> <div class="ident">cluster</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">notProperClusterID</div><div class="operator">)</div><div class="operator"></div>
+			<div class="ident">improperClusterCounter</div><div class="operator">&#43;&#43;</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Int</div><div class="operator">(</div><div class="ident">numberOfClustersToDelete</div><div class="operator">,</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">clusterList</div><div class="operator">)</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">clusterListFinished</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Int</div><div class="operator">(</div><div class="ident">improperClusterEntries</div><div class="operator">,</div> <div class="ident">improperClusterCounter</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">clusterListFinished</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="keyword">return</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">improperClusterCounter</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>readClusterListFromFile function reads list of clusters from provided text
+file.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">readClusterListFromFile</div><div class="operator">(</div><div class="ident">filename</div> <div class="ident">string</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">ClusterList</div><div class="operator">,</div> <div class="ident">int</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Debug</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Cluster list read from file&#34;</div><div class="operator">)</div><div class="operator"></div>
 
 	<div class="ident">improperClusterCounter</div> <div class="operator">:=</div> <div class="literal">0</div><div class="operator"></div>
 
@@ -247,14 +336,14 @@ https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner
 </td>
 	<td class="code"><pre><code>		<div class="keyword">if</div> <div class="ident">IsValidUUID</div><div class="operator">(</div><div class="ident">line</div><div class="operator">)</div> <div class="operator">{</div>
 			<div class="ident">clusterList</div> <div class="operator">=</div> <div class="ident">append</div><div class="operator">(</div><div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">ClusterName</div><div class="operator">(</div><div class="ident">line</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
-			<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Str</div><div class="operator">(</div><div class="literal">&#34;input&#34;</div><div class="operator">,</div> <div class="ident">line</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Proper cluster ID&#34;</div><div class="operator">)</div><div class="operator"></div>
+			<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Str</div><div class="operator">(</div><div class="ident">inputWithClusterID</div><div class="operator">,</div> <div class="ident">line</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">properClusterID</div><div class="operator">)</div><div class="operator"></div>
 		<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
-			<div class="ident">log</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Str</div><div class="operator">(</div><div class="literal">&#34;input&#34;</div><div class="operator">,</div> <div class="ident">line</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Not a proper cluster ID&#34;</div><div class="operator">)</div><div class="operator"></div>
+			<div class="ident">log</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Str</div><div class="operator">(</div><div class="ident">inputWithClusterID</div><div class="operator">,</div> <div class="ident">line</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">notProperClusterID</div><div class="operator">)</div><div class="operator"></div>
 			<div class="ident">improperClusterCounter</div><div class="operator">&#43;&#43;</div><div class="operator"></div>
 		<div class="operator">}</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
-	<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Int</div><div class="operator">(</div><div class="literal">&#34;number of clusters to delete&#34;</div><div class="operator">,</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">clusterList</div><div class="operator">)</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Cluster list finished&#34;</div><div class="operator">)</div><div class="operator"></div>
-	<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Int</div><div class="operator">(</div><div class="literal">&#34;improper cluster entries&#34;</div><div class="operator">,</div> <div class="ident">improperClusterCounter</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Cluster list finished&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Int</div><div class="operator">(</div><div class="ident">numberOfClustersToDelete</div><div class="operator">,</div> <div class="ident">len</div><div class="operator">(</div><div class="ident">clusterList</div><div class="operator">)</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">clusterListFinished</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Int</div><div class="operator">(</div><div class="ident">improperClusterEntries</div><div class="operator">,</div> <div class="ident">improperClusterCounter</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">clusterListFinished</div><div class="operator">)</div><div class="operator"></div>
 
 	<div class="keyword">return</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">improperClusterCounter</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
 <div class="operator">}</div><div class="operator"></div>
@@ -324,15 +413,25 @@ cleanup step.</p>
 retention, cleanup selected data, or fill-id database by test data</p>
 </td>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">doSelectedOperation</div><div class="operator">(</div><div class="ident">config</div> <div class="ident">ConfigStruct</div><div class="operator">,</div> <div class="ident">connection</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">,</div>
-	<div class="ident">performCleanup</div> <div class="ident">bool</div><div class="operator">,</div> <div class="ident">fillInDatabase</div> <div class="ident">bool</div><div class="operator">,</div> <div class="ident">printSummaryTable</div> <div class="ident">bool</div><div class="operator">)</div> <div class="ident">error</div> <div class="operator">{</div>
-	<div class="keyword">if</div> <div class="ident">performCleanup</div> <div class="operator">{</div>
+	<div class="ident">showVersion</div> <div class="ident">bool</div><div class="operator">,</div> <div class="ident">showAuthors</div> <div class="ident">bool</div><div class="operator">,</div> <div class="ident">performCleanup</div> <div class="ident">bool</div><div class="operator">,</div>
+	<div class="ident">detectMultipleRuleDisable</div> <div class="ident">bool</div><div class="operator">,</div> <div class="ident">fillInDatabase</div> <div class="ident">bool</div><div class="operator">,</div>
+	<div class="ident">printSummaryTable</div> <div class="ident">bool</div><div class="operator">,</div> <div class="ident">clusters</div> <div class="ident">string</div><div class="operator">,</div>
+	<div class="ident">output</div> <div class="ident">string</div><div class="operator">)</div> <div class="ident">error</div> <div class="operator">{</div>
+	<div class="keyword">switch</div> <div class="operator">{</div>
+	<div class="keyword">case</div> <div class="ident">showVersion</div><div class="operator">:</div>
+		<div class="ident">fmt</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="ident">version</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div> <div class="ident">nil</div><div class="operator"></div>
+	<div class="keyword">case</div> <div class="ident">showAuthors</div><div class="operator">:</div>
+		<div class="ident">fmt</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="ident">authors</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div> <div class="ident">nil</div><div class="operator"></div>
+	<div class="keyword">case</div> <div class="ident">performCleanup</div><div class="operator">:</div>
 </code></pre></td>
       </tr>
       
       <tr class="section">
 	<td class="doc"><p>cleanup operation</p>
 </td>
-	<td class="code"><pre><code>		<div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">improperClusterCounter</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">readClusterList</div><div class="operator">(</div><div class="ident">config</div><div class="operator">.</div><div class="ident">Cleaner</div><div class="operator">.</div><div class="ident">ClusterListFile</div><div class="operator">)</div><div class="operator"></div>
+	<td class="code"><pre><code>		<div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">improperClusterCounter</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">readClusterList</div><div class="operator">(</div><div class="ident">config</div><div class="operator">.</div><div class="ident">Cleaner</div><div class="operator">.</div><div class="ident">ClusterListFile</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">)</div><div class="operator"></div>
 		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 			<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Read cluster list&#34;</div><div class="operator">)</div><div class="operator"></div>
 			<div class="keyword">return</div> <div class="ident">err</div><div class="operator"></div>
@@ -349,7 +448,27 @@ retention, cleanup selected data, or fill-id database by test data</p>
 			<div class="ident">summary</div><div class="operator">.</div><div class="ident">DeletionsForTable</div> <div class="operator">=</div> <div class="ident">deletionsForTable</div><div class="operator"></div>
 			<div class="ident">PrintSummaryTable</div><div class="operator">(</div><div class="ident">summary</div><div class="operator">)</div><div class="operator"></div>
 		<div class="operator">}</div><div class="operator"></div>
-	<div class="operator">}</div> <div class="keyword">else</div> <div class="keyword">if</div> <div class="ident">fillInDatabase</div> <div class="operator">{</div>
+		<div class="keyword">return</div> <div class="ident">nil</div><div class="operator"></div>
+	<div class="keyword">case</div> <div class="ident">detectMultipleRuleDisable</div><div class="operator">:</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>detect clusters that have the same rule(s) disabled by different users</p>
+</td>
+	<td class="code"><pre><code>		<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">displayMultipleRuleDisable</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">,</div> <div class="ident">output</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+			<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">selectingRecordsFromDatabase</div><div class="operator">)</div><div class="operator"></div>
+			<div class="keyword">return</div> <div class="ident">err</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>everything seems to be fine</p>
+</td>
+	<td class="code"><pre><code>		<div class="keyword">return</div> <div class="ident">nil</div><div class="operator"></div>
+	<div class="keyword">case</div> <div class="ident">fillInDatabase</div><div class="operator">:</div>
 </code></pre></td>
       </tr>
       
@@ -361,32 +480,51 @@ retention, cleanup selected data, or fill-id database by test data</p>
 			<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Fill-in database by test data&#34;</div><div class="operator">)</div><div class="operator"></div>
 			<div class="keyword">return</div> <div class="ident">err</div><div class="operator"></div>
 		<div class="operator">}</div><div class="operator"></div>
-	<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
-</code></pre></td>
-      </tr>
-      
-      <tr class="section">
-	<td class="doc"><p>display old records in database</p>
-</td>
-	<td class="code"><pre><code>		<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">displayAllOldRecords</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">,</div> <div class="ident">config</div><div class="operator">.</div><div class="ident">Cleaner</div><div class="operator">.</div><div class="ident">MaxAge</div><div class="operator">)</div><div class="operator"></div>
-		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
-			<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Selecting records from database&#34;</div><div class="operator">)</div><div class="operator"></div>
-			<div class="keyword">return</div> <div class="ident">err</div><div class="operator"></div>
-		<div class="operator">}</div><div class="operator"></div>
-	<div class="operator">}</div><div class="operator"></div>
 </code></pre></td>
       </tr>
       
       <tr class="section">
 	<td class="doc"><p>everything seems to be fine</p>
 </td>
-	<td class="code"><pre><code>	<div class="keyword">return</div> <div class="ident">nil</div><div class="operator"></div>
-<div class="operator">}</div><div class="operator"></div>
+	<td class="code"><pre><code>		<div class="keyword">return</div> <div class="ident">nil</div><div class="operator"></div>
+	<div class="keyword">default</div><div class="operator">:</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>display old records in database</p>
+</td>
+	<td class="code"><pre><code>		<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">displayAllOldRecords</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">,</div> <div class="ident">config</div><div class="operator">.</div><div class="ident">Cleaner</div><div class="operator">.</div><div class="ident">MaxAge</div><div class="operator">,</div> <div class="ident">output</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+			<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">selectingRecordsFromDatabase</div><div class="operator">)</div><div class="operator"></div>
+			<div class="keyword">return</div> <div class="ident">err</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>everything seems to be fine</p>
+</td>
+	<td class="code"><pre><code>		<div class="keyword">return</div> <div class="ident">nil</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>we should not end there</p>
+</td>
+	<td class="code"><pre><code><div class="operator">}</div><div class="operator"></div>
 
 <div class="keyword">func</div> <div class="ident">main</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
 	<div class="keyword">var</div> <div class="ident">performCleanup</div> <div class="ident">bool</div><div class="operator"></div>
 	<div class="keyword">var</div> <div class="ident">printSummaryTable</div> <div class="ident">bool</div><div class="operator"></div>
+	<div class="keyword">var</div> <div class="ident">detectMultipleRuleDisable</div> <div class="ident">bool</div><div class="operator"></div>
 	<div class="keyword">var</div> <div class="ident">fillInDatabase</div> <div class="ident">bool</div><div class="operator"></div>
+	<div class="keyword">var</div> <div class="ident">showVersion</div> <div class="ident">bool</div><div class="operator"></div>
+	<div class="keyword">var</div> <div class="ident">showAuthors</div> <div class="ident">bool</div><div class="operator"></div>
+	<div class="keyword">var</div> <div class="ident">maxAge</div> <div class="ident">string</div><div class="operator"></div>
+	<div class="keyword">var</div> <div class="ident">clusters</div> <div class="ident">string</div><div class="operator"></div>
+	<div class="keyword">var</div> <div class="ident">output</div> <div class="ident">string</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -396,7 +534,13 @@ retention, cleanup selected data, or fill-id database by test data</p>
 </td>
 	<td class="code"><pre><code>	<div class="ident">flag</div><div class="operator">.</div><div class="ident">BoolVar</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">performCleanup</div><div class="operator">,</div> <div class="literal">&#34;cleanup&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="literal">&#34;perform database cleanup&#34;</div><div class="operator">)</div><div class="operator"></div>
 	<div class="ident">flag</div><div class="operator">.</div><div class="ident">BoolVar</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">printSummaryTable</div><div class="operator">,</div> <div class="literal">&#34;summary&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="literal">&#34;print summary table after cleanup&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">flag</div><div class="operator">.</div><div class="ident">BoolVar</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">detectMultipleRuleDisable</div><div class="operator">,</div> <div class="literal">&#34;multiple-rule-disable&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="literal">&#34;list clusters with the same rule(s) disabled by different users&#34;</div><div class="operator">)</div><div class="operator"></div>
 	<div class="ident">flag</div><div class="operator">.</div><div class="ident">BoolVar</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">fillInDatabase</div><div class="operator">,</div> <div class="literal">&#34;fill-in-db&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="literal">&#34;fill-in database by test data&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">flag</div><div class="operator">.</div><div class="ident">BoolVar</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">showVersion</div><div class="operator">,</div> <div class="literal">&#34;version&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="literal">&#34;show cleaner version&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">flag</div><div class="operator">.</div><div class="ident">BoolVar</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">showAuthors</div><div class="operator">,</div> <div class="literal">&#34;authors&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="literal">&#34;show authors&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">flag</div><div class="operator">.</div><div class="ident">StringVar</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">maxAge</div><div class="operator">,</div> <div class="literal">&#34;max-age&#34;</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">,</div> <div class="literal">&#34;max age for displaying old records&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">flag</div><div class="operator">.</div><div class="ident">StringVar</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">clusters</div><div class="operator">,</div> <div class="literal">&#34;clusters&#34;</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">,</div> <div class="literal">&#34;list of clusters to cleanup&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">flag</div><div class="operator">.</div><div class="ident">StringVar</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">output</div><div class="operator">,</div> <div class="literal">&#34;output&#34;</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">,</div> <div class="literal">&#34;filename for old cluster listing&#34;</div><div class="operator">)</div><div class="operator"></div>
 	<div class="ident">flag</div><div class="operator">.</div><div class="ident">Parse</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
@@ -420,6 +564,16 @@ retention, cleanup selected data, or fill-id database by test data</p>
       </tr>
       
       <tr class="section">
+	<td class="doc"><p>override default value read from configuration file</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">maxAge</div> <div class="operator">!=</div> <div class="literal">&#34;&#34;</div> <div class="operator">{</div>
+		<div class="ident">config</div><div class="operator">.</div><div class="ident">Cleaner</div><div class="operator">.</div><div class="ident">MaxAge</div> <div class="operator">=</div> <div class="ident">maxAge</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
 	<td class="doc"><p>initialize connection to database</p>
 </td>
 	<td class="code"><pre><code>	<div class="ident">connection</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">initDatabaseConnection</div><div class="operator">(</div><div class="ident">config</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator">)</div><div class="operator"></div>
@@ -433,7 +587,10 @@ retention, cleanup selected data, or fill-id database by test data</p>
       <tr class="section">
 	<td class="doc"><p>perform selected operation</p>
 </td>
-	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">doSelectedOperation</div><div class="operator">(</div><div class="ident">config</div><div class="operator">,</div> <div class="ident">connection</div><div class="operator">,</div> <div class="ident">performCleanup</div><div class="operator">,</div> <div class="ident">fillInDatabase</div><div class="operator">,</div> <div class="ident">printSummaryTable</div><div class="operator">)</div><div class="operator"></div>
+	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">doSelectedOperation</div><div class="operator">(</div><div class="ident">config</div><div class="operator">,</div> <div class="ident">connection</div><div class="operator">,</div> <div class="ident">showVersion</div><div class="operator">,</div> <div class="ident">showAuthors</div><div class="operator">,</div>
+		<div class="ident">performCleanup</div><div class="operator">,</div> <div class="ident">detectMultipleRuleDisable</div><div class="operator">,</div> <div class="ident">fillInDatabase</div><div class="operator">,</div>
+		<div class="ident">printSummaryTable</div><div class="operator">,</div> <div class="ident">clusters</div><div class="operator">,</div>
+		<div class="ident">output</div><div class="operator">)</div><div class="operator"></div>
 	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 		<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Operation failed&#34;</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>

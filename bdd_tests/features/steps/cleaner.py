@@ -97,6 +97,8 @@ Usage of insights-results-aggregator-cleaner:
         fill-in database by test data
   -max-age string
         max age for displaying old records
+  -multiple-rule-disable
+        list clusters with the same rule(s) disabled by different users
   -output string
         filename for old cluster listing
   -summary
