@@ -25,7 +25,11 @@ limitations under the License.
 // Aggregator database.
 //
 // Currently this service just displays such clusters (cluster IDs) and do
-// nothing else - i.e. the results are not deleted.
+// nothing else - i.e. the results are not deleted by default.
+//
+// Additionally it is possible to detect and displays clusters where any rule
+// have been disabled by multiple users at the same time. Such records might
+// have to be deleted in order to maintain database consistency.
 package main
 
 // Generated documentation is available at:
@@ -194,7 +198,8 @@ func PrintSummaryTable(summary Summary) {
 // retention, cleanup selected data, or fill-id database by test data
 func doSelectedOperation(config ConfigStruct, connection *sql.DB,
 	showVersion bool, showAuthors bool, performCleanup bool,
-	fillInDatabase bool, printSummaryTable bool, clusters string,
+	detectMultipleRuleDisable bool, fillInDatabase bool,
+	printSummaryTable bool, clusters string,
 	output string) error {
 	switch {
 	case showVersion:
@@ -222,6 +227,16 @@ func doSelectedOperation(config ConfigStruct, connection *sql.DB,
 			summary.DeletionsForTable = deletionsForTable
 			PrintSummaryTable(summary)
 		}
+		return nil
+	case detectMultipleRuleDisable:
+		// detect clusters that have the same rule(s) disabled by different users
+		err := displayMultipleRuleDisable(connection, output)
+		if err != nil {
+			log.Err(err).Msg("Selecting records from database")
+			return err
+		}
+		// everything seems to be fine
+		return nil
 	case fillInDatabase:
 		// fill-in database by test data
 		err := fillInDatabaseByTestData(connection)
@@ -248,6 +263,7 @@ func doSelectedOperation(config ConfigStruct, connection *sql.DB,
 func main() {
 	var performCleanup bool
 	var printSummaryTable bool
+	var detectMultipleRuleDisable bool
 	var fillInDatabase bool
 	var showVersion bool
 	var showAuthors bool
@@ -258,6 +274,7 @@ func main() {
 	// define and parse all command line options
 	flag.BoolVar(&performCleanup, "cleanup", false, "perform database cleanup")
 	flag.BoolVar(&printSummaryTable, "summary", false, "print summary table after cleanup")
+	flag.BoolVar(&detectMultipleRuleDisable, "multiple-rule-disable", false, "list clusters with the same rule(s) disabled by different users")
 	flag.BoolVar(&fillInDatabase, "fill-in-db", false, "fill-in database by test data")
 	flag.BoolVar(&showVersion, "version", false, "show cleaner version")
 	flag.BoolVar(&showAuthors, "authors", false, "show authors")
@@ -291,7 +308,8 @@ func main() {
 
 	// perform selected operation
 	err = doSelectedOperation(config, connection, showVersion, showAuthors,
-		performCleanup, fillInDatabase, printSummaryTable, clusters,
+		performCleanup, detectMultipleRuleDisable, fillInDatabase,
+		printSummaryTable, clusters,
 		output)
 	if err != nil {
 		log.Err(err).Msg("Operation failed")
