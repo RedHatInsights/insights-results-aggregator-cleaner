@@ -48,6 +48,7 @@ package main
 //
 // [cleaner]
 // max_age = "90 days"
+// cluster_list_file = "cluster_list.txt"
 //
 //
 // Environment variables that can be used to override configuration file settings:
@@ -106,6 +107,8 @@ type LoggingConfiguration struct {
 type CleanerConfiguration struct {
 	// MaxAge is specification of max age for records to be cleaned
 	MaxAge string `mapstructure:"max_age" toml:"max_age"`
+	// ClusterListFile contains file name with list of clusters to delete
+	ClusterListFile string `mapstructure:"cluster_list_file" toml:"cluster_list_file"`
 }
 
 // StorageConfiguration represents configuration of data storage
@@ -125,6 +128,7 @@ type StorageConfiguration struct {
 func LoadConfiguration(configFileEnvVariableName string, defaultConfigFile string) (ConfigStruct, error) {
 	var config ConfigStruct
 
+	// env. variable holding name of configuration file
 	configFile, specified := os.LookupEnv(configFileEnvVariableName)
 	if specified {
 		// we need to separate the directory name and filename without
@@ -141,6 +145,7 @@ func LoadConfiguration(configFileEnvVariableName string, defaultConfigFile strin
 		viper.AddConfigPath(".")
 	}
 
+	// try to read the whole configuration
 	err := viper.ReadInConfig()
 	if _, isNotFoundError := err.(viper.ConfigFileNotFoundError); !specified && isNotFoundError {
 		// viper is not smart enough to understand the structure of
@@ -186,7 +191,7 @@ func GetLoggingConfiguration(config ConfigStruct) LoggingConfiguration {
 	return config.Logging
 }
 
-// GetCleanerConfiguration returns cloudwatch configuration
+// GetCleanerConfiguration returns cleaner configuration
 func GetCleanerConfiguration(config ConfigStruct) CleanerConfiguration {
 	return config.Cleaner
 }

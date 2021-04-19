@@ -15,3 +15,6 @@
 # vendor/
 
 insights-results-aggregator-cleaner
+
+bdd_tests/test
+issue.py
