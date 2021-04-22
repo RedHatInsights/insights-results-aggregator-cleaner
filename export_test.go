@@ -28,4 +28,5 @@ package main
 var (
 	ReadOrgID                         = readOrgID
 	PerformDisplayMultipleRuleDisable = performDisplayMultipleRuleDisable
+	PerformListOfOldReports           = performListOfOldReports
 )

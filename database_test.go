@@ -19,6 +19,7 @@ package main_test
 import (
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	cleaner "github.com/RedHatInsights/insights-results-aggregator-cleaner"
@@ -191,6 +192,102 @@ func TestPerformDisplayMultipleRuleDisableOnError(t *testing.T) {
 `
 	// call the tested function
 	err = cleaner.PerformDisplayMultipleRuleDisable(connection, nil, query1, "cluster_rule_toggle")
+	if err == nil {
+		t.Fatalf("error was expected while updating stats")
+	}
+
+	// check if the error is correct
+	if err != mockedError {
+		t.Errorf("different error was returned: %v", err)
+	}
+
+	// check if all expectations were met
+	err = mock.ExpectationsWereMet()
+	if err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+}
+
+// TestPerformListOfOldReportsNoResults checks the basic behaviour of
+// performListOfOldReports function.
+func TestPerformListOfOldReportsNoResults(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer connection.Close()
+
+	rows := sqlmock.NewRows([]string{})
+
+	// expected query performed by tested function
+	expectedQuery := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
+	mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
+
+	// call the tested function
+	err = cleaner.PerformListOfOldReports(connection, "10", nil)
+	if err != nil {
+		t.Errorf("error was not expected while updating stats: %s", err)
+	}
+
+	// check if all expectations were met
+	err = mock.ExpectationsWereMet()
+	if err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+}
+
+// TestPerformListOfOldReportsResults checks the basic behaviour of
+// performListOfOldReports function.
+func TestPerformListOfOldReportsResults(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer connection.Close()
+
+	rows := sqlmock.NewRows([]string{"cluster", "reported_at", "last_checked"})
+	reportedAt := time.Now()
+	updatedAt := time.Now()
+	rows.AddRow("123e4567-e89b-12d3-a456-426614173998", reportedAt, updatedAt)
+
+	// expected query performed by tested function
+	expectedQuery := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
+	mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
+
+	// call the tested function
+	err = cleaner.PerformListOfOldReports(connection, "10", nil)
+	if err != nil {
+		t.Errorf("error was not expected while updating stats: %s", err)
+	}
+
+	// check if all expectations were met
+	err = mock.ExpectationsWereMet()
+	if err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+}
+
+// TestPerformListOfOldReportsOnError checks the error handling
+// ability in performListOfOldReports function.
+func TestPerformListOfOldReportsOnError(t *testing.T) {
+	// error to be thrown
+	mockedError := errors.New("mocked error")
+
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer connection.Close()
+
+	// expected query performed by tested function
+	expectedQuery := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
+	mock.ExpectQuery(expectedQuery).WillReturnError(mockedError)
+
+	// call the tested function
+	err = cleaner.PerformListOfOldReports(connection, "10", nil)
 	if err == nil {
 		t.Fatalf("error was expected while updating stats")
 	}
