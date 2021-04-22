@@ -24,6 +24,109 @@ import (
 	cleaner "github.com/RedHatInsights/insights-results-aggregator-cleaner"
 )
 
+func TestReadOrgIDNoResults(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer connection.Close()
+
+	rows := sqlmock.NewRows([]string{})
+
+	// expected query performed by tested function
+	expectedQuery := "select org_id from report where cluster = \\$1"
+	mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
+
+	// call the tested function
+	org_id, err := cleaner.ReadOrgID(connection, "123e4567-e89b-12d3-a456-426614174000")
+	if err != nil {
+		t.Errorf("error was not expected while updating stats: %s", err)
+	}
+
+	// check the org ID returned from tested function
+	if org_id != -1 {
+		t.Errorf("wrong org_id returned: %d", org_id)
+	}
+
+	// check if all expectations were met
+	err = mock.ExpectationsWereMet()
+	if err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+}
+
+func TestReadOrgIDResult(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer connection.Close()
+
+	rows := sqlmock.NewRows([]string{"org_id"})
+	rows.AddRow("42")
+
+	// expected query performed by tested function
+	expectedQuery := "select org_id from report where cluster = \\$1"
+	mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
+
+	// call the tested function
+	org_id, err := cleaner.ReadOrgID(connection, "123e4567-e89b-12d3-a456-426614174000")
+	if err != nil {
+		t.Errorf("error was not expected while updating stats: %s", err)
+	}
+
+	// check the org ID returned from tested function
+	if org_id != 42 {
+		t.Errorf("wrong org_id returned: %d", org_id)
+	}
+
+	// check if all expectations were met
+	err = mock.ExpectationsWereMet()
+	if err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+}
+
+func TestReadOrgIDOnError(t *testing.T) {
+	// error to be thrown
+	mockedError := errors.New("mocked error")
+
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer connection.Close()
+
+	// expected query performed by tested function
+	expectedQuery := "select org_id from report where cluster = \\$1"
+	mock.ExpectQuery(expectedQuery).WillReturnError(mockedError)
+
+	// call the tested function
+	org_id, err := cleaner.ReadOrgID(connection, "123e4567-e89b-12d3-a456-426614173999")
+	if err == nil {
+		t.Fatalf("error was expected while updating stats")
+	}
+
+	// check the org ID returned from tested function
+	if org_id != -1 {
+		t.Errorf("wrong org_id returned: %d", org_id)
+	}
+
+	// check if the error is correct
+	if err != mockedError {
+		t.Errorf("different error was returned: %v", err)
+	}
+
+	// check if all expectations were met
+	err = mock.ExpectationsWereMet()
+	if err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+}
+
 // TestPerformDisplayMultipleRuleDisableNoResults checks the basic behaviour of
 // performDisplayMultipleRuleDisable function.
 func TestPerformDisplayMultipleRuleDisableNoResults(t *testing.T) {
