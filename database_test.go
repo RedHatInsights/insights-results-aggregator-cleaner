@@ -25,6 +25,7 @@ import (
 	cleaner "github.com/RedHatInsights/insights-results-aggregator-cleaner"
 )
 
+// TestReadOrgIDNoResults checks the function readOrgID.
 func TestReadOrgIDNoResults(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
@@ -33,6 +34,7 @@ func TestReadOrgIDNoResults(t *testing.T) {
 	}
 	defer connection.Close()
 
+	// prepare mocked result for SQL query
 	rows := sqlmock.NewRows([]string{})
 
 	// expected query performed by tested function
@@ -57,6 +59,7 @@ func TestReadOrgIDNoResults(t *testing.T) {
 	}
 }
 
+// TestReadOrgIDResults checks the function readOrgID.
 func TestReadOrgIDResult(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
@@ -65,6 +68,7 @@ func TestReadOrgIDResult(t *testing.T) {
 	}
 	defer connection.Close()
 
+	// prepare mocked result for SQL query
 	rows := sqlmock.NewRows([]string{"org_id"})
 	rows.AddRow("42")
 
@@ -90,6 +94,7 @@ func TestReadOrgIDResult(t *testing.T) {
 	}
 }
 
+// TestReadOrgIDOnError checks error handling in function readOrgID.
 func TestReadOrgIDOnError(t *testing.T) {
 	// error to be thrown
 	mockedError := errors.New("mocked error")
@@ -138,6 +143,7 @@ func TestPerformDisplayMultipleRuleDisableNoResults(t *testing.T) {
 	}
 	defer connection.Close()
 
+	// prepare mocked result for SQL query
 	rows := sqlmock.NewRows([]string{})
 
 	// expected query performed by tested function
@@ -218,6 +224,7 @@ func TestPerformListOfOldReportsNoResults(t *testing.T) {
 	}
 	defer connection.Close()
 
+	// prepare mocked result for SQL query
 	rows := sqlmock.NewRows([]string{})
 
 	// expected query performed by tested function
@@ -247,6 +254,7 @@ func TestPerformListOfOldReportsResults(t *testing.T) {
 	}
 	defer connection.Close()
 
+	// prepare mocked result for SQL query
 	rows := sqlmock.NewRows([]string{"cluster", "reported_at", "last_checked"})
 	reportedAt := time.Now()
 	updatedAt := time.Now()
@@ -324,6 +332,7 @@ func TestDeleteRecordFromTable(t *testing.T) {
 		t.Errorf("error was not expected while updating stats: %s", err)
 	}
 
+	// test number of affected rows
 	if affected != 1 {
 		t.Errorf("wrong number of rows affected: %d", affected)
 	}
@@ -358,6 +367,7 @@ func TestDeleteRecordFromTableOnError(t *testing.T) {
 		t.Fatalf("error was expected while updating stats")
 	}
 
+	// test number of affected rows
 	if affected != 0 {
 		t.Errorf("wrong number of rows affected: %d", affected)
 	}
