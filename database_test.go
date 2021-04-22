@@ -32,7 +32,6 @@ func TestReadOrgIDNoResults(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-	defer connection.Close()
 
 	// prepare mocked result for SQL query
 	rows := sqlmock.NewRows([]string{})
@@ -40,6 +39,7 @@ func TestReadOrgIDNoResults(t *testing.T) {
 	// expected query performed by tested function
 	expectedQuery := "select org_id from report where cluster = \\$1"
 	mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
+	mock.ExpectClose()
 
 	// call the tested function
 	org_id, err := cleaner.ReadOrgID(connection, "123e4567-e89b-12d3-a456-426614174000")
@@ -50,6 +50,11 @@ func TestReadOrgIDNoResults(t *testing.T) {
 	// check the org ID returned from tested function
 	if org_id != -1 {
 		t.Errorf("wrong org_id returned: %d", org_id)
+	}
+
+	err = connection.Close()
+	if err != nil {
+		t.Fatalf("error during closing connection: %v", err)
 	}
 
 	// check if all expectations were met
@@ -66,11 +71,10 @@ func TestReadOrgIDResult(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-	defer connection.Close()
 
 	// prepare mocked result for SQL query
 	rows := sqlmock.NewRows([]string{"org_id"})
-	rows.AddRow("42")
+	rows.AddRow(42)
 
 	// expected query performed by tested function
 	expectedQuery := "select org_id from report where cluster = \\$1"
@@ -85,6 +89,11 @@ func TestReadOrgIDResult(t *testing.T) {
 	// check the org ID returned from tested function
 	if org_id != 42 {
 		t.Errorf("wrong org_id returned: %d", org_id)
+	}
+
+	err = connection.Close()
+	if err != nil {
+		t.Fatalf("error during closing connection: %v", err)
 	}
 
 	// check if all expectations were met
@@ -104,11 +113,11 @@ func TestReadOrgIDOnError(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-	defer connection.Close()
 
 	// expected query performed by tested function
 	expectedQuery := "select org_id from report where cluster = \\$1"
 	mock.ExpectQuery(expectedQuery).WillReturnError(mockedError)
+	mock.ExpectClose()
 
 	// call the tested function
 	org_id, err := cleaner.ReadOrgID(connection, "123e4567-e89b-12d3-a456-426614173999")
@@ -126,6 +135,11 @@ func TestReadOrgIDOnError(t *testing.T) {
 		t.Errorf("different error was returned: %v", err)
 	}
 
+	err = connection.Close()
+	if err != nil {
+		t.Fatalf("error during closing connection: %v", err)
+	}
+
 	// check if all expectations were met
 	err = mock.ExpectationsWereMet()
 	if err != nil {
@@ -141,7 +155,6 @@ func TestPerformDisplayMultipleRuleDisableNoResults(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-	defer connection.Close()
 
 	// prepare mocked result for SQL query
 	rows := sqlmock.NewRows([]string{})
@@ -149,6 +162,7 @@ func TestPerformDisplayMultipleRuleDisableNoResults(t *testing.T) {
 	// expected query performed by tested function
 	expectedQuery := "select cluster_id, rule_id, count\\(\\*\\) as cnt from cluster_rule_toggle group by cluster_id, rule_id having count\\(\\*\\)>1 order by cnt desc;"
 	mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
+	mock.ExpectClose()
 
 	// first query to be performed
 	query1 := `
@@ -162,6 +176,11 @@ func TestPerformDisplayMultipleRuleDisableNoResults(t *testing.T) {
 	err = cleaner.PerformDisplayMultipleRuleDisable(connection, nil, query1, "cluster_rule_toggle")
 	if err != nil {
 		t.Errorf("error was not expected while updating stats: %s", err)
+	}
+
+	err = connection.Close()
+	if err != nil {
+		t.Fatalf("error during closing connection: %v", err)
 	}
 
 	// check if all expectations were met
@@ -182,11 +201,11 @@ func TestPerformDisplayMultipleRuleDisableOnError(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-	defer connection.Close()
 
 	// expected query performed by tested function
 	expectedQuery := "select cluster_id, rule_id, count\\(\\*\\) as cnt from cluster_rule_toggle group by cluster_id, rule_id having count\\(\\*\\)>1 order by cnt desc;"
 	mock.ExpectQuery(expectedQuery).WillReturnError(mockedError)
+	mock.ExpectClose()
 
 	// first query to be performed
 	query1 := `
@@ -207,6 +226,11 @@ func TestPerformDisplayMultipleRuleDisableOnError(t *testing.T) {
 		t.Errorf("different error was returned: %v", err)
 	}
 
+	err = connection.Close()
+	if err != nil {
+		t.Fatalf("error during closing connection: %v", err)
+	}
+
 	// check if all expectations were met
 	err = mock.ExpectationsWereMet()
 	if err != nil {
@@ -222,7 +246,6 @@ func TestPerformListOfOldReportsNoResults(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-	defer connection.Close()
 
 	// prepare mocked result for SQL query
 	rows := sqlmock.NewRows([]string{})
@@ -230,11 +253,17 @@ func TestPerformListOfOldReportsNoResults(t *testing.T) {
 	// expected query performed by tested function
 	expectedQuery := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
 	mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
+	mock.ExpectClose()
 
 	// call the tested function
 	err = cleaner.PerformListOfOldReports(connection, "10", nil)
 	if err != nil {
 		t.Errorf("error was not expected while updating stats: %s", err)
+	}
+
+	err = connection.Close()
+	if err != nil {
+		t.Fatalf("error during closing connection: %v", err)
 	}
 
 	// check if all expectations were met
@@ -252,7 +281,6 @@ func TestPerformListOfOldReportsResults(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-	defer connection.Close()
 
 	// prepare mocked result for SQL query
 	rows := sqlmock.NewRows([]string{"cluster", "reported_at", "last_checked"})
@@ -263,11 +291,17 @@ func TestPerformListOfOldReportsResults(t *testing.T) {
 	// expected query performed by tested function
 	expectedQuery := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
 	mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
+	mock.ExpectClose()
 
 	// call the tested function
 	err = cleaner.PerformListOfOldReports(connection, "10", nil)
 	if err != nil {
 		t.Errorf("error was not expected while updating stats: %s", err)
+	}
+
+	err = connection.Close()
+	if err != nil {
+		t.Fatalf("error during closing connection: %v", err)
 	}
 
 	// check if all expectations were met
@@ -288,11 +322,11 @@ func TestPerformListOfOldReportsOnError(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-	defer connection.Close()
 
 	// expected query performed by tested function
 	expectedQuery := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
 	mock.ExpectQuery(expectedQuery).WillReturnError(mockedError)
+	mock.ExpectClose()
 
 	// call the tested function
 	err = cleaner.PerformListOfOldReports(connection, "10", nil)
@@ -303,6 +337,11 @@ func TestPerformListOfOldReportsOnError(t *testing.T) {
 	// check if the error is correct
 	if err != mockedError {
 		t.Errorf("different error was returned: %v", err)
+	}
+
+	err = connection.Close()
+	if err != nil {
+		t.Fatalf("error during closing connection: %v", err)
 	}
 
 	// check if all expectations were met
@@ -320,11 +359,11 @@ func TestDeleteRecordFromTable(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-	defer connection.Close()
 
 	// expected query performed by tested function
 	expectedExec := "DELETE FROM table_x WHERE key_x = \\$"
 	mock.ExpectExec(expectedExec).WithArgs("key_value").WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectClose()
 
 	// call the tested function
 	affected, err := cleaner.DeleteRecordFromTable(connection, "table_x", "key_x", "key_value")
@@ -335,6 +374,11 @@ func TestDeleteRecordFromTable(t *testing.T) {
 	// test number of affected rows
 	if affected != 1 {
 		t.Errorf("wrong number of rows affected: %d", affected)
+	}
+
+	err = connection.Close()
+	if err != nil {
+		t.Fatalf("error during closing connection: %v", err)
 	}
 
 	// check if all expectations were met
@@ -355,11 +399,11 @@ func TestDeleteRecordFromTableOnError(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-	defer connection.Close()
 
 	// expected query performed by tested function
 	expectedExec := "DELETE FROM table_x WHERE key_x = \\$"
 	mock.ExpectExec(expectedExec).WithArgs("key_value").WillReturnError(mockedError)
+	mock.ExpectClose()
 
 	// call the tested function
 	affected, err := cleaner.DeleteRecordFromTable(connection, "table_x", "key_x", "key_value")
@@ -375,6 +419,11 @@ func TestDeleteRecordFromTableOnError(t *testing.T) {
 	// check if the error is correct
 	if err != mockedError {
 		t.Errorf("different error was returned: %v", err)
+	}
+
+	err = connection.Close()
+	if err != nil {
+		t.Fatalf("error during closing connection: %v", err)
 	}
 
 	// check if all expectations were met

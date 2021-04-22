@@ -161,7 +161,6 @@ limitations under the License.
 	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatalf</div><div class="operator">(</div><div class="literal">&#34;an error &#39;%s&#39; was not expected when opening a stub database connection&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
-	<div class="keyword">defer</div> <div class="ident">connection</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -179,6 +178,7 @@ limitations under the License.
 </td>
 	<td class="code"><pre><code>	<div class="ident">expectedQuery</div> <div class="operator">:=</div> <div class="literal">&#34;select org_id from report where cluster = \\$1&#34;</div><div class="operator"></div>
 	<div class="ident">mock</div><div class="operator">.</div><div class="ident">ExpectQuery</div><div class="operator">(</div><div class="ident">expectedQuery</div><div class="operator">)</div><div class="operator">.</div><div class="ident">WillReturnRows</div><div class="operator">(</div><div class="ident">rows</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">mock</div><div class="operator">.</div><div class="ident">ExpectClose</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -199,6 +199,11 @@ limitations under the License.
 </td>
 	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">org_id</div> <div class="operator">!=</div> <div class="operator">-</div><div class="literal">1</div> <div class="operator">{</div>
 		<div class="ident">t</div><div class="operator">.</div><div class="ident">Errorf</div><div class="operator">(</div><div class="literal">&#34;wrong org_id returned: %d&#34;</div><div class="operator">,</div> <div class="ident">org_id</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">connection</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatalf</div><div class="operator">(</div><div class="literal">&#34;error during closing connection: %v&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 
 </code></pre></td>
@@ -230,7 +235,6 @@ limitations under the License.
 	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatalf</div><div class="operator">(</div><div class="literal">&#34;an error &#39;%s&#39; was not expected when opening a stub database connection&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
-	<div class="keyword">defer</div> <div class="ident">connection</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -239,7 +243,7 @@ limitations under the License.
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
 	<td class="code"><pre><code>	<div class="ident">rows</div> <div class="operator">:=</div> <div class="ident">sqlmock</div><div class="operator">.</div><div class="ident">NewRows</div><div class="operator">(</div><div class="operator">[</div><div class="operator">]</div><div class="ident">string</div><div class="operator">{</div><div class="literal">&#34;org_id&#34;</div><div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
-	<div class="ident">rows</div><div class="operator">.</div><div class="ident">AddRow</div><div class="operator">(</div><div class="literal">&#34;42&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">rows</div><div class="operator">.</div><div class="ident">AddRow</div><div class="operator">(</div><div class="literal">42</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -269,6 +273,11 @@ limitations under the License.
 </td>
 	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">org_id</div> <div class="operator">!=</div> <div class="literal">42</div> <div class="operator">{</div>
 		<div class="ident">t</div><div class="operator">.</div><div class="ident">Errorf</div><div class="operator">(</div><div class="literal">&#34;wrong org_id returned: %d&#34;</div><div class="operator">,</div> <div class="ident">org_id</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">connection</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatalf</div><div class="operator">(</div><div class="literal">&#34;error during closing connection: %v&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 
 </code></pre></td>
@@ -308,7 +317,6 @@ limitations under the License.
 	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatalf</div><div class="operator">(</div><div class="literal">&#34;an error &#39;%s&#39; was not expected when opening a stub database connection&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
-	<div class="keyword">defer</div> <div class="ident">connection</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -318,6 +326,7 @@ limitations under the License.
 </td>
 	<td class="code"><pre><code>	<div class="ident">expectedQuery</div> <div class="operator">:=</div> <div class="literal">&#34;select org_id from report where cluster = \\$1&#34;</div><div class="operator"></div>
 	<div class="ident">mock</div><div class="operator">.</div><div class="ident">ExpectQuery</div><div class="operator">(</div><div class="ident">expectedQuery</div><div class="operator">)</div><div class="operator">.</div><div class="ident">WillReturnError</div><div class="operator">(</div><div class="ident">mockedError</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">mock</div><div class="operator">.</div><div class="ident">ExpectClose</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -350,6 +359,11 @@ limitations under the License.
 		<div class="ident">t</div><div class="operator">.</div><div class="ident">Errorf</div><div class="operator">(</div><div class="literal">&#34;different error was returned: %v&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 
+	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">connection</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatalf</div><div class="operator">(</div><div class="literal">&#34;error during closing connection: %v&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
 </code></pre></td>
       </tr>
       
@@ -380,7 +394,6 @@ performDisplayMultipleRuleDisable function.</p>
 	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatalf</div><div class="operator">(</div><div class="literal">&#34;an error &#39;%s&#39; was not expected when opening a stub database connection&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
-	<div class="keyword">defer</div> <div class="ident">connection</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -398,6 +411,7 @@ performDisplayMultipleRuleDisable function.</p>
 </td>
 	<td class="code"><pre><code>	<div class="ident">expectedQuery</div> <div class="operator">:=</div> <div class="literal">&#34;select cluster_id, rule_id, count\\(\\*\\) as cnt from cluster_rule_toggle group by cluster_id, rule_id having count\\(\\*\\)&gt;1 order by cnt desc;&#34;</div><div class="operator"></div>
 	<div class="ident">mock</div><div class="operator">.</div><div class="ident">ExpectQuery</div><div class="operator">(</div><div class="ident">expectedQuery</div><div class="operator">)</div><div class="operator">.</div><div class="ident">WillReturnRows</div><div class="operator">(</div><div class="ident">rows</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">mock</div><div class="operator">.</div><div class="ident">ExpectClose</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -421,6 +435,11 @@ performDisplayMultipleRuleDisable function.</p>
 	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">cleaner</div><div class="operator">.</div><div class="ident">PerformDisplayMultipleRuleDisable</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator">,</div> <div class="ident">query1</div><div class="operator">,</div> <div class="literal">&#34;cluster_rule_toggle&#34;</div><div class="operator">)</div><div class="operator"></div>
 	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 		<div class="ident">t</div><div class="operator">.</div><div class="ident">Errorf</div><div class="operator">(</div><div class="literal">&#34;error was not expected while updating stats: %s&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">connection</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatalf</div><div class="operator">(</div><div class="literal">&#34;error during closing connection: %v&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 
 </code></pre></td>
@@ -461,7 +480,6 @@ ability in performDisplayMultipleRuleDisable function.</p>
 	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatalf</div><div class="operator">(</div><div class="literal">&#34;an error &#39;%s&#39; was not expected when opening a stub database connection&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
-	<div class="keyword">defer</div> <div class="ident">connection</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -471,6 +489,7 @@ ability in performDisplayMultipleRuleDisable function.</p>
 </td>
 	<td class="code"><pre><code>	<div class="ident">expectedQuery</div> <div class="operator">:=</div> <div class="literal">&#34;select cluster_id, rule_id, count\\(\\*\\) as cnt from cluster_rule_toggle group by cluster_id, rule_id having count\\(\\*\\)&gt;1 order by cnt desc;&#34;</div><div class="operator"></div>
 	<div class="ident">mock</div><div class="operator">.</div><div class="ident">ExpectQuery</div><div class="operator">(</div><div class="ident">expectedQuery</div><div class="operator">)</div><div class="operator">.</div><div class="ident">WillReturnError</div><div class="operator">(</div><div class="ident">mockedError</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">mock</div><div class="operator">.</div><div class="ident">ExpectClose</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -506,6 +525,11 @@ ability in performDisplayMultipleRuleDisable function.</p>
 		<div class="ident">t</div><div class="operator">.</div><div class="ident">Errorf</div><div class="operator">(</div><div class="literal">&#34;different error was returned: %v&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 
+	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">connection</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatalf</div><div class="operator">(</div><div class="literal">&#34;error during closing connection: %v&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
 </code></pre></td>
       </tr>
       
@@ -536,7 +560,6 @@ performListOfOldReports function.</p>
 	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatalf</div><div class="operator">(</div><div class="literal">&#34;an error &#39;%s&#39; was not expected when opening a stub database connection&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
-	<div class="keyword">defer</div> <div class="ident">connection</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -554,6 +577,7 @@ performListOfOldReports function.</p>
 </td>
 	<td class="code"><pre><code>	<div class="ident">expectedQuery</div> <div class="operator">:=</div> <div class="literal">&#34;SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at &lt; NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at&#34;</div><div class="operator"></div>
 	<div class="ident">mock</div><div class="operator">.</div><div class="ident">ExpectQuery</div><div class="operator">(</div><div class="ident">expectedQuery</div><div class="operator">)</div><div class="operator">.</div><div class="ident">WillReturnRows</div><div class="operator">(</div><div class="ident">rows</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">mock</div><div class="operator">.</div><div class="ident">ExpectClose</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -564,6 +588,11 @@ performListOfOldReports function.</p>
 	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">cleaner</div><div class="operator">.</div><div class="ident">PerformListOfOldReports</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">,</div> <div class="literal">&#34;10&#34;</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator">)</div><div class="operator"></div>
 	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 		<div class="ident">t</div><div class="operator">.</div><div class="ident">Errorf</div><div class="operator">(</div><div class="literal">&#34;error was not expected while updating stats: %s&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">connection</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatalf</div><div class="operator">(</div><div class="literal">&#34;error during closing connection: %v&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 
 </code></pre></td>
@@ -596,7 +625,6 @@ performListOfOldReports function.</p>
 	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatalf</div><div class="operator">(</div><div class="literal">&#34;an error &#39;%s&#39; was not expected when opening a stub database connection&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
-	<div class="keyword">defer</div> <div class="ident">connection</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -617,6 +645,7 @@ performListOfOldReports function.</p>
 </td>
 	<td class="code"><pre><code>	<div class="ident">expectedQuery</div> <div class="operator">:=</div> <div class="literal">&#34;SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at &lt; NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at&#34;</div><div class="operator"></div>
 	<div class="ident">mock</div><div class="operator">.</div><div class="ident">ExpectQuery</div><div class="operator">(</div><div class="ident">expectedQuery</div><div class="operator">)</div><div class="operator">.</div><div class="ident">WillReturnRows</div><div class="operator">(</div><div class="ident">rows</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">mock</div><div class="operator">.</div><div class="ident">ExpectClose</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -627,6 +656,11 @@ performListOfOldReports function.</p>
 	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">cleaner</div><div class="operator">.</div><div class="ident">PerformListOfOldReports</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">,</div> <div class="literal">&#34;10&#34;</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator">)</div><div class="operator"></div>
 	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 		<div class="ident">t</div><div class="operator">.</div><div class="ident">Errorf</div><div class="operator">(</div><div class="literal">&#34;error was not expected while updating stats: %s&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">connection</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatalf</div><div class="operator">(</div><div class="literal">&#34;error during closing connection: %v&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 
 </code></pre></td>
@@ -667,7 +701,6 @@ ability in performListOfOldReports function.</p>
 	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatalf</div><div class="operator">(</div><div class="literal">&#34;an error &#39;%s&#39; was not expected when opening a stub database connection&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
-	<div class="keyword">defer</div> <div class="ident">connection</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -677,6 +710,7 @@ ability in performListOfOldReports function.</p>
 </td>
 	<td class="code"><pre><code>	<div class="ident">expectedQuery</div> <div class="operator">:=</div> <div class="literal">&#34;SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at &lt; NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at&#34;</div><div class="operator"></div>
 	<div class="ident">mock</div><div class="operator">.</div><div class="ident">ExpectQuery</div><div class="operator">(</div><div class="ident">expectedQuery</div><div class="operator">)</div><div class="operator">.</div><div class="ident">WillReturnError</div><div class="operator">(</div><div class="ident">mockedError</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">mock</div><div class="operator">.</div><div class="ident">ExpectClose</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -697,6 +731,11 @@ ability in performListOfOldReports function.</p>
 </td>
 	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">mockedError</div> <div class="operator">{</div>
 		<div class="ident">t</div><div class="operator">.</div><div class="ident">Errorf</div><div class="operator">(</div><div class="literal">&#34;different error was returned: %v&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">connection</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatalf</div><div class="operator">(</div><div class="literal">&#34;error during closing connection: %v&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 
 </code></pre></td>
@@ -729,7 +768,6 @@ deleteRecordFromTable function.</p>
 	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatalf</div><div class="operator">(</div><div class="literal">&#34;an error &#39;%s&#39; was not expected when opening a stub database connection&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
-	<div class="keyword">defer</div> <div class="ident">connection</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -739,6 +777,7 @@ deleteRecordFromTable function.</p>
 </td>
 	<td class="code"><pre><code>	<div class="ident">expectedExec</div> <div class="operator">:=</div> <div class="literal">&#34;DELETE FROM table_x WHERE key_x = \\$&#34;</div><div class="operator"></div>
 	<div class="ident">mock</div><div class="operator">.</div><div class="ident">ExpectExec</div><div class="operator">(</div><div class="ident">expectedExec</div><div class="operator">)</div><div class="operator">.</div><div class="ident">WithArgs</div><div class="operator">(</div><div class="literal">&#34;key_value&#34;</div><div class="operator">)</div><div class="operator">.</div><div class="ident">WillReturnResult</div><div class="operator">(</div><div class="ident">sqlmock</div><div class="operator">.</div><div class="ident">NewResult</div><div class="operator">(</div><div class="literal">1</div><div class="operator">,</div> <div class="literal">1</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">mock</div><div class="operator">.</div><div class="ident">ExpectClose</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -759,6 +798,11 @@ deleteRecordFromTable function.</p>
 </td>
 	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">affected</div> <div class="operator">!=</div> <div class="literal">1</div> <div class="operator">{</div>
 		<div class="ident">t</div><div class="operator">.</div><div class="ident">Errorf</div><div class="operator">(</div><div class="literal">&#34;wrong number of rows affected: %d&#34;</div><div class="operator">,</div> <div class="ident">affected</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">connection</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatalf</div><div class="operator">(</div><div class="literal">&#34;error during closing connection: %v&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 
 </code></pre></td>
@@ -799,7 +843,6 @@ deleteRecordFromTable function.</p>
 	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatalf</div><div class="operator">(</div><div class="literal">&#34;an error &#39;%s&#39; was not expected when opening a stub database connection&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
-	<div class="keyword">defer</div> <div class="ident">connection</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -809,6 +852,7 @@ deleteRecordFromTable function.</p>
 </td>
 	<td class="code"><pre><code>	<div class="ident">expectedExec</div> <div class="operator">:=</div> <div class="literal">&#34;DELETE FROM table_x WHERE key_x = \\$&#34;</div><div class="operator"></div>
 	<div class="ident">mock</div><div class="operator">.</div><div class="ident">ExpectExec</div><div class="operator">(</div><div class="ident">expectedExec</div><div class="operator">)</div><div class="operator">.</div><div class="ident">WithArgs</div><div class="operator">(</div><div class="literal">&#34;key_value&#34;</div><div class="operator">)</div><div class="operator">.</div><div class="ident">WillReturnError</div><div class="operator">(</div><div class="ident">mockedError</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">mock</div><div class="operator">.</div><div class="ident">ExpectClose</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -839,6 +883,11 @@ deleteRecordFromTable function.</p>
 </td>
 	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">mockedError</div> <div class="operator">{</div>
 		<div class="ident">t</div><div class="operator">.</div><div class="ident">Errorf</div><div class="operator">(</div><div class="literal">&#34;different error was returned: %v&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">connection</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Fatalf</div><div class="operator">(</div><div class="literal">&#34;error during closing connection: %v&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 
 </code></pre></td>
