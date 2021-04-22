@@ -29,4 +29,5 @@ var (
 	ReadOrgID                         = readOrgID
 	PerformDisplayMultipleRuleDisable = performDisplayMultipleRuleDisable
 	PerformListOfOldReports           = performListOfOldReports
+	DeleteRecordFromTable             = deleteRecordFromTable
 )

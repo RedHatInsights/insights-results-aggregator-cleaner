@@ -303,3 +303,73 @@ func TestPerformListOfOldReportsOnError(t *testing.T) {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
 }
+
+// TestDeleteRecordFromTable checks the basic behaviour of
+// deleteRecordFromTable function.
+func TestDeleteRecordFromTable(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer connection.Close()
+
+	// expected query performed by tested function
+	expectedExec := "DELETE FROM table_x WHERE key_x = \\$"
+	mock.ExpectExec(expectedExec).WithArgs("key_value").WillReturnResult(sqlmock.NewResult(1, 1))
+
+	// call the tested function
+	affected, err := cleaner.DeleteRecordFromTable(connection, "table_x", "key_x", "key_value")
+	if err != nil {
+		t.Errorf("error was not expected while updating stats: %s", err)
+	}
+
+	if affected != 1 {
+		t.Errorf("wrong number of rows affected: %d", affected)
+	}
+
+	// check if all expectations were met
+	err = mock.ExpectationsWereMet()
+	if err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+}
+
+// TestDeleteRecordFromTableOnError checks the error handling in
+// deleteRecordFromTable function.
+func TestDeleteRecordFromTableOnError(t *testing.T) {
+	// error to be thrown
+	mockedError := errors.New("mocked error")
+
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer connection.Close()
+
+	// expected query performed by tested function
+	expectedExec := "DELETE FROM table_x WHERE key_x = \\$"
+	mock.ExpectExec(expectedExec).WithArgs("key_value").WillReturnError(mockedError)
+
+	// call the tested function
+	affected, err := cleaner.DeleteRecordFromTable(connection, "table_x", "key_x", "key_value")
+	if err == nil {
+		t.Fatalf("error was expected while updating stats")
+	}
+
+	if affected != 0 {
+		t.Errorf("wrong number of rows affected: %d", affected)
+	}
+
+	// check if the error is correct
+	if err != mockedError {
+		t.Errorf("different error was returned: %v", err)
+	}
+
+	// check if all expectations were met
+	err = mock.ExpectationsWereMet()
+	if err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+}
