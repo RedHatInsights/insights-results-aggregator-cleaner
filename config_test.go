@@ -16,6 +16,9 @@ limitations under the License.
 
 package main_test
 
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/config_test.html
+
 import (
 	"testing"
 )
