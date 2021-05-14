@@ -16,6 +16,9 @@ limitations under the License.
 
 package main
 
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/database.html
+
 // This source file contains an implementation of interface between Go code and
 // (almost any) SQL database like PostgreSQL, SQLite, or MariaDB.
 //
