@@ -16,6 +16,9 @@ limitations under the License.
 
 package main
 
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/config.html
+
 // This source file contains definition of data type named ConfigStruct that
 // represents configuration of Insights Results Aggregator Cleaner. This source
 // file also contains function named LoadConfiguration that can be used to load

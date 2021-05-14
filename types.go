@@ -16,6 +16,9 @@ limitations under the License.
 
 package main
 
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/types.html
+
 // Definition of custom data types used by this tool.
 
 // ClusterName represents name of cluster in format

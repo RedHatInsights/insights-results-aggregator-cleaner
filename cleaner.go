@@ -34,6 +34,9 @@ package main
 
 // Generated documentation is available at:
 // https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner
+//
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/cleaner.html
 
 import (
 	"bufio"
