@@ -105,7 +105,7 @@ godoc: install_docgo install_addlicense ${DOCFILES}
 
 install_docgo: export GO111MODULE=off
 install_docgo:
-	[[ `command -v docgo` ]] || go get -u github.com/dhconnelly/docgo
+	[[ `command -v docgo` ]] || GO111MODULE=off go get -u github.com/dhconnelly/docgo
 
 install_addlicense: export GO111MODULE=off
 install_addlicense:
