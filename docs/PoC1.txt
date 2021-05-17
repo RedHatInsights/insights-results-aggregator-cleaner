@@ -1,0 +1,12 @@
+Poc: Ability to remove all data for given cluster ID
+
+        As an admin of CCX I need to remove all data from the external data
+        pipeline for given cluster ID to be able to clean up wrong data,
+        outdated data, data for the whole customer/company etc.
+
+    Proposed solution
+        * OS job accepting list of clusters from source repo
+        * Simplest solution
+        * Git history, git diff, git show, git blame etc. is there for free
+        * Need to be deployed on demand by changing # pods
+
