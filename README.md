@@ -19,6 +19,9 @@ Such clusters can be detected very easily by checking the timestamps stored
 (along other information) in the `report` table in Insights Results Aggregator
 database.
 
+Additionally the service can delete records for provided list of clusters. This
+means the clusters can be deleted on demand and in controlled environment.
+
 ### Usage
 
 ```
@@ -53,6 +56,9 @@ else - i.e. the results are not deleted by default.
 In order to delete data, the `-cleanup` command line option needs to be used.
 In this case the file `cluster_list.txt` should contain list of clusters to be
 deleted.
+
+Optionally it is possible to specify list of clusters to be cleaned up by using
+the `clusters ...` command line option.
 
 ### Test data generation
 
