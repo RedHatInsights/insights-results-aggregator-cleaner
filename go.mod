@@ -9,6 +9,7 @@ require (
 	github.com/lib/pq v1.9.0
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/olekukonko/tablewriter v0.0.5
+	github.com/redhatinsights/app-common-go v1.5.1
 	github.com/rs/zerolog v1.20.0
 	github.com/spf13/viper v1.7.1
 )
