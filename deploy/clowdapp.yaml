@@ -1,0 +1,117 @@
+---
+apiVersion: v1
+kind: Template
+metadata:
+  name: ccx-insights-results-aggregator-cleaner
+objects:
+
+- apiVersion: cloud.redhat.com/v1alpha1
+  kind: ClowdApp
+  metadata:
+    name: ccx-insights-results-aggregator-cleaner
+  spec:
+    envName: ${ENV_NAME}
+    dependencies:
+      - ingress
+      - insights-results-db
+    jobs:
+      - name: cleaner
+        schedule: ${JOB_SCHEDULE}
+        restartPolicy: Never
+        concurrencyPolicy: Forbid
+        podSpec:
+          image: ${IMAGE}:${IMAGE_TAG}
+          resources:
+            limits:
+              cpu: ${CPU_LIMIT}
+              memory: ${MEMORY_LIMIT}
+            requests:
+              cpu: ${CPU_REQUEST}
+              memory: ${MEMORY_REQUEST}
+          env:
+            - name: INSIGHTS_RESULTS_CLEANER__STORAGE__PG_PARAMS
+              value: sslmode=disable
+            - name: INSIGHTS_RESULTS_CLEANER__STORAGE__DB_DRIVER
+              value: postgres
+            - name: INSIGHTS_RESULTS_CLEANER__LOGGING__DEBUG
+              value: "${DEBUG}"
+            - name: INSIGHTS_RESULTS_CLEANER__LOGGING__LOG_DEVEL
+              value: "${LOG_LEVEL}"
+            - name: INSIGHTS_RESULTS_CLEANER__CLEANER__MAX_AGE
+              value: "90 days"
+            - name: HABERDASHER_EMITTER
+              value: ${HABERDASHER_EMITTER}
+            - name: HABERDASHER_KAFKA_BOOTSTRAP
+              value: ${HABERDASHER_KAFKA_BOOTSTRAP}
+            - name: HABERDASHER_KAFKA_TOPIC
+              value: ${HABERDASHER_KAFKA_TOPIC}
+            - name: HABERDASHER_LABELS
+              value: ${HABERDASHER_LABELS}
+            - name: HABERDASHER_TAGS
+              value: ${HABERDASHER_TAGS}
+          resources:
+            limits:
+              cpu: ${CPU_LIMIT}
+              memory: ${MEMORY_LIMIT}
+            requests:
+              cpu: ${CPU_REQUEST}
+              memory: ${MEMORY_REQUEST}
+    database:
+      sharedDbAppName: insights-results-db
+
+
+parameters:
+- description: Image name
+  name: IMAGE
+  value: quay.io/cloudservices/insights-results-aggregator-cleaner
+- name: IMAGE_TAG
+  required: true
+  description: Image tag to use for apps
+  value: latest
+- description: Determines Clowder deployment
+  name: CLOWDER_ENABLED
+  value: "false"
+- description: Env Name
+  name: ENV_NAME
+  required: true
+- name: SUSPEND_JOB
+  description: Should the cron job be disabled?
+  value: "false"
+- name: JOB_SCHEDULE
+  description: When the cronjob runs
+  value: "1 */1 * * *"
+- name: CPU_LIMIT
+  description: Cpu limit of service
+  value: 500m
+- name: MEMORY_LIMIT
+  description: memory limit of service
+  value: 512Mi
+- name: CPU_REQUEST
+  description: Cpu request of service
+  value: 200m
+- name: MEMORY_REQUEST
+  description: memory request of service
+  value: 256Mi
+- name: LOG_LEVEL
+  description: Log level
+  value: ""
+- name: DEBUG
+  value: "false"
+- name: DATABASE_SERVICE_NAME
+  required: true
+  value: ccx-data-pipeline-db
+- name: HABERDASHER_EMITTER
+  description: Emitter for haberdasher logs [stderr|kafka]
+  value: stderr
+- name: HABERDASHER_KAFKA_BOOTSTRAP
+  description: Bootstrap server for haberdasher kafka emitter
+  value: "mq-kafka:29092"
+- name: HABERDASHER_KAFKA_TOPIC
+  description: Kafka topic for haberdasher kafka emitter
+  value: "platform.logging.logs"
+- name: HABERDASHER_TAGS
+  description: Haberdasher tags for unstructured logs
+  value: '["ccx"]'
+- name: HABERDASHER_LABELS
+  description: Haberdasher labels for unstructured logs
+  value: '{"app": "insights-results-aggregator-cleaner"}'

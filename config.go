@@ -75,6 +75,7 @@ import (
 	"path/filepath"
 
 	"github.com/BurntSushi/toml"
+	clowder "github.com/redhatinsights/app-common-go/pkg/api/v1"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 )
@@ -181,6 +182,15 @@ func LoadConfiguration(configFileEnvVariableName string, defaultConfigFile strin
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_", ".", "__"))
 
 	err = viper.Unmarshal(&config)
+	if err != nil {
+		return config, fmt.Errorf("fatal - can not unmarshal configuration: %s", err)
+	}
+
+	if err := updateConfigFromClowder(&config); err != nil {
+		fmt.Println("Error loading clowder configuration")
+		return config, err
+	}
+
 	return config, err
 }
 
@@ -197,4 +207,24 @@ func GetLoggingConfiguration(config ConfigStruct) LoggingConfiguration {
 // GetCleanerConfiguration returns cleaner configuration
 func GetCleanerConfiguration(config ConfigStruct) CleanerConfiguration {
 	return config.Cleaner
+}
+
+// updateConfigFromClowder updates the current config with the values defined in clowder
+func updateConfigFromClowder(c *ConfigStruct) error {
+	if clowder.IsClowderEnabled() {
+		// can not use Zerolog at this moment!
+		fmt.Println("Clowder is enabled")
+
+		//get DB configuraton from clowder
+		c.Storage.PGDBName = clowder.LoadedConfig.Database.Name
+		c.Storage.PGHost = clowder.LoadedConfig.Database.Hostname
+		c.Storage.PGPort = clowder.LoadedConfig.Database.Port
+		c.Storage.PGUsername = clowder.LoadedConfig.Database.Username
+		c.Storage.PGPassword = clowder.LoadedConfig.Database.Password
+
+	} else {
+		fmt.Println("Clowder is disabled")
+	}
+
+	return nil
 }
