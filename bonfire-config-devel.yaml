@@ -17,10 +17,10 @@ apps:
       parameters:
         CLOWDER_ENABLED: "true"
         IMAGE_TAG: qa
-    - name: insights-results-db 
+    - name: ccx-insights-results
       host: github
       repo: RedHatInsights/insights-results-aggregator
-      path: deploy/irdb_clowdapp.yaml
+      path: deploy/clowdapp.yaml
       ref: master
       parameters:
         CLOWDER_ENABLED: "true"
