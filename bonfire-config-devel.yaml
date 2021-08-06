@@ -2,16 +2,16 @@
 # Defines where to fetch the file that defines application configs
 
 appsFile:
-  host: gitlab
-  repo: insights-platform/cicd-common
+  host: github
+  repo: RedHatInsights/cicd-common
   path: bonfire_configs/ephemeral_apps.yaml
 
 apps:
 - name: ccx-data-pipeline
   components:
     - name: ccx-data-pipeline
-      host: gitlab
-      repo: ccx/ccx-data-pipeline
+      host: github
+      repo: RedHatInsights/ccx-data-pipeline
       path: deploy/clowdapp.yaml
       ref: master
       parameters:
