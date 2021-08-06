@@ -135,12 +135,6 @@ func readClusterListFromFile(filename string) (ClusterList, int, error) {
 	if err != nil {
 		return nil, improperClusterCounter, err
 	}
-	defer func() {
-		err := file.Close()
-		if err != nil {
-			log.Err(err).Msg("File close failed")
-		}
-	}()
 
 	// start reading from the file with a reader
 	reader := bufio.NewReader(file)
@@ -162,6 +156,13 @@ func readClusterListFromFile(filename string) (ClusterList, int, error) {
 	}
 	log.Info().Int(numberOfClustersToDelete, len(clusterList)).Msg(clusterListFinished)
 	log.Info().Int(improperClusterEntries, improperClusterCounter).Msg(clusterListFinished)
+
+	// close file and catch any I/O error
+	err := file.Close()
+	if err != nil {
+		log.Err(err).Msg("File close failed")
+		return clusterList, improperClusterCounter, err
+	}
 
 	return clusterList, improperClusterCounter, nil
 }
