@@ -2,8 +2,8 @@
 # Defines where to fetch the file that defines application configs
 
 appsFile:
-  host: gitlab
-  repo: insights-platform/cicd-common
+  host: github
+  repo: RedHatInsights/cicd-common
   path: bonfire_configs/ephemeral_apps.yaml
 
 apps:
