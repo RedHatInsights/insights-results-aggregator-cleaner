@@ -326,3 +326,5 @@ Actually cleaning the data for given cluster:
 * `cluster_rule_user_feedback` by `cluster_id`
 * `cluster_user_rule_disable_feedback` by `cluster_id`
 * `rule_hit` by `cluster_id`
+
+
