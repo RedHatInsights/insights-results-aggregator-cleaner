@@ -158,8 +158,10 @@ func readClusterListFromFile(filename string) (ClusterList, int, error) {
 	log.Info().Int(improperClusterEntries, improperClusterCounter).Msg(clusterListFinished)
 
 	// close file and catch any I/O error
-	err := file.Close()
+	err = file.Close()
 	if err != nil {
+		// if error is detected during file close, we need to inform
+		// caller about it
 		log.Err(err).Msg("File close failed")
 		return clusterList, improperClusterCounter, err
 	}
