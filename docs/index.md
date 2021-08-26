@@ -291,5 +291,5 @@ Actually cleaning the data for given cluster:
 
 * [cleaner.go](./packages/cleaner.html)
 * [config.go](./packages/config.html)
-* [database.go](./packages/database.html)
+* [storage.go](./packages/storage.html)
 * [types.go](./packages/types.html)
