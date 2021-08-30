@@ -20,8 +20,145 @@ package main_test
 // https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/config_test.html
 
 import (
+	"os"
+
 	"testing"
+
+	"github.com/RedHatInsights/insights-operator-utils/tests/helpers"
+	"github.com/rs/zerolog"
+	"github.com/stretchr/testify/assert"
+
+	main "github.com/RedHatInsights/insights-results-aggregator-cleaner"
 )
 
-func TestY(t *testing.T) {
+func init() {
+	zerolog.SetGlobalLevel(zerolog.WarnLevel)
+}
+
+func mustLoadConfiguration(envVar string) {
+	_, err := main.LoadConfiguration(envVar, "tests/config1")
+	if err != nil {
+		panic(err)
+	}
+}
+
+func mustFailLoadingConfigurationIfWrongEnvVar(envVar string) {
+	_, err := main.LoadConfiguration(envVar, "ANonExistingDefaultConfigPath")
+	if err == nil {
+		panic(err)
+	}
+}
+
+func removeFile(t *testing.T, filename string) {
+	err := os.Remove(filename)
+	helpers.FailOnError(t, err)
+}
+
+func mustSetEnv(t *testing.T, key, val string) {
+	err := os.Setenv(key, val)
+	helpers.FailOnError(t, err)
+}
+
+// TestLoadDefaultConfiguration loads a configuration file for testing
+func TestLoadDefaultConfiguration(t *testing.T) {
+	os.Clearenv()
+	mustLoadConfiguration("nonExistingEnvVar")
+}
+
+// TestLoadConfigurationFromEnvVariable tests loading the config. file for testing from an environment variable
+func TestLoadConfigurationFromEnvVariable(t *testing.T) {
+	os.Clearenv()
+
+	mustSetEnv(t, "INSIGHTS_RESULTS_CLEANER_CONFIG_FILE", "tests/config2")
+	mustLoadConfiguration("INSIGHTS_RESULTS_CLEANER_CONFIG_FILE")
+}
+
+// TestLoadConfigurationNonEnvVarUnknownConfigFile tests loading an unexisting config file when no environment variable is provided
+func TestLoadConfigurationNonEnvVarUnknownConfigFile(t *testing.T) {
+	_, err := main.LoadConfiguration("", "foobar")
+	assert.Nil(t, err)
+}
+
+// TestLoadConfigurationBadConfigFile tests loading an unexisting config file when no environment variable is provided
+func TestLoadConfigurationBadConfigFile(t *testing.T) {
+	_, err := main.LoadConfiguration("", "tests/config3")
+	assert.Contains(t, err.Error(), `fatal error config file: While parsing config:`)
+}
+
+// TestLoadingConfigurationEnvVariableBadValueNoDefaultConfig tests loading a non-existent configuration file set in environment
+func TestLoadingConfigurationEnvVariableBadValueNoDefaultConfig(t *testing.T) {
+	os.Clearenv()
+
+	mustSetEnv(t, "INSIGHTS_RESULTS_CLEANER_CONFIG_FILE", "non existing file")
+
+	_, err := main.LoadConfiguration("INSIGHTS_RESULTS_CLEANER_CONFIG_FILE", "")
+	assert.Contains(t, err.Error(), `fatal error config file: Config File "non existing file" Not Found in`)
+}
+
+// TestLoadingConfigurationEnvVariableBadValueNoDefaultConfig tests that if env var is provided, it must point to a valid config file
+func TestLoadingConfigurationEnvVariableBadValueDefaultConfigFailure(t *testing.T) {
+	os.Clearenv()
+
+	mustSetEnv(t, "INSIGHTS_RESULTS_CLEANER_CONFIG_FILE", "non existing file")
+
+	_, err := main.LoadConfiguration("INSIGHTS_RESULTS_CLEANER_CONFIG_FILE", "tests/config1")
+	assert.Contains(t, err.Error(), `fatal error config file: Config File "non existing file" Not Found in`)
+}
+
+// TestLoadCleanerConfiguration tests loading the cleaner configuration sub-tree
+func TestLoadCleanerConfiguration(t *testing.T) {
+	envVar := "INSIGHTS_RESULTS_CLEANER_CONFIG_FILE"
+
+	//helpers.FailOnError(t, os.Chdir(".."))
+
+	mustSetEnv(t, envVar, "tests/config2")
+	config, err := main.LoadConfiguration(envVar, "")
+	assert.Nil(t, err, "Failed loading configuration file from env var!")
+
+	cleanerCfg := main.GetCleanerConfiguration(config)
+
+	assert.Equal(t, "90 days", cleanerCfg.MaxAge)
+	assert.Equal(t, "cluster_list.txt", cleanerCfg.ClusterListFile)
+}
+
+// TestLoadStorageConfiguration tests loading the storage configuration sub-tree
+func TestLoadStorageConfiguration(t *testing.T) {
+	envVar := "INSIGHTS_RESULTS_CLEANER_CONFIG_FILE"
+	mustSetEnv(t, envVar, "tests/config2")
+	config, err := main.LoadConfiguration(envVar, "")
+	assert.Nil(t, err, "Failed loading configuration file from env var!")
+
+	storageCfg := main.GetStorageConfiguration(config)
+
+	assert.Equal(t, "sqlite3", storageCfg.Driver)
+	assert.Equal(t, "user", storageCfg.PGUsername)
+	assert.Equal(t, "password", storageCfg.PGPassword)
+	assert.Equal(t, "localhost", storageCfg.PGHost)
+	assert.Equal(t, 5432, storageCfg.PGPort)
+	assert.Equal(t, "notifications", storageCfg.PGDBName)
+	assert.Equal(t, "", storageCfg.PGParams)
+}
+
+// TestLoadLoggingConfiguration tests loading the logging configuration sub-tree
+func TestLoadLoggingConfiguration(t *testing.T) {
+	envVar := "INSIGHTS_RESULTS_CLEANER_CONFIG_FILE"
+	mustSetEnv(t, envVar, "tests/config2")
+	config, err := main.LoadConfiguration(envVar, "")
+	assert.Nil(t, err, "Failed loading configuration file from env var!")
+
+	loggingCfg := main.GetLoggingConfiguration(config)
+
+	assert.Equal(t, true, loggingCfg.Debug)
+	assert.Equal(t, "", loggingCfg.LogLevel)
+}
+
+// TestLoadConfigurationFromEnvVariableClowderEnabled tests loading the config.
+// file for testing from an environment variable. Clowder config is enabled in
+// this case.
+func _TestLoadConfigurationFromEnvVariableClowderEnabled(t *testing.T) {
+	os.Clearenv()
+
+	mustSetEnv(t, "INSIGHTS_RESULTS_CLEANER_CONFIG_FILE", "tests/config2")
+	mustSetEnv(t, "ACG_CONFIG", "tests/clowder_config.json")
+	mustLoadConfiguration("INSIGHTS_RESULTS_CLEANER_CONFIG_FILE")
 }
