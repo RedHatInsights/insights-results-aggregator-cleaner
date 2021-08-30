@@ -16,9 +16,6 @@ limitations under the License.
 
 package main
 
-// Documentation in literate-programming-style is available at:
-// https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/config.html
-
 // This source file contains definition of data type named ConfigStruct that
 // represents configuration of Insights Results Aggregator Cleaner. This source
 // file also contains function named LoadConfiguration that can be used to load
@@ -30,6 +27,9 @@ package main
 
 // Generated documentation is available at:
 // https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner
+
+// Documentation in literate-programming-style is available at:
+// https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/config.html
 
 // Default name of configuration file is config.toml
 // It can be changed via environment variable INSIGHTS_RESULTS_CLEANER_CONFIG_FILE
@@ -72,12 +72,19 @@ import (
 	"os"
 	"strings"
 
-	"path/filepath"
-
 	"github.com/BurntSushi/toml"
 	clowder "github.com/redhatinsights/app-common-go/pkg/api/v1"
+
+	"path/filepath"
+
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
+)
+
+// Common constants used for during logging and error reporting
+const (
+	filenameAttribute               = "filename"
+	parsingConfigurationFileMessage = "parsing configuration file"
 )
 
 // ConfigStruct is a structure holding the whole service configuration
@@ -135,6 +142,7 @@ func LoadConfiguration(configFileEnvVariableName string, defaultConfigFile strin
 	// env. variable holding name of configuration file
 	configFile, specified := os.LookupEnv(configFileEnvVariableName)
 	if specified {
+		log.Info().Str(filenameAttribute, configFile).Msg(parsingConfigurationFileMessage)
 		// we need to separate the directory name and filename without
 		// extension
 		directory, basename := filepath.Split(configFile)
@@ -143,7 +151,7 @@ func LoadConfiguration(configFileEnvVariableName string, defaultConfigFile strin
 		viper.SetConfigName(file)
 		viper.AddConfigPath(directory)
 	} else {
-		log.Info().Str("filename", defaultConfigFile).Msg("Parsing configuration file")
+		log.Info().Str(filenameAttribute, defaultConfigFile).Msg(parsingConfigurationFileMessage)
 		// parse the configuration
 		viper.SetConfigName(defaultConfigFile)
 		viper.AddConfigPath(".")
@@ -152,8 +160,11 @@ func LoadConfiguration(configFileEnvVariableName string, defaultConfigFile strin
 	// try to read the whole configuration
 	err := viper.ReadInConfig()
 	if _, isNotFoundError := err.(viper.ConfigFileNotFoundError); !specified && isNotFoundError {
-		// viper is not smart enough to understand the structure of
-		// config by itself
+		// If config file is not present (which might be correct in
+		// some environment) we need to read configuration from
+		// environment variables. The problem is that Viper is not
+		// smart enough to understand the structure of config by
+		// itself, so we need to read fake config file
 		fakeTomlConfigWriter := new(bytes.Buffer)
 
 		err := toml.NewEncoder(fakeTomlConfigWriter).Encode(config)
@@ -170,6 +181,7 @@ func LoadConfiguration(configFileEnvVariableName string, defaultConfigFile strin
 			return config, err
 		}
 	} else if err != nil {
+		// error is processed on caller side
 		return config, fmt.Errorf("fatal error config file: %s", err)
 	}
 
