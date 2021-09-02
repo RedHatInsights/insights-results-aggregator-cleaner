@@ -11,8 +11,6 @@ objects:
     name: ccx-insights-results-aggregator-cleaner
   spec:
     envName: ${ENV_NAME}
-    dependencies:
-      - ccx-insights-results
     jobs:
       - name: cleaner
         schedule: ${JOB_SCHEDULE}
@@ -56,8 +54,7 @@ objects:
               cpu: ${CPU_REQUEST}
               memory: ${MEMORY_REQUEST}
     database:
-      sharedDbAppName: ccx-insights-results
-
+      sharedDbAppName: ccx-data-pipeline
 
 parameters:
 - description: Image name
