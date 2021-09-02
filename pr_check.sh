@@ -4,12 +4,13 @@
 # Options that must be configured by app owner
 # --------------------------------------------
 APP_NAME="ccx-data-pipeline"  # name of app-sre "application" folder this component lives in
-COMPONENT_NAME="insights-results-aggregator-cleaner"  # name of app-sre "resourceTemplate" in deploy.yaml for this component
+COMPONENT_NAME="insights-aggregator-cleaner"  # name of app-sre "resourceTemplate" in deploy.yaml for this component
 IMAGE="quay.io/cloudservices/insights-results-aggregator-cleaner"
 
 IQE_PLUGINS="ccx"
 IQE_MARKER_EXPRESSION="smoke"
 IQE_FILTER_EXPRESSION=""
+IQE_CJI_TIMEOUT="30m"
 
 # TODO: Temporary stub to make CI pass with clowder.
 mkdir artifacts
@@ -21,4 +22,4 @@ curl -s $CICD_URL/bootstrap.sh > .cicd_bootstrap.sh && source .cicd_bootstrap.sh
 
 source $CICD_ROOT/build.sh
 source $CICD_ROOT/deploy_ephemeral_env.sh
-source $CICD_ROOT/smoke_test.sh
+source $CICD_ROOT/cji_smoke_test.sh
