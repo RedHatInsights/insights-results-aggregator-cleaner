@@ -12,7 +12,7 @@ objects:
   spec:
     envName: ${ENV_NAME}
     dependencies:
-      - ccx-insights-results
+      - insights-results
     jobs:
       - name: cleaner
         schedule: ${JOB_SCHEDULE}
@@ -56,7 +56,7 @@ objects:
               cpu: ${CPU_REQUEST}
               memory: ${MEMORY_REQUEST}
     database:
-      sharedDbAppName: ccx-insights-results
+      sharedDbAppName: insights-results
 
 parameters:
 - description: Image name
