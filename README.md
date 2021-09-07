@@ -66,6 +66,8 @@ Usage of cleaner:
         list clusters with the same rule(s) disabled by different users
   -output string
         filename for old cluster listing
+  -show-configuration
+        show configuration
   -summary
         print summary table after cleanup
   -version
