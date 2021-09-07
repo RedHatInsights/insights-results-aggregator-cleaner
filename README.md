@@ -7,6 +7,32 @@
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/RedHatInsights/insights-results-aggregator-cleaner)
 [![License](https://img.shields.io/badge/license-Apache-blue)](https://github.com/RedHatInsights/insights-results-aggregator-cleaner/blob/master/LICENSE)
 
+<!-- vim-markdown-toc GFM -->
+
+* [Description](#description)
+    * [Usage](#usage)
+    * [Default operation](#default-operation)
+    * [Data cleanup](#data-cleanup)
+    * [Test data generation](#test-data-generation)
+    * [Building](#building)
+    * [Makefile targets](#makefile-targets)
+    * [Configuration](#configuration)
+    * [Usage](#usage-1)
+        * [Output example](#output-example)
+* [Database structure](#database-structure)
+    * [Table `report`](#table-report)
+    * [Table `cluster_rule_toggle`](#table-cluster_rule_toggle)
+    * [Table `cluster_rule_user_feedback`](#table-cluster_rule_user_feedback)
+    * [Table `cluster_user_rule_disable_feedback`](#table-cluster_user_rule_disable_feedback)
+    * [Table `consumer_error`](#table-consumer_error)
+    * [Table `migration_info `](#table-migration_info-)
+    * [Table `rule_hit`](#table-rule_hit)
+    * [Database tables affected by this service](#database-tables-affected-by-this-service)
+* [Package manifest](#package-manifest)
+
+<!-- vim-markdown-toc -->
+
+
 ## Description
 
 Simple service that can be used to identify clusters, for which we are keeping
