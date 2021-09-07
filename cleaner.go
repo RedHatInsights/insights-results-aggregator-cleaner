@@ -93,6 +93,31 @@ func readClusterList(filename string, clusters string) (ClusterList, int, error)
 	return readClusterListFromCLIArgument(clusters)
 }
 
+// showConfiguration function displays actual configuration.
+func showConfiguration(config ConfigStruct) {
+	storageConfig := GetStorageConfiguration(config)
+	log.Info().
+		Str("Driver", storageConfig.Driver).
+		Str("DB Name", storageConfig.PGDBName).
+		Str("Username", storageConfig.PGUsername). // password is omitted on purpose
+		Str("Host", storageConfig.PGHost).
+		Int("DB Port", storageConfig.PGPort).
+		Msg("Storage configuration")
+
+	loggingConfig := GetLoggingConfiguration(config)
+	log.Info().
+		Str("Level", loggingConfig.LogLevel).
+		Bool("Pretty colored debug logging", loggingConfig.Debug).
+		Bool("Log to cloudwatch", loggingConfig.LoggingToCloudWatchEnabled).
+		Msg("Logging configuration")
+
+	cleanerConfiguration := GetCleanerConfiguration(config)
+	log.Info().
+		Str("Records max age", cleanerConfiguration.MaxAge).
+		Str("Cluster list file", cleanerConfiguration.ClusterListFile).
+		Msg("Cleaner configuration")
+}
+
 // readClusterListFromCLIArgument reads list of clusters from CLI argument
 func readClusterListFromCLIArgument(clusters string) (ClusterList, int, error) {
 	log.Debug().Msg("Cluster list read from CLI argument")
@@ -204,6 +229,7 @@ func PrintSummaryTable(summary Summary) {
 // doSelectedOperation function performs selected operation: check data
 // retention, cleanup selected data, or fill-id database by test data
 func doSelectedOperation(config ConfigStruct, connection *sql.DB,
+	showConfigurationFlag bool,
 	showVersion bool, showAuthors bool, performCleanup bool,
 	detectMultipleRuleDisable bool, fillInDatabase bool,
 	printSummaryTable bool, clusters string,
@@ -214,6 +240,9 @@ func doSelectedOperation(config ConfigStruct, connection *sql.DB,
 		return nil
 	case showAuthors:
 		fmt.Println(authors)
+		return nil
+	case showConfigurationFlag:
+		showConfiguration(config)
 		return nil
 	case performCleanup:
 		// cleanup operation
@@ -271,6 +300,7 @@ func main() {
 	var printSummaryTable bool
 	var detectMultipleRuleDisable bool
 	var fillInDatabase bool
+	var showConfiguration bool
 	var showVersion bool
 	var showAuthors bool
 	var maxAge string
@@ -282,6 +312,7 @@ func main() {
 	flag.BoolVar(&printSummaryTable, "summary", false, "print summary table after cleanup")
 	flag.BoolVar(&detectMultipleRuleDisable, "multiple-rule-disable", false, "list clusters with the same rule(s) disabled by different users")
 	flag.BoolVar(&fillInDatabase, "fill-in-db", false, "fill-in database by test data")
+	flag.BoolVar(&showConfiguration, "show-configuration", false, "show configuration")
 	flag.BoolVar(&showVersion, "version", false, "show cleaner version")
 	flag.BoolVar(&showAuthors, "authors", false, "show authors")
 	flag.StringVar(&maxAge, "max-age", "", "max age for displaying old records")
@@ -313,7 +344,7 @@ func main() {
 	}
 
 	// perform selected operation
-	err = doSelectedOperation(config, connection, showVersion, showAuthors,
+	err = doSelectedOperation(config, connection, showConfiguration, showVersion, showAuthors,
 		performCleanup, detectMultipleRuleDisable, fillInDatabase,
 		printSummaryTable, clusters,
 		output)
