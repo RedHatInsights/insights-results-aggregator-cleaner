@@ -228,25 +228,20 @@ func PrintSummaryTable(summary Summary) {
 
 // doSelectedOperation function performs selected operation: check data
 // retention, cleanup selected data, or fill-id database by test data
-func doSelectedOperation(config ConfigStruct, connection *sql.DB,
-	showConfigurationFlag bool,
-	showVersion bool, showAuthors bool, performCleanup bool,
-	detectMultipleRuleDisable bool, fillInDatabase bool,
-	printSummaryTable bool, clusters string,
-	output string) error {
+func doSelectedOperation(config ConfigStruct, connection *sql.DB, cliFlags CliFlags) error {
 	switch {
-	case showVersion:
+	case cliFlags.ShowVersion:
 		fmt.Println(version)
 		return nil
-	case showAuthors:
+	case cliFlags.ShowAuthors:
 		fmt.Println(authors)
 		return nil
-	case showConfigurationFlag:
+	case cliFlags.ShowConfiguration:
 		showConfiguration(config)
 		return nil
-	case performCleanup:
+	case cliFlags.PerformCleanup:
 		// cleanup operation
-		clusterList, improperClusterCounter, err := readClusterList(config.Cleaner.ClusterListFile, clusters)
+		clusterList, improperClusterCounter, err := readClusterList(config.Cleaner.ClusterListFile, cliFlags.Clusters)
 		if err != nil {
 			log.Err(err).Msg("Read cluster list")
 			return err
@@ -256,7 +251,7 @@ func doSelectedOperation(config ConfigStruct, connection *sql.DB,
 			log.Err(err).Msg("Performing cleanup")
 			return err
 		}
-		if printSummaryTable {
+		if cliFlags.PrintSummaryTable {
 			var summary Summary
 			summary.ProperClusterEntries = len(clusterList)
 			summary.ImproperClusterEntries = improperClusterCounter
@@ -264,16 +259,16 @@ func doSelectedOperation(config ConfigStruct, connection *sql.DB,
 			PrintSummaryTable(summary)
 		}
 		return nil
-	case detectMultipleRuleDisable:
+	case cliFlags.DetectMultipleRuleDisable:
 		// detect clusters that have the same rule(s) disabled by different users
-		err := displayMultipleRuleDisable(connection, output)
+		err := displayMultipleRuleDisable(connection, cliFlags.Output)
 		if err != nil {
 			log.Err(err).Msg(selectingRecordsFromDatabase)
 			return err
 		}
 		// everything seems to be fine
 		return nil
-	case fillInDatabase:
+	case cliFlags.FillInDatabase:
 		// fill-in database by test data
 		err := fillInDatabaseByTestData(connection)
 		if err != nil {
@@ -284,7 +279,7 @@ func doSelectedOperation(config ConfigStruct, connection *sql.DB,
 		return nil
 	default:
 		// display old records in database
-		err := displayAllOldRecords(connection, config.Cleaner.MaxAge, output)
+		err := displayAllOldRecords(connection, config.Cleaner.MaxAge, cliFlags.Output)
 		if err != nil {
 			log.Err(err).Msg(selectingRecordsFromDatabase)
 			return err
@@ -296,28 +291,20 @@ func doSelectedOperation(config ConfigStruct, connection *sql.DB,
 }
 
 func main() {
-	var performCleanup bool
-	var printSummaryTable bool
-	var detectMultipleRuleDisable bool
-	var fillInDatabase bool
-	var showConfiguration bool
-	var showVersion bool
-	var showAuthors bool
-	var maxAge string
-	var clusters string
-	var output string
+	// command line flags
+	var cliFlags CliFlags
 
 	// define and parse all command line options
-	flag.BoolVar(&performCleanup, "cleanup", false, "perform database cleanup")
-	flag.BoolVar(&printSummaryTable, "summary", false, "print summary table after cleanup")
-	flag.BoolVar(&detectMultipleRuleDisable, "multiple-rule-disable", false, "list clusters with the same rule(s) disabled by different users")
-	flag.BoolVar(&fillInDatabase, "fill-in-db", false, "fill-in database by test data")
-	flag.BoolVar(&showConfiguration, "show-configuration", false, "show configuration")
-	flag.BoolVar(&showVersion, "version", false, "show cleaner version")
-	flag.BoolVar(&showAuthors, "authors", false, "show authors")
-	flag.StringVar(&maxAge, "max-age", "", "max age for displaying old records")
-	flag.StringVar(&clusters, "clusters", "", "list of clusters to cleanup")
-	flag.StringVar(&output, "output", "", "filename for old cluster listing")
+	flag.BoolVar(&cliFlags.PerformCleanup, "cleanup", false, "perform database cleanup")
+	flag.BoolVar(&cliFlags.PrintSummaryTable, "summary", false, "print summary table after cleanup")
+	flag.BoolVar(&cliFlags.DetectMultipleRuleDisable, "multiple-rule-disable", false, "list clusters with the same rule(s) disabled by different users")
+	flag.BoolVar(&cliFlags.FillInDatabase, "fill-in-db", false, "fill-in database by test data")
+	flag.BoolVar(&cliFlags.ShowConfiguration, "show-configuration", false, "show configuration")
+	flag.BoolVar(&cliFlags.ShowVersion, "version", false, "show cleaner version")
+	flag.BoolVar(&cliFlags.ShowAuthors, "authors", false, "show authors")
+	flag.StringVar(&cliFlags.MaxAge, "max-age", "", "max age for displaying old records")
+	flag.StringVar(&cliFlags.Clusters, "clusters", "", "list of clusters to cleanup")
+	flag.StringVar(&cliFlags.Output, "output", "", "filename for old cluster listing")
 	flag.Parse()
 
 	// config has exactly the same structure as *.toml file
@@ -333,8 +320,8 @@ func main() {
 	log.Debug().Msg("Started")
 
 	// override default value read from configuration file
-	if maxAge != "" {
-		config.Cleaner.MaxAge = maxAge
+	if cliFlags.MaxAge != "" {
+		config.Cleaner.MaxAge = cliFlags.MaxAge
 	}
 
 	// initialize connection to database
@@ -344,10 +331,7 @@ func main() {
 	}
 
 	// perform selected operation
-	err = doSelectedOperation(config, connection, showConfiguration, showVersion, showAuthors,
-		performCleanup, detectMultipleRuleDisable, fillInDatabase,
-		printSummaryTable, clusters,
-		output)
+	err = doSelectedOperation(config, connection, cliFlags)
 	if err != nil {
 		log.Err(err).Msg("Operation failed")
 	}
