@@ -43,3 +43,17 @@ type Summary struct {
 	ImproperClusterEntries int
 	DeletionsForTable      map[string]int
 }
+
+// CliFlags represents structure holding all command line arguments and flags.
+type CliFlags struct {
+	ShowVersion               bool
+	ShowAuthors               bool
+	ShowConfiguration         bool
+	PrintSummaryTable         bool
+	Output                    string
+	PerformCleanup            bool
+	DetectMultipleRuleDisable bool
+	FillInDatabase            bool
+	MaxAge                    string
+	Clusters                  string
+}
