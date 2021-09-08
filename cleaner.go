@@ -228,7 +228,7 @@ func PrintSummaryTable(summary Summary) {
 
 // doSelectedOperation function performs selected operation: check data
 // retention, cleanup selected data, or fill-id database by test data
-func doSelectedOperation(config ConfigStruct, connection *sql.DB, cliFlags CliFlags) error {
+func doSelectedOperation(configuration ConfigStruct, connection *sql.DB, cliFlags CliFlags) error {
 	switch {
 	case cliFlags.ShowVersion:
 		fmt.Println(version)
@@ -237,11 +237,13 @@ func doSelectedOperation(config ConfigStruct, connection *sql.DB, cliFlags CliFl
 		fmt.Println(authors)
 		return nil
 	case cliFlags.ShowConfiguration:
-		showConfiguration(config)
+		showConfiguration(configuration)
 		return nil
 	case cliFlags.PerformCleanup:
 		// cleanup operation
-		clusterList, improperClusterCounter, err := readClusterList(config.Cleaner.ClusterListFile, cliFlags.Clusters)
+		clusterList, improperClusterCounter, err := readClusterList(
+			configuration.Cleaner.ClusterListFile,
+			cliFlags.Clusters)
 		if err != nil {
 			log.Err(err).Msg("Read cluster list")
 			return err
@@ -279,7 +281,8 @@ func doSelectedOperation(config ConfigStruct, connection *sql.DB, cliFlags CliFl
 		return nil
 	default:
 		// display old records in database
-		err := displayAllOldRecords(connection, config.Cleaner.MaxAge, cliFlags.Output)
+		err := displayAllOldRecords(connection,
+			configuration.Cleaner.MaxAge, cliFlags.Output)
 		if err != nil {
 			log.Err(err).Msg(selectingRecordsFromDatabase)
 			return err
