@@ -144,10 +144,202 @@ https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/co
 </td>
 	<td class="code"><pre><code>
 <div class="keyword">import</div> <div class="operator">(</div>
+	<div class="literal">&#34;os&#34;</div><div class="operator"></div>
+
 	<div class="literal">&#34;testing&#34;</div><div class="operator"></div>
+
+	<div class="literal">&#34;github.com/RedHatInsights/insights-operator-utils/tests/helpers&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;github.com/rs/zerolog&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;github.com/stretchr/testify/assert&#34;</div><div class="operator"></div>
+
+	<div class="ident">main</div> <div class="literal">&#34;github.com/RedHatInsights/insights-results-aggregator-cleaner&#34;</div><div class="operator"></div>
 <div class="operator">)</div><div class="operator"></div>
 
-<div class="keyword">func</div> <div class="ident">TestY</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+<div class="keyword">func</div> <div class="ident">init</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">zerolog</div><div class="operator">.</div><div class="ident">SetGlobalLevel</div><div class="operator">(</div><div class="ident">zerolog</div><div class="operator">.</div><div class="ident">WarnLevel</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+<div class="keyword">func</div> <div class="ident">mustLoadConfiguration</div><div class="operator">(</div><div class="ident">envVar</div> <div class="ident">string</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">_</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">LoadConfiguration</div><div class="operator">(</div><div class="ident">envVar</div><div class="operator">,</div> <div class="literal">&#34;tests/config1&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">panic</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+<div class="keyword">func</div> <div class="ident">mustFailLoadingConfigurationIfWrongEnvVar</div><div class="operator">(</div><div class="ident">envVar</div> <div class="ident">string</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">_</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">LoadConfiguration</div><div class="operator">(</div><div class="ident">envVar</div><div class="operator">,</div> <div class="literal">&#34;ANonExistingDefaultConfigPath&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">==</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">panic</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+<div class="keyword">func</div> <div class="ident">removeFile</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">,</div> <div class="ident">filename</div> <div class="ident">string</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">os</div><div class="operator">.</div><div class="ident">Remove</div><div class="operator">(</div><div class="ident">filename</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">helpers</div><div class="operator">.</div><div class="ident">FailOnError</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+<div class="keyword">func</div> <div class="ident">mustSetEnv</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">,</div> <div class="ident">key</div><div class="operator">,</div> <div class="ident">val</div> <div class="ident">string</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">os</div><div class="operator">.</div><div class="ident">Setenv</div><div class="operator">(</div><div class="ident">key</div><div class="operator">,</div> <div class="ident">val</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">helpers</div><div class="operator">.</div><div class="ident">FailOnError</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestLoadDefaultConfiguration loads a configuration file for testing</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestLoadDefaultConfiguration</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">os</div><div class="operator">.</div><div class="ident">Clearenv</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">mustLoadConfiguration</div><div class="operator">(</div><div class="literal">&#34;nonExistingEnvVar&#34;</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestLoadConfigurationFromEnvVariable tests loading the config. file for testing from an environment variable</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestLoadConfigurationFromEnvVariable</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">os</div><div class="operator">.</div><div class="ident">Clearenv</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">mustSetEnv</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="literal">&#34;INSIGHTS_RESULTS_CLEANER_CONFIG_FILE&#34;</div><div class="operator">,</div> <div class="literal">&#34;tests/config2&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">mustLoadConfiguration</div><div class="operator">(</div><div class="literal">&#34;INSIGHTS_RESULTS_CLEANER_CONFIG_FILE&#34;</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestLoadConfigurationNonEnvVarUnknownConfigFile tests loading an unexisting config file when no environment variable is provided</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestLoadConfigurationNonEnvVarUnknownConfigFile</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">_</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">LoadConfiguration</div><div class="operator">(</div><div class="literal">&#34;&#34;</div><div class="operator">,</div> <div class="literal">&#34;foobar&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Nil</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestLoadConfigurationBadConfigFile tests loading an unexisting config file when no environment variable is provided</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestLoadConfigurationBadConfigFile</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">_</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">LoadConfiguration</div><div class="operator">(</div><div class="literal">&#34;&#34;</div><div class="operator">,</div> <div class="literal">&#34;tests/config3&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">,</div> <div class="literal">`fatal error config file: While parsing config:`</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestLoadingConfigurationEnvVariableBadValueNoDefaultConfig tests loading a non-existent configuration file set in environment</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestLoadingConfigurationEnvVariableBadValueNoDefaultConfig</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">os</div><div class="operator">.</div><div class="ident">Clearenv</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">mustSetEnv</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="literal">&#34;INSIGHTS_RESULTS_CLEANER_CONFIG_FILE&#34;</div><div class="operator">,</div> <div class="literal">&#34;non existing file&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">_</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">LoadConfiguration</div><div class="operator">(</div><div class="literal">&#34;INSIGHTS_RESULTS_CLEANER_CONFIG_FILE&#34;</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">,</div> <div class="literal">`fatal error config file: Config File &#34;non existing file&#34; Not Found in`</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestLoadingConfigurationEnvVariableBadValueNoDefaultConfig tests that if env var is provided, it must point to a valid config file</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestLoadingConfigurationEnvVariableBadValueDefaultConfigFailure</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">os</div><div class="operator">.</div><div class="ident">Clearenv</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">mustSetEnv</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="literal">&#34;INSIGHTS_RESULTS_CLEANER_CONFIG_FILE&#34;</div><div class="operator">,</div> <div class="literal">&#34;non existing file&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">_</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">LoadConfiguration</div><div class="operator">(</div><div class="literal">&#34;INSIGHTS_RESULTS_CLEANER_CONFIG_FILE&#34;</div><div class="operator">,</div> <div class="literal">&#34;tests/config1&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">,</div> <div class="literal">`fatal error config file: Config File &#34;non existing file&#34; Not Found in`</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestLoadCleanerConfiguration tests loading the cleaner configuration sub-tree</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestLoadCleanerConfiguration</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">envVar</div> <div class="operator">:=</div> <div class="literal">&#34;INSIGHTS_RESULTS_CLEANER_CONFIG_FILE&#34;</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>helpers.FailOnError(t, os.Chdir(&quot;..&quot;))</p>
+</td>
+	<td class="code"><pre><code>
+	<div class="ident">mustSetEnv</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">envVar</div><div class="operator">,</div> <div class="literal">&#34;tests/config2&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">config</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">LoadConfiguration</div><div class="operator">(</div><div class="ident">envVar</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Nil</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">,</div> <div class="literal">&#34;Failed loading configuration file from env var!&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">cleanerCfg</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">GetCleanerConfiguration</div><div class="operator">(</div><div class="ident">config</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="literal">&#34;90 days&#34;</div><div class="operator">,</div> <div class="ident">cleanerCfg</div><div class="operator">.</div><div class="ident">MaxAge</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="literal">&#34;cluster_list.txt&#34;</div><div class="operator">,</div> <div class="ident">cleanerCfg</div><div class="operator">.</div><div class="ident">ClusterListFile</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestLoadStorageConfiguration tests loading the storage configuration sub-tree</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestLoadStorageConfiguration</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">envVar</div> <div class="operator">:=</div> <div class="literal">&#34;INSIGHTS_RESULTS_CLEANER_CONFIG_FILE&#34;</div><div class="operator"></div>
+	<div class="ident">mustSetEnv</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">envVar</div><div class="operator">,</div> <div class="literal">&#34;tests/config2&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">config</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">LoadConfiguration</div><div class="operator">(</div><div class="ident">envVar</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Nil</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">,</div> <div class="literal">&#34;Failed loading configuration file from env var!&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">storageCfg</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">GetStorageConfiguration</div><div class="operator">(</div><div class="ident">config</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="literal">&#34;sqlite3&#34;</div><div class="operator">,</div> <div class="ident">storageCfg</div><div class="operator">.</div><div class="ident">Driver</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="literal">&#34;user&#34;</div><div class="operator">,</div> <div class="ident">storageCfg</div><div class="operator">.</div><div class="ident">PGUsername</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="literal">&#34;password&#34;</div><div class="operator">,</div> <div class="ident">storageCfg</div><div class="operator">.</div><div class="ident">PGPassword</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="literal">&#34;localhost&#34;</div><div class="operator">,</div> <div class="ident">storageCfg</div><div class="operator">.</div><div class="ident">PGHost</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="literal">5432</div><div class="operator">,</div> <div class="ident">storageCfg</div><div class="operator">.</div><div class="ident">PGPort</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="literal">&#34;notifications&#34;</div><div class="operator">,</div> <div class="ident">storageCfg</div><div class="operator">.</div><div class="ident">PGDBName</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">,</div> <div class="ident">storageCfg</div><div class="operator">.</div><div class="ident">PGParams</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestLoadLoggingConfiguration tests loading the logging configuration sub-tree</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestLoadLoggingConfiguration</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">envVar</div> <div class="operator">:=</div> <div class="literal">&#34;INSIGHTS_RESULTS_CLEANER_CONFIG_FILE&#34;</div><div class="operator"></div>
+	<div class="ident">mustSetEnv</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">envVar</div><div class="operator">,</div> <div class="literal">&#34;tests/config2&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">config</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">LoadConfiguration</div><div class="operator">(</div><div class="ident">envVar</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Nil</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">,</div> <div class="literal">&#34;Failed loading configuration file from env var!&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">loggingCfg</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">GetLoggingConfiguration</div><div class="operator">(</div><div class="ident">config</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">true</div><div class="operator">,</div> <div class="ident">loggingCfg</div><div class="operator">.</div><div class="ident">Debug</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">,</div> <div class="ident">loggingCfg</div><div class="operator">.</div><div class="ident">LogLevel</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestLoadConfigurationFromEnvVariableClowderEnabled tests loading the config.
+file for testing from an environment variable. Clowder config is enabled in
+this case.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">_TestLoadConfigurationFromEnvVariableClowderEnabled</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">os</div><div class="operator">.</div><div class="ident">Clearenv</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">mustSetEnv</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="literal">&#34;INSIGHTS_RESULTS_CLEANER_CONFIG_FILE&#34;</div><div class="operator">,</div> <div class="literal">&#34;tests/config2&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">mustSetEnv</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="literal">&#34;ACG_CONFIG&#34;</div><div class="operator">,</div> <div class="literal">&#34;tests/clowder_config.json&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">mustLoadConfiguration</div><div class="operator">(</div><div class="literal">&#34;INSIGHTS_RESULTS_CLEANER_CONFIG_FILE&#34;</div><div class="operator">)</div><div class="operator"></div>
 <div class="operator">}</div><div class="operator"></div>
 
 </code></pre></td>

@@ -139,14 +139,6 @@ limitations under the License.
       </tr>
       
       <tr class="section">
-	<td class="doc"><p>Documentation in literate-programming-style is available at:
-https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/config.html</p>
-</td>
-	<td class="code"><pre><code>
-</code></pre></td>
-      </tr>
-      
-      <tr class="section">
 	<td class="doc"><p>This source file contains definition of data type named ConfigStruct that
 represents configuration of Insights Results Aggregator Cleaner. This source
 file also contains function named LoadConfiguration that can be used to load
@@ -163,6 +155,14 @@ options.</p>
       <tr class="section">
 	<td class="doc"><p>Generated documentation is available at:
 https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner</p>
+</td>
+	<td class="code"><pre><code>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>Documentation in literate-programming-style is available at:
+https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/config.html</p>
 </td>
 	<td class="code"><pre><code>
 </code></pre></td>
@@ -215,12 +215,24 @@ INSIGHTS</em>RESULTS_CLEANER<strong>CLEANER</strong>MAX_AGE</p>
 	<div class="literal">&#34;os&#34;</div><div class="operator"></div>
 	<div class="literal">&#34;strings&#34;</div><div class="operator"></div>
 
-	<div class="literal">&#34;path/filepath&#34;</div><div class="operator"></div>
-
 	<div class="literal">&#34;github.com/BurntSushi/toml&#34;</div><div class="operator"></div>
 	<div class="ident">clowder</div> <div class="literal">&#34;github.com/redhatinsights/app-common-go/pkg/api/v1&#34;</div><div class="operator"></div>
+
+	<div class="literal">&#34;path/filepath&#34;</div><div class="operator"></div>
+
 	<div class="literal">&#34;github.com/rs/zerolog/log&#34;</div><div class="operator"></div>
 	<div class="literal">&#34;github.com/spf13/viper&#34;</div><div class="operator"></div>
+<div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>Common constants used for during logging and error reporting</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">const</div> <div class="operator">(</div>
+	<div class="ident">filenameAttribute</div>               <div class="operator">=</div> <div class="literal">&#34;filename&#34;</div><div class="operator"></div>
+	<div class="ident">parsingConfigurationFileMessage</div> <div class="operator">=</div> <div class="literal">&#34;parsing configuration file&#34;</div><div class="operator"></div>
 <div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
@@ -333,6 +345,7 @@ configFileEnvVariableName or from env</p>
 </td>
 	<td class="code"><pre><code>	<div class="ident">configFile</div><div class="operator">,</div> <div class="ident">specified</div> <div class="operator">:=</div> <div class="ident">os</div><div class="operator">.</div><div class="ident">LookupEnv</div><div class="operator">(</div><div class="ident">configFileEnvVariableName</div><div class="operator">)</div><div class="operator"></div>
 	<div class="keyword">if</div> <div class="ident">specified</div> <div class="operator">{</div>
+		<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Str</div><div class="operator">(</div><div class="ident">filenameAttribute</div><div class="operator">,</div> <div class="ident">configFile</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">parsingConfigurationFileMessage</div><div class="operator">)</div><div class="operator"></div>
 </code></pre></td>
       </tr>
       
@@ -351,7 +364,7 @@ extension</p>
 	<td class="code"><pre><code>		<div class="ident">viper</div><div class="operator">.</div><div class="ident">SetConfigName</div><div class="operator">(</div><div class="ident">file</div><div class="operator">)</div><div class="operator"></div>
 		<div class="ident">viper</div><div class="operator">.</div><div class="ident">AddConfigPath</div><div class="operator">(</div><div class="ident">directory</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div> <div class="keyword">else</div> <div class="operator">{</div>
-		<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Str</div><div class="operator">(</div><div class="literal">&#34;filename&#34;</div><div class="operator">,</div> <div class="ident">defaultConfigFile</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Parsing configuration file&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Str</div><div class="operator">(</div><div class="ident">filenameAttribute</div><div class="operator">,</div> <div class="ident">defaultConfigFile</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">parsingConfigurationFileMessage</div><div class="operator">)</div><div class="operator"></div>
 </code></pre></td>
       </tr>
       
@@ -374,8 +387,11 @@ extension</p>
       </tr>
       
       <tr class="section">
-	<td class="doc"><p>viper is not smart enough to understand the structure of
-config by itself</p>
+	<td class="doc"><p>If config file is not present (which might be correct in
+some environment) we need to read configuration from
+environment variables. The problem is that Viper is not
+smart enough to understand the structure of config by
+itself, so we need to read fake config file</p>
 </td>
 	<td class="code"><pre><code>		<div class="ident">fakeTomlConfigWriter</div> <div class="operator">:=</div> <div class="ident">new</div><div class="operator">(</div><div class="ident">bytes</div><div class="operator">.</div><div class="ident">Buffer</div><div class="operator">)</div><div class="operator"></div>
 
@@ -393,7 +409,13 @@ config by itself</p>
 			<div class="keyword">return</div> <div class="ident">config</div><div class="operator">,</div> <div class="ident">err</div><div class="operator"></div>
 		<div class="operator">}</div><div class="operator"></div>
 	<div class="operator">}</div> <div class="keyword">else</div> <div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
-		<div class="keyword">return</div> <div class="ident">config</div><div class="operator">,</div> <div class="ident">fmt</div><div class="operator">.</div><div class="ident">Errorf</div><div class="operator">(</div><div class="literal">&#34;fatal error config file: %s&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>error is processed on caller side</p>
+</td>
+	<td class="code"><pre><code>		<div class="keyword">return</div> <div class="ident">config</div><div class="operator">,</div> <div class="ident">fmt</div><div class="operator">.</div><div class="ident">Errorf</div><div class="operator">(</div><div class="literal">&#34;fatal error config file: %s&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 
 </code></pre></td>
