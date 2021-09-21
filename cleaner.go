@@ -56,15 +56,10 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-const (
-	configFileEnvVariableName = "INSIGHTS_RESULTS_CLEANER_CONFIG_FILE"
-	defaultConfigFileName     = "config"
-)
-
 // Messages
 const (
-	version                      = "Insights Results Aggregator Cleaner version 1.0"
-	authors                      = "Pavel Tisnovsky, Red Hat Inc."
+	versionMessage               = "Insights Results Aggregator Cleaner version 1.0"
+	authorsMessage               = "Pavel Tisnovsky, Red Hat Inc."
 	properClusterID              = "Proper cluster ID"
 	notProperClusterID           = "Not a proper cluster ID"
 	improperClusterEntries       = "improper cluster entries"
@@ -72,6 +67,11 @@ const (
 	clusterListFinished          = "Cluster list finished"
 	inputWithClusterID           = "input"
 	selectingRecordsFromDatabase = "Selecting records from database"
+)
+
+const (
+	configFileEnvVariableName = "INSIGHTS_RESULTS_CLEANER_CONFIG_FILE"
+	defaultConfigFileName     = "config"
 )
 
 // IsValidUUID function checks if provided string contains a correct UUID.
@@ -231,10 +231,10 @@ func PrintSummaryTable(summary Summary) {
 func doSelectedOperation(configuration ConfigStruct, connection *sql.DB, cliFlags CliFlags) error {
 	switch {
 	case cliFlags.ShowVersion:
-		fmt.Println(version)
+		fmt.Println(versionMessage)
 		return nil
 	case cliFlags.ShowAuthors:
-		fmt.Println(authors)
+		fmt.Println(authorsMessage)
 		return nil
 	case cliFlags.ShowConfiguration:
 		showConfiguration(configuration)
