@@ -69,6 +69,24 @@ const (
 	selectingRecordsFromDatabase = "Selecting records from database"
 )
 
+// Exit codes
+const (
+	// ExitStatusOK means that the tool finished with success
+	ExitStatusOK = iota
+
+	// ExitStatusStorageError is returned in case of any storage-related
+	// error
+	ExitStatusStorageError
+
+	// ExitStatusFillInStorageError is returned in case the fill-in DB
+	// operation failed
+	ExitStatusFillInStorageError
+
+	// ExitStatusPerformCleanupError is returned when DB cleanup operation
+	// failed for any reason
+	ExitStatusPerformCleanupError
+)
+
 const (
 	configFileEnvVariableName = "INSIGHTS_RESULTS_CLEANER_CONFIG_FILE"
 	defaultConfigFileName     = "config"
@@ -228,17 +246,17 @@ func PrintSummaryTable(summary Summary) {
 
 // doSelectedOperation function performs selected operation: check data
 // retention, cleanup selected data, or fill-id database by test data
-func doSelectedOperation(configuration ConfigStruct, connection *sql.DB, cliFlags CliFlags) error {
+func doSelectedOperation(configuration ConfigStruct, connection *sql.DB, cliFlags CliFlags) (int, error) {
 	switch {
 	case cliFlags.ShowVersion:
 		fmt.Println(versionMessage)
-		return nil
+		return ExitStatusOK, nil
 	case cliFlags.ShowAuthors:
 		fmt.Println(authorsMessage)
-		return nil
+		return ExitStatusOK, nil
 	case cliFlags.ShowConfiguration:
 		showConfiguration(configuration)
-		return nil
+		return ExitStatusOK, nil
 	case cliFlags.PerformCleanup:
 		// cleanup operation
 		clusterList, improperClusterCounter, err := readClusterList(
@@ -246,12 +264,12 @@ func doSelectedOperation(configuration ConfigStruct, connection *sql.DB, cliFlag
 			cliFlags.Clusters)
 		if err != nil {
 			log.Err(err).Msg("Read cluster list")
-			return err
+			return ExitStatusPerformCleanupError, err
 		}
 		deletionsForTable, err := performCleanupInDB(connection, clusterList)
 		if err != nil {
 			log.Err(err).Msg("Performing cleanup")
-			return err
+			return ExitStatusPerformCleanupError, err
 		}
 		if cliFlags.PrintSummaryTable {
 			var summary Summary
@@ -260,35 +278,35 @@ func doSelectedOperation(configuration ConfigStruct, connection *sql.DB, cliFlag
 			summary.DeletionsForTable = deletionsForTable
 			PrintSummaryTable(summary)
 		}
-		return nil
+		return ExitStatusOK, nil
 	case cliFlags.DetectMultipleRuleDisable:
 		// detect clusters that have the same rule(s) disabled by different users
 		err := displayMultipleRuleDisable(connection, cliFlags.Output)
 		if err != nil {
 			log.Err(err).Msg(selectingRecordsFromDatabase)
-			return err
+			return ExitStatusStorageError, err
 		}
 		// everything seems to be fine
-		return nil
+		return ExitStatusOK, nil
 	case cliFlags.FillInDatabase:
 		// fill-in database by test data
 		err := fillInDatabaseByTestData(connection)
 		if err != nil {
 			log.Err(err).Msg("Fill-in database by test data")
-			return err
+			return ExitStatusFillInStorageError, err
 		}
 		// everything seems to be fine
-		return nil
+		return ExitStatusOK, nil
 	default:
 		// display old records in database
 		err := displayAllOldRecords(connection,
 			configuration.Cleaner.MaxAge, cliFlags.Output)
 		if err != nil {
 			log.Err(err).Msg(selectingRecordsFromDatabase)
-			return err
+			return ExitStatusStorageError, err
 		}
 		// everything seems to be fine
-		return nil
+		return ExitStatusOK, nil
 	}
 	// we should not end there
 }
@@ -308,6 +326,8 @@ func main() {
 	flag.StringVar(&cliFlags.MaxAge, "max-age", "", "max age for displaying old records")
 	flag.StringVar(&cliFlags.Clusters, "clusters", "", "list of clusters to cleanup")
 	flag.StringVar(&cliFlags.Output, "output", "", "filename for old cluster listing")
+
+	// parse all command line flags
 	flag.Parse()
 
 	// config has exactly the same structure as *.toml file
@@ -334,10 +354,14 @@ func main() {
 	}
 
 	// perform selected operation
-	err = doSelectedOperation(config, connection, cliFlags)
+	exitStatus, err := doSelectedOperation(config, connection, cliFlags)
 	if err != nil {
 		log.Err(err).Msg("Operation failed")
+		os.Exit(exitStatus)
+		return
 	}
 
+	// finito
 	log.Debug().Msg("Finished")
+	os.Exit(ExitStatusOK)
 }
