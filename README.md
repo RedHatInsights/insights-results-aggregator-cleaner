@@ -14,6 +14,7 @@
     * [Default operation](#default-operation)
     * [Data cleanup](#data-cleanup)
     * [Test data generation](#test-data-generation)
+    * [Exit status](#exit-status)
     * [Building](#building)
     * [Makefile targets](#makefile-targets)
     * [Configuration](#configuration)
@@ -92,6 +93,15 @@ the `clusters ...` command line option.
 
 Command line option `-fill-in-db` can be used to insert some test data into
 database. Don't use it on production, of course.
+
+### Exit status
+
+```
+0 the tool finished with success
+1 is returned in case of any storage-related error
+2 is returned in case the fill-in DB operation failed
+3 is returned when DB cleanup operation failed for any reason
+```
 
 ### Building
 
