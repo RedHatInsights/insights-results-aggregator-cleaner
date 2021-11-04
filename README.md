@@ -352,6 +352,7 @@ Indexes:
     "rule_hit_pkey" PRIMARY KEY, btree (cluster_id, org_id, rule_fqdn, error_key)
 ```
 
+
 ### Database tables affected by this service
 
 Figuring out which reports are older than the specified time:
@@ -368,3 +369,4 @@ Actually cleaning the data for given cluster:
 ## Package manifest
 
 Package manifest is available at [docs/manifest.txt](docs/manifest.txt).
+
