@@ -11,6 +11,8 @@ objects:
     name: ccx-insights-results-aggregator-cleaner
   spec:
     envName: ${ENV_NAME}
+    testing:
+      iqePlugin: ccx
     dependencies:
       - ccx-insights-results
     jobs:
