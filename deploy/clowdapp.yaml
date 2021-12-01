@@ -8,7 +8,7 @@ objects:
 - apiVersion: cloud.redhat.com/v1alpha1
   kind: ClowdApp
   metadata:
-    name: ccx-insights-results-aggregator-cleaner
+    name: insights-aggregator-cleaner
   spec:
     envName: ${ENV_NAME}
     testing:
