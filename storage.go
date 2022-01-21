@@ -126,7 +126,8 @@ func displayMultipleRuleDisable(connection *sql.DB, output string) error {
 
 	if output != "" {
 		// create output file
-		fout, err := os.Create(output)
+		// disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, Severity: MEDIUM)
+		fout, err := os.Create(output) // #nosec G304
 		if err != nil {
 			log.Error().Err(err).Msg(fileOpenMsg)
 		}
@@ -284,7 +285,8 @@ func displayAllOldRecords(connection *sql.DB, maxAge string, output string) erro
 
 	if output != "" {
 		// create output file
-		fout, err := os.Create(output)
+		// disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, Severity: MEDIUM)
+		fout, err := os.Create(output) // #nosec G304
 		if err != nil {
 			log.Error().Err(err).Msg(fileOpenMsg)
 		}
