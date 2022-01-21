@@ -56,3 +56,4 @@ else
     echo -e "${GREEN_BG}[OK]${NC} No potential security issues has been detected"
     exit 0
 fi
+
