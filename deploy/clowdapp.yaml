@@ -20,6 +20,7 @@ objects:
         schedule: ${JOB_SCHEDULE}
         restartPolicy: Never
         concurrencyPolicy: Forbid
+        activeDeadlineSeconds: 600
         podSpec:
           image: ${IMAGE}:${IMAGE_TAG}
           resources:
