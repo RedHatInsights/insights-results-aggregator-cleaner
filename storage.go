@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 Red Hat, Inc.
+Copyright © 2021, 2022 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -45,18 +45,6 @@ import (
 	_ "github.com/mattn/go-sqlite3" // SQLite database driver
 
 	"github.com/rs/zerolog/log"
-)
-
-// DBDriver type for db driver enum
-type DBDriver int
-
-const (
-	// DBDriverSQLite3 shows that db driver is sqlite
-	DBDriverSQLite3 DBDriver = iota
-	// DBDriverPostgres shows that db driver is postgres
-	DBDriverPostgres
-	// DBDriverGeneral general sql(used for mock now)
-	DBDriverGeneral
 )
 
 // Error messages

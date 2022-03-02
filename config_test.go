@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 Red Hat, Inc.
+Copyright © 2021, 2022 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -40,18 +40,6 @@ func mustLoadConfiguration(envVar string) {
 	if err != nil {
 		panic(err)
 	}
-}
-
-func mustFailLoadingConfigurationIfWrongEnvVar(envVar string) {
-	_, err := main.LoadConfiguration(envVar, "ANonExistingDefaultConfigPath")
-	if err == nil {
-		panic(err)
-	}
-}
-
-func removeFile(t *testing.T, filename string) {
-	err := os.Remove(filename)
-	helpers.FailOnError(t, err)
 }
 
 func mustSetEnv(t *testing.T, key, val string) {
@@ -150,15 +138,4 @@ func TestLoadLoggingConfiguration(t *testing.T) {
 
 	assert.Equal(t, true, loggingCfg.Debug)
 	assert.Equal(t, "", loggingCfg.LogLevel)
-}
-
-// TestLoadConfigurationFromEnvVariableClowderEnabled tests loading the config.
-// file for testing from an environment variable. Clowder config is enabled in
-// this case.
-func _TestLoadConfigurationFromEnvVariableClowderEnabled(t *testing.T) {
-	os.Clearenv()
-
-	mustSetEnv(t, "INSIGHTS_RESULTS_CLEANER_CONFIG_FILE", "tests/config2")
-	mustSetEnv(t, "ACG_CONFIG", "tests/clowder_config.json")
-	mustLoadConfiguration("INSIGHTS_RESULTS_CLEANER_CONFIG_FILE")
 }
