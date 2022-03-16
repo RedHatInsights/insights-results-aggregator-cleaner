@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 Red Hat, Inc.
+Copyright © 2021, 2022 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -136,7 +136,7 @@ type StorageConfiguration struct {
 
 // LoadConfiguration loads configuration from defaultConfigFile, file set in
 // configFileEnvVariableName or from env
-func LoadConfiguration(configFileEnvVariableName string, defaultConfigFile string) (ConfigStruct, error) {
+func LoadConfiguration(configFileEnvVariableName, defaultConfigFile string) (ConfigStruct, error) {
 	var config ConfigStruct
 
 	// env. variable holding name of configuration file
@@ -227,7 +227,7 @@ func updateConfigFromClowder(c *ConfigStruct) error {
 		// can not use Zerolog at this moment!
 		fmt.Println("Clowder is enabled")
 
-		//get DB configuration from clowder
+		// get DB configuration from clowder
 		c.Storage.PGDBName = clowder.LoadedConfig.Database.Name
 		c.Storage.PGHost = clowder.LoadedConfig.Database.Hostname
 		c.Storage.PGPort = clowder.LoadedConfig.Database.Port

@@ -73,12 +73,8 @@ func initDatabaseConnection(configuration StorageConfiguration) (*sql.DB, error)
 	// initialize connection into selected database using the right driver
 	switch driverName {
 	case "sqlite3":
-		//driverType := DBDriverSQLite3
-		//driver = &sqlite3.SQLiteDriver{}
 		dataSource = configuration.SQLiteDataSource
 	case "postgres":
-		//driverType := DBDriverPostgres
-		//driver = &pq.Driver{}
 		dataSource = fmt.Sprintf(
 			"postgresql://%v:%v@%v:%v/%v?%v",
 			configuration.PGUsername,
@@ -267,7 +263,7 @@ func readOrgID(connection *sql.DB, clusterName string) (int, error) {
 
 // displayAllOldRecords function read all old records, ie. records that are
 // older than the specified time duration. Those records are simply displayed.
-func displayAllOldRecords(connection *sql.DB, maxAge string, output string) error {
+func displayAllOldRecords(connection *sql.DB, maxAge, output string) error {
 	var fout *os.File = nil
 	var writer *bufio.Writer = nil
 
@@ -359,12 +355,11 @@ func performListOfOldReports(connection *sql.DB, maxAge string, writer *bufio.Wr
 
 // deleteRecordFromTable function deletes selected records (identified by
 // cluster name) from database
-func deleteRecordFromTable(connection *sql.DB, table string, key string, clusterName ClusterName) (int, error) {
+func deleteRecordFromTable(connection *sql.DB, table, key string, clusterName ClusterName) (int, error) {
 	// it is not possible to use parameter for table name or a key
 	// disable "G202 (CWE-89): SQL string concatenation (Confidence: HIGH, Severity: MEDIUM)"
 	// #nosec G202
 	sqlStatement := "DELETE FROM " + table + " WHERE " + key + " = $1;"
-	// println(sqlStatement)
 
 	// perform the SQL statement
 	result, err := connection.Exec(sqlStatement, clusterName)
