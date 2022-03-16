@@ -100,7 +100,7 @@ func IsValidUUID(input string) bool {
 
 // readClusterList function reads list of clusters from provided text file or
 // from CLI argument.
-func readClusterList(filename string, clusters string) (ClusterList, int, error) {
+func readClusterList(filename, clusters string) (ClusterList, int, error) {
 	// if clusters are not specified on command line, read list of clusters
 	// from file
 	if clusters == "" {
