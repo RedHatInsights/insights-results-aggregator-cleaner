@@ -227,7 +227,7 @@ func updateConfigFromClowder(c *ConfigStruct) error {
 		// can not use Zerolog at this moment!
 		fmt.Println("Clowder is enabled")
 
-		//get DB configuration from clowder
+		// get DB configuration from clowder
 		c.Storage.PGDBName = clowder.LoadedConfig.Database.Name
 		c.Storage.PGHost = clowder.LoadedConfig.Database.Hostname
 		c.Storage.PGPort = clowder.LoadedConfig.Database.Port

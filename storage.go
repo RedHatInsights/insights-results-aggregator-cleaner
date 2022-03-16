@@ -73,12 +73,8 @@ func initDatabaseConnection(configuration StorageConfiguration) (*sql.DB, error)
 	// initialize connection into selected database using the right driver
 	switch driverName {
 	case "sqlite3":
-		//driverType := DBDriverSQLite3
-		//driver = &sqlite3.SQLiteDriver{}
 		dataSource = configuration.SQLiteDataSource
 	case "postgres":
-		//driverType := DBDriverPostgres
-		//driver = &pq.Driver{}
 		dataSource = fmt.Sprintf(
 			"postgresql://%v:%v@%v:%v/%v?%v",
 			configuration.PGUsername,
@@ -364,7 +360,6 @@ func deleteRecordFromTable(connection *sql.DB, table string, key string, cluster
 	// disable "G202 (CWE-89): SQL string concatenation (Confidence: HIGH, Severity: MEDIUM)"
 	// #nosec G202
 	sqlStatement := "DELETE FROM " + table + " WHERE " + key + " = $1;"
-	// println(sqlStatement)
 
 	// perform the SQL statement
 	result, err := connection.Exec(sqlStatement, clusterName)
