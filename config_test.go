@@ -97,8 +97,6 @@ func TestLoadingConfigurationEnvVariableBadValueDefaultConfigFailure(t *testing.
 func TestLoadCleanerConfiguration(t *testing.T) {
 	envVar := "INSIGHTS_RESULTS_CLEANER_CONFIG_FILE"
 
-	//helpers.FailOnError(t, os.Chdir(".."))
-
 	mustSetEnv(t, envVar, "tests/config2")
 	config, err := main.LoadConfiguration(envVar, "")
 	assert.Nil(t, err, "Failed loading configuration file from env var!")
