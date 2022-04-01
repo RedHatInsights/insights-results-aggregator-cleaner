@@ -71,6 +71,8 @@ Usage of cleaner:
         show configuration
   -summary
         print summary table after cleanup
+  -vacuum
+        vacuum database
   -version
         show cleaner version
 ```
