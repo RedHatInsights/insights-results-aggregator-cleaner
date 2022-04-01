@@ -401,6 +401,20 @@ var tablesAndKeys = [...]TableAndKey{
 	},
 }
 
+// performVacuumDB vacuums the whole database
+func performVacuumDB(connection *sql.DB) error {
+	log.Info().Msg("Vacuuming started")
+	sqlStatement := "VACUUM VERBOSE;"
+
+	// perform the SQL statement
+	_, err := connection.Exec(sqlStatement)
+	if err != nil {
+		return err
+	}
+	log.Info().Msg("Vacuuming finished")
+	return nil
+}
+
 // performCleanupInDB function cleans up all data for selected cluster names
 func performCleanupInDB(connection *sql.DB,
 	clusterList ClusterList) (map[string]int, error) {

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
- Copyright 2021 Red Hat, Inc
+ Copyright 2022 Red Hat, Inc
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -118,7 +118,7 @@
       <tr class="section">
 	<td class="doc"></td>
 	<td class="code"><pre><code><div class="comment">/*
-Copyright © 2021 Red Hat, Inc.
+Copyright © 2021, 2022 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
 you may not use this file except in compliance with the License.
@@ -185,38 +185,6 @@ https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner
       </tr>
       
       <tr class="section">
-	<td class="doc"><p>DBDriver type for db driver enum</p>
-</td>
-	<td class="code"><pre><code><div class="keyword">type</div> <div class="ident">DBDriver</div> <div class="ident">int</div><div class="operator"></div>
-
-<div class="keyword">const</div> <div class="operator">(</div>
-</code></pre></td>
-      </tr>
-      
-      <tr class="section">
-	<td class="doc"><p>DBDriverSQLite3 shows that db driver is sqlite</p>
-</td>
-	<td class="code"><pre><code>	<div class="ident">DBDriverSQLite3</div> <div class="ident">DBDriver</div> <div class="operator">=</div> <div class="ident">iota</div><div class="operator"></div>
-</code></pre></td>
-      </tr>
-      
-      <tr class="section">
-	<td class="doc"><p>DBDriverPostgres shows that db driver is postgres</p>
-</td>
-	<td class="code"><pre><code>	<div class="ident">DBDriverPostgres</div><div class="operator"></div>
-</code></pre></td>
-      </tr>
-      
-      <tr class="section">
-	<td class="doc"><p>DBDriverGeneral general sql(used for mock now)</p>
-</td>
-	<td class="code"><pre><code>	<div class="ident">DBDriverGeneral</div><div class="operator"></div>
-<div class="operator">)</div><div class="operator"></div>
-
-</code></pre></td>
-      </tr>
-      
-      <tr class="section">
 	<td class="doc"><p>Error messages</p>
 </td>
 	<td class="code"><pre><code><div class="keyword">const</div> <div class="operator">(</div>
@@ -259,23 +227,9 @@ initializes connection to the storage.</p>
 </td>
 	<td class="code"><pre><code>	<div class="keyword">switch</div> <div class="ident">driverName</div> <div class="operator">{</div>
 	<div class="keyword">case</div> <div class="literal">&#34;sqlite3&#34;</div><div class="operator">:</div>
-</code></pre></td>
-      </tr>
-      
-      <tr class="section">
-	<td class="doc"><p>driverType := DBDriverSQLite3
-driver = &amp;sqlite3.SQLiteDriver{}</p>
-</td>
-	<td class="code"><pre><code>		<div class="ident">dataSource</div> <div class="operator">=</div> <div class="ident">configuration</div><div class="operator">.</div><div class="ident">SQLiteDataSource</div><div class="operator"></div>
+		<div class="ident">dataSource</div> <div class="operator">=</div> <div class="ident">configuration</div><div class="operator">.</div><div class="ident">SQLiteDataSource</div><div class="operator"></div>
 	<div class="keyword">case</div> <div class="literal">&#34;postgres&#34;</div><div class="operator">:</div>
-</code></pre></td>
-      </tr>
-      
-      <tr class="section">
-	<td class="doc"><p>driverType := DBDriverPostgres
-driver = &amp;pq.Driver{}</p>
-</td>
-	<td class="code"><pre><code>		<div class="ident">dataSource</div> <div class="operator">=</div> <div class="ident">fmt</div><div class="operator">.</div><div class="ident">Sprintf</div><div class="operator">(</div>
+		<div class="ident">dataSource</div> <div class="operator">=</div> <div class="ident">fmt</div><div class="operator">.</div><div class="ident">Sprintf</div><div class="operator">(</div>
 			<div class="literal">&#34;postgresql://%v:%v@%v:%v/%v?%v&#34;</div><div class="operator">,</div>
 			<div class="ident">configuration</div><div class="operator">.</div><div class="ident">PGUsername</div><div class="operator">,</div>
 			<div class="ident">configuration</div><div class="operator">.</div><div class="ident">PGPassword</div><div class="operator">,</div>
@@ -328,9 +282,10 @@ multiple users have disabled some rules.</p>
       </tr>
       
       <tr class="section">
-	<td class="doc"><p>create output file</p>
+	<td class="doc"><p>create output file
+disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, Severity: MEDIUM)</p>
 </td>
-	<td class="code"><pre><code>		<div class="ident">fout</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">os</div><div class="operator">.</div><div class="ident">Create</div><div class="operator">(</div><div class="ident">output</div><div class="operator">)</div><div class="operator"></div>
+	<td class="code"><pre><code>		<div class="ident">fout</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">os</div><div class="operator">.</div><div class="ident">Create</div><div class="operator">(</div><div class="ident">output</div><div class="operator">)</div> <div class="operator"></div><div class="comment">// #nosec G304</div>
 		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 			<div class="ident">log</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">fileOpenMsg</div><div class="operator">)</div><div class="operator"></div>
 		<div class="operator">}</div><div class="operator"></div>
@@ -607,7 +562,7 @@ ids where multiple users disabled any rule</p>
 	<td class="doc"><p>displayAllOldRecords function read all old records, ie. records that are
 older than the specified time duration. Those records are simply displayed.</p>
 </td>
-	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">displayAllOldRecords</div><div class="operator">(</div><div class="ident">connection</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">,</div> <div class="ident">maxAge</div> <div class="ident">string</div><div class="operator">,</div> <div class="ident">output</div> <div class="ident">string</div><div class="operator">)</div> <div class="ident">error</div> <div class="operator">{</div>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">displayAllOldRecords</div><div class="operator">(</div><div class="ident">connection</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">,</div> <div class="ident">maxAge</div><div class="operator">,</div> <div class="ident">output</div> <div class="ident">string</div><div class="operator">)</div> <div class="ident">error</div> <div class="operator">{</div>
 	<div class="keyword">var</div> <div class="ident">fout</div> <div class="operator">*</div><div class="ident">os</div><div class="operator">.</div><div class="ident">File</div> <div class="operator">=</div> <div class="ident">nil</div><div class="operator"></div>
 	<div class="keyword">var</div> <div class="ident">writer</div> <div class="operator">*</div><div class="ident">bufio</div><div class="operator">.</div><div class="ident">Writer</div> <div class="operator">=</div> <div class="ident">nil</div><div class="operator"></div>
 
@@ -616,9 +571,10 @@ older than the specified time duration. Those records are simply displayed.</p>
       </tr>
       
       <tr class="section">
-	<td class="doc"><p>create output file</p>
+	<td class="doc"><p>create output file
+disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, Severity: MEDIUM)</p>
 </td>
-	<td class="code"><pre><code>		<div class="ident">fout</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">os</div><div class="operator">.</div><div class="ident">Create</div><div class="operator">(</div><div class="ident">output</div><div class="operator">)</div><div class="operator"></div>
+	<td class="code"><pre><code>		<div class="ident">fout</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">os</div><div class="operator">.</div><div class="ident">Create</div><div class="operator">(</div><div class="ident">output</div><div class="operator">)</div> <div class="operator"></div><div class="comment">// #nosec G304</div>
 		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 			<div class="ident">log</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">fileOpenMsg</div><div class="operator">)</div><div class="operator"></div>
 		<div class="operator">}</div><div class="operator"></div>
@@ -758,7 +714,7 @@ older than the specified time duration. Those records are simply displayed.</p>
 	<td class="doc"><p>deleteRecordFromTable function deletes selected records (identified by
 cluster name) from database</p>
 </td>
-	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">deleteRecordFromTable</div><div class="operator">(</div><div class="ident">connection</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">,</div> <div class="ident">table</div> <div class="ident">string</div><div class="operator">,</div> <div class="ident">key</div> <div class="ident">string</div><div class="operator">,</div> <div class="ident">clusterName</div> <div class="ident">ClusterName</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">int</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">deleteRecordFromTable</div><div class="operator">(</div><div class="ident">connection</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">,</div> <div class="ident">table</div><div class="operator">,</div> <div class="ident">key</div> <div class="ident">string</div><div class="operator">,</div> <div class="ident">clusterName</div> <div class="ident">ClusterName</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">int</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
       
@@ -769,13 +725,7 @@ disable &quot;G202 (CWE-89): SQL string concatenation (Confidence: HIGH, Severit
 <h1>nosec G202</h1>
 </td>
 	<td class="code"><pre><code>	<div class="ident">sqlStatement</div> <div class="operator">:=</div> <div class="literal">&#34;DELETE FROM &#34;</div> <div class="operator">&#43;</div> <div class="ident">table</div> <div class="operator">&#43;</div> <div class="literal">&#34; WHERE &#34;</div> <div class="operator">&#43;</div> <div class="ident">key</div> <div class="operator">&#43;</div> <div class="literal">&#34; = $1;&#34;</div><div class="operator"></div>
-</code></pre></td>
-      </tr>
-      
-      <tr class="section">
-	<td class="doc"><p>println(sqlStatement)</p>
-</td>
-	<td class="code"><pre><code>
+
 </code></pre></td>
       </tr>
       
@@ -834,6 +784,30 @@ records to be deleted</p>
 		<div class="ident">TableName</div><div class="operator">:</div> <div class="literal">&#34;report&#34;</div><div class="operator">,</div>
 		<div class="ident">KeyName</div><div class="operator">:</div>   <div class="literal">&#34;cluster&#34;</div><div class="operator">,</div>
 	<div class="operator">}</div><div class="operator">,</div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>performVacuumDB vacuums the whole database</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">performVacuumDB</div><div class="operator">(</div><div class="ident">connection</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">)</div> <div class="ident">error</div> <div class="operator">{</div>
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Vacuuming started&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">sqlStatement</div> <div class="operator">:=</div> <div class="literal">&#34;VACUUM VERBOSE;&#34;</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>perform the SQL statement</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">_</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">connection</div><div class="operator">.</div><div class="ident">Exec</div><div class="operator">(</div><div class="ident">sqlStatement</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="keyword">return</div> <div class="ident">err</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Vacuuming finished&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">return</div> <div class="ident">nil</div><div class="operator"></div>
 <div class="operator">}</div><div class="operator"></div>
 
 </code></pre></td>
