@@ -54,6 +54,7 @@ type CliFlags struct {
 	PerformCleanup            bool
 	DetectMultipleRuleDisable bool
 	FillInDatabase            bool
+	VacuumDatabase            bool
 	MaxAge                    string
 	Clusters                  string
 }

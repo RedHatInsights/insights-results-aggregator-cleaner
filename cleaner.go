@@ -85,6 +85,10 @@ const (
 	// ExitStatusPerformCleanupError is returned when DB cleanup operation
 	// failed for any reason
 	ExitStatusPerformCleanupError
+
+	// ExitStatusPerformVacuumError is returned when DB vacuuming operation
+	// have failed for any reason
+	ExitStatusPerformVacuumError
 )
 
 const (
@@ -256,6 +260,13 @@ func doSelectedOperation(configuration ConfigStruct, connection *sql.DB, cliFlag
 	case cliFlags.ShowConfiguration:
 		showConfiguration(configuration)
 		return ExitStatusOK, nil
+	case cliFlags.VacuumDatabase:
+		err := performVacuumDB(connection)
+		if err != nil {
+			log.Err(err).Msg("Performing vacuuming database")
+			return ExitStatusPerformVacuumError, err
+		}
+		return ExitStatusOK, nil
 	case cliFlags.PerformCleanup:
 		// cleanup operation
 		clusterList, improperClusterCounter, err := readClusterList(
@@ -322,6 +333,7 @@ func main() {
 	flag.BoolVar(&cliFlags.ShowConfiguration, "show-configuration", false, "show configuration")
 	flag.BoolVar(&cliFlags.ShowVersion, "version", false, "show cleaner version")
 	flag.BoolVar(&cliFlags.ShowAuthors, "authors", false, "show authors")
+	flag.BoolVar(&cliFlags.VacuumDatabase, "vacuum", false, "vacuum database")
 	flag.StringVar(&cliFlags.MaxAge, "max-age", "", "max age for displaying old records")
 	flag.StringVar(&cliFlags.Clusters, "clusters", "", "list of clusters to cleanup")
 	flag.StringVar(&cliFlags.Output, "output", "", "filename for old cluster listing")
