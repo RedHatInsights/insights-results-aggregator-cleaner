@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
- Copyright 2021 Red Hat, Inc
+ Copyright 2022 Red Hat, Inc
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -118,7 +118,7 @@
       <tr class="section">
 	<td class="doc"></td>
 	<td class="code"><pre><code><div class="comment">/*
-Copyright © 2021 Red Hat, Inc.
+Copyright © 2021, 2022 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
 you may not use this file except in compliance with the License.
@@ -185,11 +185,6 @@ https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/cl
 	<div class="literal">&#34;github.com/olekukonko/tablewriter&#34;</div><div class="operator"></div>
 <div class="operator">)</div><div class="operator"></div>
 
-<div class="keyword">const</div> <div class="operator">(</div>
-	<div class="ident">configFileEnvVariableName</div> <div class="operator">=</div> <div class="literal">&#34;INSIGHTS_RESULTS_CLEANER_CONFIG_FILE&#34;</div><div class="operator"></div>
-	<div class="ident">defaultConfigFileName</div>     <div class="operator">=</div> <div class="literal">&#34;config&#34;</div><div class="operator"></div>
-<div class="operator">)</div><div class="operator"></div>
-
 </code></pre></td>
       </tr>
       
@@ -197,8 +192,8 @@ https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/cl
 	<td class="doc"><p>Messages</p>
 </td>
 	<td class="code"><pre><code><div class="keyword">const</div> <div class="operator">(</div>
-	<div class="ident">version</div>                      <div class="operator">=</div> <div class="literal">&#34;Insights Results Aggregator Cleaner version 1.0&#34;</div><div class="operator"></div>
-	<div class="ident">authors</div>                      <div class="operator">=</div> <div class="literal">&#34;Pavel Tisnovsky, Red Hat Inc.&#34;</div><div class="operator"></div>
+	<div class="ident">versionMessage</div>               <div class="operator">=</div> <div class="literal">&#34;Insights Results Aggregator Cleaner version 1.0&#34;</div><div class="operator"></div>
+	<div class="ident">authorsMessage</div>               <div class="operator">=</div> <div class="literal">&#34;Pavel Tisnovsky, Red Hat Inc.&#34;</div><div class="operator"></div>
 	<div class="ident">properClusterID</div>              <div class="operator">=</div> <div class="literal">&#34;Proper cluster ID&#34;</div><div class="operator"></div>
 	<div class="ident">notProperClusterID</div>           <div class="operator">=</div> <div class="literal">&#34;Not a proper cluster ID&#34;</div><div class="operator"></div>
 	<div class="ident">improperClusterEntries</div>       <div class="operator">=</div> <div class="literal">&#34;improper cluster entries&#34;</div><div class="operator"></div>
@@ -206,6 +201,63 @@ https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/cl
 	<div class="ident">clusterListFinished</div>          <div class="operator">=</div> <div class="literal">&#34;Cluster list finished&#34;</div><div class="operator"></div>
 	<div class="ident">inputWithClusterID</div>           <div class="operator">=</div> <div class="literal">&#34;input&#34;</div><div class="operator"></div>
 	<div class="ident">selectingRecordsFromDatabase</div> <div class="operator">=</div> <div class="literal">&#34;Selecting records from database&#34;</div><div class="operator"></div>
+<div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>Exit codes</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">const</div> <div class="operator">(</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>ExitStatusOK means that the tool finished with success</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">ExitStatusOK</div> <div class="operator">=</div> <div class="ident">iota</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>ExitStatusStorageError is returned in case of any storage-related
+error</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">ExitStatusStorageError</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>ExitStatusFillInStorageError is returned in case the fill-in DB
+operation failed</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">ExitStatusFillInStorageError</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>ExitStatusPerformCleanupError is returned when DB cleanup operation
+failed for any reason</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">ExitStatusPerformCleanupError</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>ExitStatusPerformVacuumError is returned when DB vacuuming operation
+have failed for any reason</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">ExitStatusPerformVacuumError</div><div class="operator"></div>
+<div class="operator">)</div><div class="operator"></div>
+
+<div class="keyword">const</div> <div class="operator">(</div>
+	<div class="ident">configFileEnvVariableName</div> <div class="operator">=</div> <div class="literal">&#34;INSIGHTS_RESULTS_CLEANER_CONFIG_FILE&#34;</div><div class="operator"></div>
+	<div class="ident">defaultConfigFileName</div>     <div class="operator">=</div> <div class="literal">&#34;config&#34;</div><div class="operator"></div>
 <div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
@@ -226,7 +278,7 @@ https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/cl
 	<td class="doc"><p>readClusterList function reads list of clusters from provided text file or
 from CLI argument.</p>
 </td>
-	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">readClusterList</div><div class="operator">(</div><div class="ident">filename</div> <div class="ident">string</div><div class="operator">,</div> <div class="ident">clusters</div> <div class="ident">string</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">ClusterList</div><div class="operator">,</div> <div class="ident">int</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">readClusterList</div><div class="operator">(</div><div class="ident">filename</div><div class="operator">,</div> <div class="ident">clusters</div> <div class="ident">string</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">ClusterList</div><div class="operator">,</div> <div class="ident">int</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
       
@@ -333,10 +385,8 @@ file.</p>
       
       <tr class="section">
 	<td class="doc"><p>disable &quot;G304 (CWE-22): Potential file inclusion via variable&quot;</p>
-
-<h1>nosec G304</h1>
 </td>
-	<td class="code"><pre><code>	<div class="ident">file</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">os</div><div class="operator">.</div><div class="ident">Open</div><div class="operator">(</div><div class="ident">filename</div><div class="operator">)</div><div class="operator"></div>
+	<td class="code"><pre><code>	<div class="ident">file</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">os</div><div class="operator">.</div><div class="ident">Open</div><div class="operator">(</div><div class="ident">filename</div><div class="operator">)</div> <div class="operator"></div><div class="comment">// #nosec G304</div>
 	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 		<div class="keyword">return</div> <div class="ident">nil</div><div class="operator">,</div> <div class="ident">improperClusterCounter</div><div class="operator">,</div> <div class="ident">err</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
@@ -458,17 +508,24 @@ cleanup step.</p>
 	<td class="doc"><p>doSelectedOperation function performs selected operation: check data
 retention, cleanup selected data, or fill-id database by test data</p>
 </td>
-	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">doSelectedOperation</div><div class="operator">(</div><div class="ident">configuration</div> <div class="ident">ConfigStruct</div><div class="operator">,</div> <div class="ident">connection</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">,</div> <div class="ident">cliFlags</div> <div class="ident">CliFlags</div><div class="operator">)</div> <div class="ident">error</div> <div class="operator">{</div>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">doSelectedOperation</div><div class="operator">(</div><div class="ident">configuration</div> <div class="ident">ConfigStruct</div><div class="operator">,</div> <div class="ident">connection</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">,</div> <div class="ident">cliFlags</div> <div class="ident">CliFlags</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">int</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
 	<div class="keyword">switch</div> <div class="operator">{</div>
 	<div class="keyword">case</div> <div class="ident">cliFlags</div><div class="operator">.</div><div class="ident">ShowVersion</div><div class="operator">:</div>
-		<div class="ident">fmt</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="ident">version</div><div class="operator">)</div><div class="operator"></div>
-		<div class="keyword">return</div> <div class="ident">nil</div><div class="operator"></div>
+		<div class="ident">fmt</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="ident">versionMessage</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div> <div class="ident">ExitStatusOK</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
 	<div class="keyword">case</div> <div class="ident">cliFlags</div><div class="operator">.</div><div class="ident">ShowAuthors</div><div class="operator">:</div>
-		<div class="ident">fmt</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="ident">authors</div><div class="operator">)</div><div class="operator"></div>
-		<div class="keyword">return</div> <div class="ident">nil</div><div class="operator"></div>
+		<div class="ident">fmt</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="ident">authorsMessage</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div> <div class="ident">ExitStatusOK</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
 	<div class="keyword">case</div> <div class="ident">cliFlags</div><div class="operator">.</div><div class="ident">ShowConfiguration</div><div class="operator">:</div>
 		<div class="ident">showConfiguration</div><div class="operator">(</div><div class="ident">configuration</div><div class="operator">)</div><div class="operator"></div>
-		<div class="keyword">return</div> <div class="ident">nil</div><div class="operator"></div>
+		<div class="keyword">return</div> <div class="ident">ExitStatusOK</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
+	<div class="keyword">case</div> <div class="ident">cliFlags</div><div class="operator">.</div><div class="ident">VacuumDatabase</div><div class="operator">:</div>
+		<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">performVacuumDB</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+			<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Performing vacuuming database&#34;</div><div class="operator">)</div><div class="operator"></div>
+			<div class="keyword">return</div> <div class="ident">ExitStatusPerformVacuumError</div><div class="operator">,</div> <div class="ident">err</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator"></div>
+		<div class="keyword">return</div> <div class="ident">ExitStatusOK</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
 	<div class="keyword">case</div> <div class="ident">cliFlags</div><div class="operator">.</div><div class="ident">PerformCleanup</div><div class="operator">:</div>
 </code></pre></td>
       </tr>
@@ -481,12 +538,12 @@ retention, cleanup selected data, or fill-id database by test data</p>
 			<div class="ident">cliFlags</div><div class="operator">.</div><div class="ident">Clusters</div><div class="operator">)</div><div class="operator"></div>
 		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 			<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Read cluster list&#34;</div><div class="operator">)</div><div class="operator"></div>
-			<div class="keyword">return</div> <div class="ident">err</div><div class="operator"></div>
+			<div class="keyword">return</div> <div class="ident">ExitStatusPerformCleanupError</div><div class="operator">,</div> <div class="ident">err</div><div class="operator"></div>
 		<div class="operator">}</div><div class="operator"></div>
 		<div class="ident">deletionsForTable</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">performCleanupInDB</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">)</div><div class="operator"></div>
 		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 			<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Performing cleanup&#34;</div><div class="operator">)</div><div class="operator"></div>
-			<div class="keyword">return</div> <div class="ident">err</div><div class="operator"></div>
+			<div class="keyword">return</div> <div class="ident">ExitStatusPerformCleanupError</div><div class="operator">,</div> <div class="ident">err</div><div class="operator"></div>
 		<div class="operator">}</div><div class="operator"></div>
 		<div class="keyword">if</div> <div class="ident">cliFlags</div><div class="operator">.</div><div class="ident">PrintSummaryTable</div> <div class="operator">{</div>
 			<div class="keyword">var</div> <div class="ident">summary</div> <div class="ident">Summary</div><div class="operator"></div>
@@ -495,7 +552,7 @@ retention, cleanup selected data, or fill-id database by test data</p>
 			<div class="ident">summary</div><div class="operator">.</div><div class="ident">DeletionsForTable</div> <div class="operator">=</div> <div class="ident">deletionsForTable</div><div class="operator"></div>
 			<div class="ident">PrintSummaryTable</div><div class="operator">(</div><div class="ident">summary</div><div class="operator">)</div><div class="operator"></div>
 		<div class="operator">}</div><div class="operator"></div>
-		<div class="keyword">return</div> <div class="ident">nil</div><div class="operator"></div>
+		<div class="keyword">return</div> <div class="ident">ExitStatusOK</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
 	<div class="keyword">case</div> <div class="ident">cliFlags</div><div class="operator">.</div><div class="ident">DetectMultipleRuleDisable</div><div class="operator">:</div>
 </code></pre></td>
       </tr>
@@ -506,7 +563,7 @@ retention, cleanup selected data, or fill-id database by test data</p>
 	<td class="code"><pre><code>		<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">displayMultipleRuleDisable</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">,</div> <div class="ident">cliFlags</div><div class="operator">.</div><div class="ident">Output</div><div class="operator">)</div><div class="operator"></div>
 		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 			<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">selectingRecordsFromDatabase</div><div class="operator">)</div><div class="operator"></div>
-			<div class="keyword">return</div> <div class="ident">err</div><div class="operator"></div>
+			<div class="keyword">return</div> <div class="ident">ExitStatusStorageError</div><div class="operator">,</div> <div class="ident">err</div><div class="operator"></div>
 		<div class="operator">}</div><div class="operator"></div>
 </code></pre></td>
       </tr>
@@ -514,7 +571,7 @@ retention, cleanup selected data, or fill-id database by test data</p>
       <tr class="section">
 	<td class="doc"><p>everything seems to be fine</p>
 </td>
-	<td class="code"><pre><code>		<div class="keyword">return</div> <div class="ident">nil</div><div class="operator"></div>
+	<td class="code"><pre><code>		<div class="keyword">return</div> <div class="ident">ExitStatusOK</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
 	<div class="keyword">case</div> <div class="ident">cliFlags</div><div class="operator">.</div><div class="ident">FillInDatabase</div><div class="operator">:</div>
 </code></pre></td>
       </tr>
@@ -525,7 +582,7 @@ retention, cleanup selected data, or fill-id database by test data</p>
 	<td class="code"><pre><code>		<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">fillInDatabaseByTestData</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">)</div><div class="operator"></div>
 		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 			<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Fill-in database by test data&#34;</div><div class="operator">)</div><div class="operator"></div>
-			<div class="keyword">return</div> <div class="ident">err</div><div class="operator"></div>
+			<div class="keyword">return</div> <div class="ident">ExitStatusFillInStorageError</div><div class="operator">,</div> <div class="ident">err</div><div class="operator"></div>
 		<div class="operator">}</div><div class="operator"></div>
 </code></pre></td>
       </tr>
@@ -533,7 +590,7 @@ retention, cleanup selected data, or fill-id database by test data</p>
       <tr class="section">
 	<td class="doc"><p>everything seems to be fine</p>
 </td>
-	<td class="code"><pre><code>		<div class="keyword">return</div> <div class="ident">nil</div><div class="operator"></div>
+	<td class="code"><pre><code>		<div class="keyword">return</div> <div class="ident">ExitStatusOK</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
 	<div class="keyword">default</div><div class="operator">:</div>
 </code></pre></td>
       </tr>
@@ -545,7 +602,7 @@ retention, cleanup selected data, or fill-id database by test data</p>
 			<div class="ident">configuration</div><div class="operator">.</div><div class="ident">Cleaner</div><div class="operator">.</div><div class="ident">MaxAge</div><div class="operator">,</div> <div class="ident">cliFlags</div><div class="operator">.</div><div class="ident">Output</div><div class="operator">)</div><div class="operator"></div>
 		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 			<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">selectingRecordsFromDatabase</div><div class="operator">)</div><div class="operator"></div>
-			<div class="keyword">return</div> <div class="ident">err</div><div class="operator"></div>
+			<div class="keyword">return</div> <div class="ident">ExitStatusStorageError</div><div class="operator">,</div> <div class="ident">err</div><div class="operator"></div>
 		<div class="operator">}</div><div class="operator"></div>
 </code></pre></td>
       </tr>
@@ -553,7 +610,7 @@ retention, cleanup selected data, or fill-id database by test data</p>
       <tr class="section">
 	<td class="doc"><p>everything seems to be fine</p>
 </td>
-	<td class="code"><pre><code>		<div class="keyword">return</div> <div class="ident">nil</div><div class="operator"></div>
+	<td class="code"><pre><code>		<div class="keyword">return</div> <div class="ident">ExitStatusOK</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 </code></pre></td>
       </tr>
@@ -585,10 +642,18 @@ retention, cleanup selected data, or fill-id database by test data</p>
 	<div class="ident">flag</div><div class="operator">.</div><div class="ident">BoolVar</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">cliFlags</div><div class="operator">.</div><div class="ident">ShowConfiguration</div><div class="operator">,</div> <div class="literal">&#34;show-configuration&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="literal">&#34;show configuration&#34;</div><div class="operator">)</div><div class="operator"></div>
 	<div class="ident">flag</div><div class="operator">.</div><div class="ident">BoolVar</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">cliFlags</div><div class="operator">.</div><div class="ident">ShowVersion</div><div class="operator">,</div> <div class="literal">&#34;version&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="literal">&#34;show cleaner version&#34;</div><div class="operator">)</div><div class="operator"></div>
 	<div class="ident">flag</div><div class="operator">.</div><div class="ident">BoolVar</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">cliFlags</div><div class="operator">.</div><div class="ident">ShowAuthors</div><div class="operator">,</div> <div class="literal">&#34;authors&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="literal">&#34;show authors&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">flag</div><div class="operator">.</div><div class="ident">BoolVar</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">cliFlags</div><div class="operator">.</div><div class="ident">VacuumDatabase</div><div class="operator">,</div> <div class="literal">&#34;vacuum&#34;</div><div class="operator">,</div> <div class="ident">false</div><div class="operator">,</div> <div class="literal">&#34;vacuum database&#34;</div><div class="operator">)</div><div class="operator"></div>
 	<div class="ident">flag</div><div class="operator">.</div><div class="ident">StringVar</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">cliFlags</div><div class="operator">.</div><div class="ident">MaxAge</div><div class="operator">,</div> <div class="literal">&#34;max-age&#34;</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">,</div> <div class="literal">&#34;max age for displaying old records&#34;</div><div class="operator">)</div><div class="operator"></div>
 	<div class="ident">flag</div><div class="operator">.</div><div class="ident">StringVar</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">cliFlags</div><div class="operator">.</div><div class="ident">Clusters</div><div class="operator">,</div> <div class="literal">&#34;clusters&#34;</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">,</div> <div class="literal">&#34;list of clusters to cleanup&#34;</div><div class="operator">)</div><div class="operator"></div>
 	<div class="ident">flag</div><div class="operator">.</div><div class="ident">StringVar</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">cliFlags</div><div class="operator">.</div><div class="ident">Output</div><div class="operator">,</div> <div class="literal">&#34;output&#34;</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">,</div> <div class="literal">&#34;filename for old cluster listing&#34;</div><div class="operator">)</div><div class="operator"></div>
-	<div class="ident">flag</div><div class="operator">.</div><div class="ident">Parse</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>parse all command line flags</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">flag</div><div class="operator">.</div><div class="ident">Parse</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -634,12 +699,21 @@ retention, cleanup selected data, or fill-id database by test data</p>
       <tr class="section">
 	<td class="doc"><p>perform selected operation</p>
 </td>
-	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">doSelectedOperation</div><div class="operator">(</div><div class="ident">config</div><div class="operator">,</div> <div class="ident">connection</div><div class="operator">,</div> <div class="ident">cliFlags</div><div class="operator">)</div><div class="operator"></div>
+	<td class="code"><pre><code>	<div class="ident">exitStatus</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">doSelectedOperation</div><div class="operator">(</div><div class="ident">config</div><div class="operator">,</div> <div class="ident">connection</div><div class="operator">,</div> <div class="ident">cliFlags</div><div class="operator">)</div><div class="operator"></div>
 	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 		<div class="ident">log</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Operation failed&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">os</div><div class="operator">.</div><div class="ident">Exit</div><div class="operator">(</div><div class="ident">exitStatus</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 
-	<div class="ident">log</div><div class="operator">.</div><div class="ident">Debug</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Finished&#34;</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>finito</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">log</div><div class="operator">.</div><div class="ident">Debug</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Finished&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">os</div><div class="operator">.</div><div class="ident">Exit</div><div class="operator">(</div><div class="ident">ExitStatusOK</div><div class="operator">)</div><div class="operator"></div>
 <div class="operator">}</div><div class="operator"></div>
 
 </code></pre></td>
