@@ -304,6 +304,18 @@ func fillInDatabase(connection *sql.DB) (int, error) {
 	return ExitStatusOK, nil
 }
 
+// displayOldRecords function displays old records in database
+func displayOldRecords(configuration ConfigStruct, connection *sql.DB, cliFlags CliFlags) (int, error) {
+	err := displayAllOldRecords(connection,
+		configuration.Cleaner.MaxAge, cliFlags.Output)
+	if err != nil {
+		log.Err(err).Msg(selectingRecordsFromDatabase)
+		return ExitStatusStorageError, err
+	}
+	// everything seems to be fine
+	return ExitStatusOK, nil
+}
+
 // doSelectedOperation function performs selected operation: check data
 // retention, cleanup selected data, or fill-id database by test data
 func doSelectedOperation(configuration ConfigStruct, connection *sql.DB, cliFlags CliFlags) (int, error) {
@@ -326,15 +338,7 @@ func doSelectedOperation(configuration ConfigStruct, connection *sql.DB, cliFlag
 	case cliFlags.FillInDatabase:
 		return fillInDatabase(connection)
 	default:
-		// display old records in database
-		err := displayAllOldRecords(connection,
-			configuration.Cleaner.MaxAge, cliFlags.Output)
-		if err != nil {
-			log.Err(err).Msg(selectingRecordsFromDatabase)
-			return ExitStatusStorageError, err
-		}
-		// everything seems to be fine
-		return ExitStatusOK, nil
+		return displayOldRecords(configuration, connection, cliFlags)
 	}
 	// we should not end there
 }
