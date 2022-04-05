@@ -247,6 +247,75 @@ func PrintSummaryTable(summary Summary) {
 	table.Render()
 }
 
+// vacuumDB function starts the database vacuuming operation
+func vacuumDB(connection *sql.DB) (int, error) {
+	err := performVacuumDB(connection)
+	if err != nil {
+		log.Err(err).Msg("Performing vacuuming database")
+		return ExitStatusPerformVacuumError, err
+	}
+	return ExitStatusOK, nil
+}
+
+// cleanup function starts the cleanup operation
+func cleanup(configuration ConfigStruct, connection *sql.DB, cliFlags CliFlags) (int, error) {
+	// cleanup operation
+	clusterList, improperClusterCounter, err := readClusterList(
+		configuration.Cleaner.ClusterListFile,
+		cliFlags.Clusters)
+	if err != nil {
+		log.Err(err).Msg("Read cluster list")
+		return ExitStatusPerformCleanupError, err
+	}
+	deletionsForTable, err := performCleanupInDB(connection, clusterList)
+	if err != nil {
+		log.Err(err).Msg("Performing cleanup")
+		return ExitStatusPerformCleanupError, err
+	}
+	if cliFlags.PrintSummaryTable {
+		var summary Summary
+		summary.ProperClusterEntries = len(clusterList)
+		summary.ImproperClusterEntries = improperClusterCounter
+		summary.DeletionsForTable = deletionsForTable
+		PrintSummaryTable(summary)
+	}
+	return ExitStatusOK, nil
+}
+
+// detectMultipleRuleDisable function detects clusters that have the same rule(s) disabled by different users
+func detectMultipleRuleDisable(connection *sql.DB, cliFlags CliFlags) (int, error) {
+	err := displayMultipleRuleDisable(connection, cliFlags.Output)
+	if err != nil {
+		log.Err(err).Msg(selectingRecordsFromDatabase)
+		return ExitStatusStorageError, err
+	}
+	// everything seems to be fine
+	return ExitStatusOK, nil
+}
+
+// fillInDatabase function fills-in database by test data
+func fillInDatabase(connection *sql.DB) (int, error) {
+	err := fillInDatabaseByTestData(connection)
+	if err != nil {
+		log.Err(err).Msg("Fill-in database by test data")
+		return ExitStatusFillInStorageError, err
+	}
+	// everything seems to be fine
+	return ExitStatusOK, nil
+}
+
+// displayOldRecords function displays old records in database
+func displayOldRecords(configuration ConfigStruct, connection *sql.DB, cliFlags CliFlags) (int, error) {
+	err := displayAllOldRecords(connection,
+		configuration.Cleaner.MaxAge, cliFlags.Output)
+	if err != nil {
+		log.Err(err).Msg(selectingRecordsFromDatabase)
+		return ExitStatusStorageError, err
+	}
+	// everything seems to be fine
+	return ExitStatusOK, nil
+}
+
 // doSelectedOperation function performs selected operation: check data
 // retention, cleanup selected data, or fill-id database by test data
 func doSelectedOperation(configuration ConfigStruct, connection *sql.DB, cliFlags CliFlags) (int, error) {
@@ -261,62 +330,15 @@ func doSelectedOperation(configuration ConfigStruct, connection *sql.DB, cliFlag
 		showConfiguration(configuration)
 		return ExitStatusOK, nil
 	case cliFlags.VacuumDatabase:
-		err := performVacuumDB(connection)
-		if err != nil {
-			log.Err(err).Msg("Performing vacuuming database")
-			return ExitStatusPerformVacuumError, err
-		}
-		return ExitStatusOK, nil
+		return vacuumDB(connection)
 	case cliFlags.PerformCleanup:
-		// cleanup operation
-		clusterList, improperClusterCounter, err := readClusterList(
-			configuration.Cleaner.ClusterListFile,
-			cliFlags.Clusters)
-		if err != nil {
-			log.Err(err).Msg("Read cluster list")
-			return ExitStatusPerformCleanupError, err
-		}
-		deletionsForTable, err := performCleanupInDB(connection, clusterList)
-		if err != nil {
-			log.Err(err).Msg("Performing cleanup")
-			return ExitStatusPerformCleanupError, err
-		}
-		if cliFlags.PrintSummaryTable {
-			var summary Summary
-			summary.ProperClusterEntries = len(clusterList)
-			summary.ImproperClusterEntries = improperClusterCounter
-			summary.DeletionsForTable = deletionsForTable
-			PrintSummaryTable(summary)
-		}
-		return ExitStatusOK, nil
+		return cleanup(configuration, connection, cliFlags)
 	case cliFlags.DetectMultipleRuleDisable:
-		// detect clusters that have the same rule(s) disabled by different users
-		err := displayMultipleRuleDisable(connection, cliFlags.Output)
-		if err != nil {
-			log.Err(err).Msg(selectingRecordsFromDatabase)
-			return ExitStatusStorageError, err
-		}
-		// everything seems to be fine
-		return ExitStatusOK, nil
+		return detectMultipleRuleDisable(connection, cliFlags)
 	case cliFlags.FillInDatabase:
-		// fill-in database by test data
-		err := fillInDatabaseByTestData(connection)
-		if err != nil {
-			log.Err(err).Msg("Fill-in database by test data")
-			return ExitStatusFillInStorageError, err
-		}
-		// everything seems to be fine
-		return ExitStatusOK, nil
+		return fillInDatabase(connection)
 	default:
-		// display old records in database
-		err := displayAllOldRecords(connection,
-			configuration.Cleaner.MaxAge, cliFlags.Output)
-		if err != nil {
-			log.Err(err).Msg(selectingRecordsFromDatabase)
-			return ExitStatusStorageError, err
-		}
-		// everything seems to be fine
-		return ExitStatusOK, nil
+		return displayOldRecords(configuration, connection, cliFlags)
 	}
 	// we should not end there
 }
