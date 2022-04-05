@@ -282,6 +282,17 @@ func cleanup(configuration ConfigStruct, connection *sql.DB, cliFlags CliFlags) 
 	return ExitStatusOK, nil
 }
 
+// detectMultipleRuleDisable function detects clusters that have the same rule(s) disabled by different users
+func detectMultipleRuleDisable(connection *sql.DB, cliFlags CliFlags) (int, error) {
+	err := displayMultipleRuleDisable(connection, cliFlags.Output)
+	if err != nil {
+		log.Err(err).Msg(selectingRecordsFromDatabase)
+		return ExitStatusStorageError, err
+	}
+	// everything seems to be fine
+	return ExitStatusOK, nil
+}
+
 // doSelectedOperation function performs selected operation: check data
 // retention, cleanup selected data, or fill-id database by test data
 func doSelectedOperation(configuration ConfigStruct, connection *sql.DB, cliFlags CliFlags) (int, error) {
@@ -300,14 +311,7 @@ func doSelectedOperation(configuration ConfigStruct, connection *sql.DB, cliFlag
 	case cliFlags.PerformCleanup:
 		return cleanup(configuration, connection, cliFlags)
 	case cliFlags.DetectMultipleRuleDisable:
-		// detect clusters that have the same rule(s) disabled by different users
-		err := displayMultipleRuleDisable(connection, cliFlags.Output)
-		if err != nil {
-			log.Err(err).Msg(selectingRecordsFromDatabase)
-			return ExitStatusStorageError, err
-		}
-		// everything seems to be fine
-		return ExitStatusOK, nil
+		return detectMultipleRuleDisable(connection, cliFlags)
 	case cliFlags.FillInDatabase:
 		// fill-in database by test data
 		err := fillInDatabaseByTestData(connection)
