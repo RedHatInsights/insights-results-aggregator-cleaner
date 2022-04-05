@@ -28,6 +28,7 @@
     * [Table `consumer_error`](#table-consumer_error)
     * [Table `migration_info `](#table-migration_info-)
     * [Table `rule_hit`](#table-rule_hit)
+    * [Table `recommendation`](#table-recommendation)
     * [Database tables affected by this service](#database-tables-affected-by-this-service)
 * [Package manifest](#package-manifest)
 
@@ -241,6 +242,10 @@ List of tables:
  public | migration_info                     | table | postgres
  public | report                             | table | postgres
  public | rule_hit                           | table | postgres
+ public | recommendation                     | table | postgres
+ public | advisor_ratings                    | table | postgres
+ public | rule_disable                       | table | postgres
+
 ```
 
 ### Table `report`
@@ -353,6 +358,21 @@ Indexes:
     "rule_hit_pkey" PRIMARY KEY, btree (cluster_id, org_id, rule_fqdn, error_key)
 ```
 
+### Table `recommendation`
+
+```
+                                 Table "public.recommendation"
+   Column   |            Type             | Collation | Nullable |           Default            
+------------+-----------------------------+-----------+----------+------------------------------
+ org_id     | integer                     |           | not null | 
+ cluster_id | character varying           |           | not null | 
+ rule_fqdn  | text                        |           | not null | 
+ error_key  | character varying           |           | not null | 
+ rule_id    | character varying           |           | not null | '.'::character varying
+ created_at | timestamp without time zone |           |          | timezone('utc'::text, now())
+Indexes:
+    "recommendation_pk" PRIMARY KEY, btree (org_id, cluster_id, rule_fqdn, error_key)
+```
 
 ### Database tables affected by this service
 
@@ -366,6 +386,7 @@ Actually cleaning the data for given cluster:
 * `cluster_rule_user_feedback` by `cluster_id`
 * `cluster_user_rule_disable_feedback` by `cluster_id`
 * `rule_hit` by `cluster_id`
+* `recommendation` by `cluster_id`
 
 ## Package manifest
 
