@@ -135,6 +135,8 @@ json-check           Check all JSONs for basic syntax
 style                Run all the formatting related commands (fmt, vet, lint, cyclo) + check shell scripts
 run                  Build the project and executes the binary
 test                 Run the unit tests
+cover                Display text coverage in Web browser
+coverage             Display test coverage in terminal
 before_commit        Checks done before commit
 help                 Show this help screen
 ```

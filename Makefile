@@ -70,10 +70,10 @@ run: ${BINARY} ## Build the project and executes the binary
 test: ${BINARY} ## Run the unit tests
 	./unit-tests.sh
 
-cover: test
+cover: test ## Display text coverage in Web browser
 	@go tool cover -html=coverage.out
 
-coverage:
+coverage: ## Display test coverage in terminal
 	@go tool cover -func=coverage.out
 
 license: install_addlicense
