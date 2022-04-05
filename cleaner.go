@@ -257,6 +257,31 @@ func vacuumDB(connection *sql.DB) (int, error) {
 	return ExitStatusOK, nil
 }
 
+// cleanup function starts the cleanup operation
+func cleanup(configuration ConfigStruct, connection *sql.DB, cliFlags CliFlags) (int, error) {
+	// cleanup operation
+	clusterList, improperClusterCounter, err := readClusterList(
+		configuration.Cleaner.ClusterListFile,
+		cliFlags.Clusters)
+	if err != nil {
+		log.Err(err).Msg("Read cluster list")
+		return ExitStatusPerformCleanupError, err
+	}
+	deletionsForTable, err := performCleanupInDB(connection, clusterList)
+	if err != nil {
+		log.Err(err).Msg("Performing cleanup")
+		return ExitStatusPerformCleanupError, err
+	}
+	if cliFlags.PrintSummaryTable {
+		var summary Summary
+		summary.ProperClusterEntries = len(clusterList)
+		summary.ImproperClusterEntries = improperClusterCounter
+		summary.DeletionsForTable = deletionsForTable
+		PrintSummaryTable(summary)
+	}
+	return ExitStatusOK, nil
+}
+
 // doSelectedOperation function performs selected operation: check data
 // retention, cleanup selected data, or fill-id database by test data
 func doSelectedOperation(configuration ConfigStruct, connection *sql.DB, cliFlags CliFlags) (int, error) {
@@ -273,27 +298,7 @@ func doSelectedOperation(configuration ConfigStruct, connection *sql.DB, cliFlag
 	case cliFlags.VacuumDatabase:
 		return vacuumDB(connection)
 	case cliFlags.PerformCleanup:
-		// cleanup operation
-		clusterList, improperClusterCounter, err := readClusterList(
-			configuration.Cleaner.ClusterListFile,
-			cliFlags.Clusters)
-		if err != nil {
-			log.Err(err).Msg("Read cluster list")
-			return ExitStatusPerformCleanupError, err
-		}
-		deletionsForTable, err := performCleanupInDB(connection, clusterList)
-		if err != nil {
-			log.Err(err).Msg("Performing cleanup")
-			return ExitStatusPerformCleanupError, err
-		}
-		if cliFlags.PrintSummaryTable {
-			var summary Summary
-			summary.ProperClusterEntries = len(clusterList)
-			summary.ImproperClusterEntries = improperClusterCounter
-			summary.DeletionsForTable = deletionsForTable
-			PrintSummaryTable(summary)
-		}
-		return ExitStatusOK, nil
+		return cleanup(configuration, connection, cliFlags)
 	case cliFlags.DetectMultipleRuleDisable:
 		// detect clusters that have the same rule(s) disabled by different users
 		err := displayMultipleRuleDisable(connection, cliFlags.Output)
