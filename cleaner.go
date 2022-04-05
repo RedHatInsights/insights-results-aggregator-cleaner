@@ -293,6 +293,17 @@ func detectMultipleRuleDisable(connection *sql.DB, cliFlags CliFlags) (int, erro
 	return ExitStatusOK, nil
 }
 
+// fillInDatabase function fills-in database by test data
+func fillInDatabase(connection *sql.DB) (int, error) {
+	err := fillInDatabaseByTestData(connection)
+	if err != nil {
+		log.Err(err).Msg("Fill-in database by test data")
+		return ExitStatusFillInStorageError, err
+	}
+	// everything seems to be fine
+	return ExitStatusOK, nil
+}
+
 // doSelectedOperation function performs selected operation: check data
 // retention, cleanup selected data, or fill-id database by test data
 func doSelectedOperation(configuration ConfigStruct, connection *sql.DB, cliFlags CliFlags) (int, error) {
@@ -313,14 +324,7 @@ func doSelectedOperation(configuration ConfigStruct, connection *sql.DB, cliFlag
 	case cliFlags.DetectMultipleRuleDisable:
 		return detectMultipleRuleDisable(connection, cliFlags)
 	case cliFlags.FillInDatabase:
-		// fill-in database by test data
-		err := fillInDatabaseByTestData(connection)
-		if err != nil {
-			log.Err(err).Msg("Fill-in database by test data")
-			return ExitStatusFillInStorageError, err
-		}
-		// everything seems to be fine
-		return ExitStatusOK, nil
+		return fillInDatabase(connection)
 	default:
 		// display old records in database
 		err := displayAllOldRecords(connection,
