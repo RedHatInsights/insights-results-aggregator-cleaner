@@ -247,6 +247,16 @@ func PrintSummaryTable(summary Summary) {
 	table.Render()
 }
 
+// vacuumDB function starts the database vacuuming operation
+func vacuumDB(connection *sql.DB) (int, error) {
+	err := performVacuumDB(connection)
+	if err != nil {
+		log.Err(err).Msg("Performing vacuuming database")
+		return ExitStatusPerformVacuumError, err
+	}
+	return ExitStatusOK, nil
+}
+
 // doSelectedOperation function performs selected operation: check data
 // retention, cleanup selected data, or fill-id database by test data
 func doSelectedOperation(configuration ConfigStruct, connection *sql.DB, cliFlags CliFlags) (int, error) {
@@ -261,12 +271,7 @@ func doSelectedOperation(configuration ConfigStruct, connection *sql.DB, cliFlag
 		showConfiguration(configuration)
 		return ExitStatusOK, nil
 	case cliFlags.VacuumDatabase:
-		err := performVacuumDB(connection)
-		if err != nil {
-			log.Err(err).Msg("Performing vacuuming database")
-			return ExitStatusPerformVacuumError, err
-		}
-		return ExitStatusOK, nil
+		return vacuumDB(connection)
 	case cliFlags.PerformCleanup:
 		// cleanup operation
 		clusterList, improperClusterCounter, err := readClusterList(
