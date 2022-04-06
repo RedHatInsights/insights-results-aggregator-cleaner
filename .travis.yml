@@ -30,6 +30,7 @@ jobs:
         - ./goerrcheck.sh
         - ./goconst.sh
         - ./gosec.sh
+        - ./gocyclo.sh
         - ./abcgo.sh
         - ./ineffassign.sh
         - ./shellcheck.sh
