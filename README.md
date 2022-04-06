@@ -30,6 +30,8 @@
     * [Table `rule_hit`](#table-rule_hit)
     * [Table `recommendation`](#table-recommendation)
     * [Database tables affected by this service](#database-tables-affected-by-this-service)
+* [Documentation](#documentation)
+* [Contribution](#contribution)
 * [Package manifest](#package-manifest)
 
 <!-- vim-markdown-toc -->
@@ -389,6 +391,21 @@ Actually cleaning the data for given cluster:
 * `cluster_user_rule_disable_feedback` by `cluster_id`
 * `rule_hit` by `cluster_id`
 * `recommendation` by `cluster_id`
+
+
+
+## Documentation
+
+Documentation is hosted on Github Pages <https://redhatinsights.github.io/insights-results-aggregator-cleaner-proxy/>.
+Sources are located in [docs](https://github.com/RedHatInsights/insights-results-aggregator-cleaner-proxy/tree/master/docs).
+
+
+## Contribution
+
+Please look into document [CONTRIBUTING.md](CONTRIBUTING.md) that contains all information about how to
+contribute to this project.
+
+
 
 ## Package manifest
 
