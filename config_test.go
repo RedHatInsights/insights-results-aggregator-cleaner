@@ -137,3 +137,14 @@ func TestLoadLoggingConfiguration(t *testing.T) {
 	assert.Equal(t, true, loggingCfg.Debug)
 	assert.Equal(t, "", loggingCfg.LogLevel)
 }
+
+// TestLoadConfigurationFromEnvVariableClowderEnabled tests loading the config.
+// file for testing from an environment variable. Clowder config is enabled in
+// this case.
+func TestLoadConfigurationFromEnvVariableClowderEnabled(t *testing.T) {
+	os.Clearenv()
+
+	mustSetEnv(t, "INSIGHTS_RESULTS_CLEANER_CONFIG_FILE", "tests/config2")
+	mustSetEnv(t, "ACG_CONFIG", "tests/clowder_config.json")
+	mustLoadConfiguration("INSIGHTS_RESULTS_CLEANER_CONFIG_FILE")
+}
