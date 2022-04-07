@@ -223,20 +223,21 @@ func GetCleanerConfiguration(config ConfigStruct) CleanerConfiguration {
 
 // updateConfigFromClowder updates the current config with the values defined in clowder
 func updateConfigFromClowder(c *ConfigStruct) error {
-	if clowder.IsClowderEnabled() {
+	if !clowder.IsClowderEnabled() || clowder.LoadedConfig == nil {
 		// can not use Zerolog at this moment!
-		fmt.Println("Clowder is enabled")
-
-		// get DB configuration from clowder
-		c.Storage.PGDBName = clowder.LoadedConfig.Database.Name
-		c.Storage.PGHost = clowder.LoadedConfig.Database.Hostname
-		c.Storage.PGPort = clowder.LoadedConfig.Database.Port
-		c.Storage.PGUsername = clowder.LoadedConfig.Database.Username
-		c.Storage.PGPassword = clowder.LoadedConfig.Database.Password
-
-	} else {
+		// we have to use standard output
 		fmt.Println("Clowder is disabled")
+		return nil
 	}
+
+	fmt.Println("Clowder is enabled")
+
+	// get DB configuration from clowder
+	c.Storage.PGDBName = clowder.LoadedConfig.Database.Name
+	c.Storage.PGHost = clowder.LoadedConfig.Database.Hostname
+	c.Storage.PGPort = clowder.LoadedConfig.Database.Port
+	c.Storage.PGUsername = clowder.LoadedConfig.Database.Username
+	c.Storage.PGPassword = clowder.LoadedConfig.Database.Password
 
 	return nil
 }
