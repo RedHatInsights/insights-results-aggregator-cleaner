@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 Red Hat, Inc.
+Copyright © 2021, 2022 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,8 +20,45 @@ package main_test
 // https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/cleaner_test.html
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
+
+	main "github.com/RedHatInsights/insights-results-aggregator-cleaner"
 )
 
-func TestX(t *testing.T) {
+func TestIsValidUUID(t *testing.T) {
+	type UUID struct {
+		id    string
+		valid bool
+	}
+
+	uuids := []UUID{
+		UUID{
+			id:    "",
+			valid: false,
+		},
+		UUID{
+			id:    "00000000-0000-0000-0000-000000000000",
+			valid: true,
+		},
+		UUID{
+			id:    "5d5892d4-1f74-4ccf-91af-548dfc9767aa",
+			valid: true,
+		},
+		UUID{ // x at beginning
+			id:    "xd5892d4-1f74-4ccf-91af-548dfc9767aa",
+			valid: false,
+		},
+		UUID{ // wrong separator
+			id:    "5d5892d4-1f74-4cc-f91af-548dfc9767aa",
+			valid: false,
+		},
+	}
+
+	for _, uuid := range uuids {
+		v := main.IsValidUUID(uuid.id)
+		assert.Equal(t, v, uuid.valid)
+
+	}
+
 }
