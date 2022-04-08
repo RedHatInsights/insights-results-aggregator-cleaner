@@ -138,3 +138,29 @@ func TestIsValidUUID(t *testing.T) {
 	}
 
 }
+
+// TestDoSelectedOperationShowVersion checks the function showVersion called
+// via doSelectedOperation function
+func TestDoSelectedOperationShowVersion(t *testing.T) {
+	const expected = "Insights Results Aggregator Cleaner version 1.0\n"
+
+	// stub for structures needed to call the tested function
+	configuration := main.ConfigStruct{}
+	cliFlags := main.CliFlags{
+		ShowVersion:       true,
+		ShowAuthors:       false,
+		ShowConfiguration: false,
+	}
+
+	// try to call the tested function and capture its output
+	output, err := capture.StandardOutput(func() {
+		code, err := main.DoSelectedOperation(configuration, nil, cliFlags)
+		assert.Equal(t, code, main.ExitStatusOK)
+		assert.Nil(t, err)
+	})
+
+	// check the captured text
+	checkCapture(t, err)
+
+	assert.Contains(t, output, expected)
+}
