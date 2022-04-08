@@ -54,6 +54,19 @@ func TestShowVersion(t *testing.T) {
 	assert.Contains(t, output, expected)
 }
 
+// TestShowAuthors checks the function showAuthors
+func TestShowAuthors(t *testing.T) {
+	// try to call the tested function and capture its output
+	output, err := capture.StandardOutput(func() {
+		main.ShowAuthors()
+	})
+
+	// check the captured text
+	checkCapture(t, err)
+
+	assert.Contains(t, output, "Red Hat Inc.")
+}
+
 func TestIsValidUUID(t *testing.T) {
 	type UUID struct {
 		id    string
