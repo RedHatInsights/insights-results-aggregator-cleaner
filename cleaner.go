@@ -96,6 +96,11 @@ const (
 	defaultConfigFileName     = "config"
 )
 
+// showVersion function displays version information.
+func showVersion() {
+	fmt.Println(versionMessage)
+}
+
 // IsValidUUID function checks if provided string contains a correct UUID.
 func IsValidUUID(input string) bool {
 	_, err := uuid.Parse(input)
@@ -321,7 +326,7 @@ func displayOldRecords(configuration ConfigStruct, connection *sql.DB, cliFlags 
 func doSelectedOperation(configuration ConfigStruct, connection *sql.DB, cliFlags CliFlags) (int, error) {
 	switch {
 	case cliFlags.ShowVersion:
-		fmt.Println(versionMessage)
+		showVersion()
 		return ExitStatusOK, nil
 	case cliFlags.ShowAuthors:
 		fmt.Println(authorsMessage)
