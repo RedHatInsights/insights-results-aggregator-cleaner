@@ -264,6 +264,26 @@ have failed for any reason</p>
       </tr>
       
       <tr class="section">
+	<td class="doc"><p>showVersion function displays version information.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">showVersion</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">fmt</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="ident">versionMessage</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>showAuthors function displays information about authors.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">showAuthors</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">fmt</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="ident">authorsMessage</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
 	<td class="doc"><p>IsValidUUID function checks if provided string contains a correct UUID.</p>
 </td>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">IsValidUUID</div><div class="operator">(</div><div class="ident">input</div> <div class="ident">string</div><div class="operator">)</div> <div class="ident">bool</div> <div class="operator">{</div>
@@ -625,10 +645,10 @@ retention, cleanup selected data, or fill-id database by test data</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">doSelectedOperation</div><div class="operator">(</div><div class="ident">configuration</div> <div class="ident">ConfigStruct</div><div class="operator">,</div> <div class="ident">connection</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">,</div> <div class="ident">cliFlags</div> <div class="ident">CliFlags</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">int</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
 	<div class="keyword">switch</div> <div class="operator">{</div>
 	<div class="keyword">case</div> <div class="ident">cliFlags</div><div class="operator">.</div><div class="ident">ShowVersion</div><div class="operator">:</div>
-		<div class="ident">fmt</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="ident">versionMessage</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">showVersion</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 		<div class="keyword">return</div> <div class="ident">ExitStatusOK</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
 	<div class="keyword">case</div> <div class="ident">cliFlags</div><div class="operator">.</div><div class="ident">ShowAuthors</div><div class="operator">:</div>
-		<div class="ident">fmt</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="ident">authorsMessage</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">showAuthors</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 		<div class="keyword">return</div> <div class="ident">ExitStatusOK</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
 	<div class="keyword">case</div> <div class="ident">cliFlags</div><div class="operator">.</div><div class="ident">ShowConfiguration</div><div class="operator">:</div>
 		<div class="ident">showConfiguration</div><div class="operator">(</div><div class="ident">configuration</div><div class="operator">)</div><div class="operator"></div>
