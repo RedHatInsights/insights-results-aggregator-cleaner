@@ -310,6 +310,22 @@ https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/co
 </code></pre></td>
       </tr>
       
+      <tr class="section">
+	<td class="doc"><p>TestLoadConfigurationFromEnvVariableClowderEnabled tests loading the config.
+file for testing from an environment variable. Clowder config is enabled in
+this case.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestLoadConfigurationFromEnvVariableClowderEnabled</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">os</div><div class="operator">.</div><div class="ident">Clearenv</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">mustSetEnv</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="literal">&#34;INSIGHTS_RESULTS_CLEANER_CONFIG_FILE&#34;</div><div class="operator">,</div> <div class="literal">&#34;tests/config2&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">mustSetEnv</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="literal">&#34;ACG_CONFIG&#34;</div><div class="operator">,</div> <div class="literal">&#34;tests/clowder_config.json&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">mustLoadConfiguration</div><div class="operator">(</div><div class="literal">&#34;INSIGHTS_RESULTS_CLEANER_CONFIG_FILE&#34;</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
     </tbody>
   </table>
 </div>
