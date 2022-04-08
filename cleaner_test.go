@@ -21,9 +21,10 @@ package main_test
 
 import (
 	"github.com/rs/zerolog"
-	//"github.com/rs/zerolog/log"
+	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/tisnik/go-capture"
+	"os"
 	"testing"
 
 	main "github.com/RedHatInsights/insights-results-aggregator-cleaner"
@@ -65,6 +66,40 @@ func TestShowAuthors(t *testing.T) {
 	checkCapture(t, err)
 
 	assert.Contains(t, output, "Red Hat Inc.")
+}
+
+// TestShowConfiguration checks the function ShowConfiguration
+func TestShowConfiguration(t *testing.T) {
+	// fill in configuration structure
+	configuration := main.ConfigStruct{}
+	configuration.Storage = main.StorageConfiguration{
+		Driver:     "postgres",
+		PGUsername: "foo",
+		PGPassword: "bar",
+		PGHost:     "baz",
+		PGDBName:   "aggregator",
+		PGParams:   ""}
+	configuration.Logging = main.LoggingConfiguration{
+		Debug:    true,
+		LogLevel: ""}
+	configuration.Cleaner = main.CleanerConfiguration{
+		MaxAge:          "3 days",
+		ClusterListFile: "cluster_list.txt"}
+
+	// try to call the tested function and capture its output
+	output, err := capture.ErrorOutput(func() {
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+		log.Logger = log.Output(zerolog.New(os.Stderr))
+
+		main.ShowConfiguration(configuration)
+	})
+
+	// check the captured text
+	checkCapture(t, err)
+
+	assert.Contains(t, output, "Driver")
+	assert.Contains(t, output, "Level")
+	assert.Contains(t, output, "Records max age")
 }
 
 func TestIsValidUUID(t *testing.T) {
