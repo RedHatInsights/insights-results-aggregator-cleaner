@@ -188,3 +188,33 @@ func TestDoSelectedOperationShowAuthors(t *testing.T) {
 
 	assert.Contains(t, output, "Red Hat Inc.")
 }
+
+// TestDoSelectedOperationShowConfiguration checks the function
+// showConfiguration called via doSelectedOperation function
+func TestDoSelectedOperationShowConfiguration(t *testing.T) {
+	// fill in configuration structure
+	configuration := main.ConfigStruct{}
+
+	cliFlags := main.CliFlags{
+		ShowVersion:       false,
+		ShowAuthors:       false,
+		ShowConfiguration: true,
+	}
+
+	// try to call the tested function and capture its output
+	output, err := capture.ErrorOutput(func() {
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+		log.Logger = log.Output(zerolog.New(os.Stderr))
+
+		code, err := main.DoSelectedOperation(configuration, nil, cliFlags)
+		assert.Equal(t, code, main.ExitStatusOK)
+		assert.Nil(t, err)
+	})
+
+	// check the captured text
+	checkCapture(t, err)
+
+	assert.Contains(t, output, "Driver")
+	assert.Contains(t, output, "Level")
+	assert.Contains(t, output, "Records max age")
+}
