@@ -101,6 +101,11 @@ func showVersion() {
 	fmt.Println(versionMessage)
 }
 
+// showAuthors function displays information about authors.
+func showAuthors() {
+	fmt.Println(authorsMessage)
+}
+
 // IsValidUUID function checks if provided string contains a correct UUID.
 func IsValidUUID(input string) bool {
 	_, err := uuid.Parse(input)
@@ -329,7 +334,7 @@ func doSelectedOperation(configuration ConfigStruct, connection *sql.DB, cliFlag
 		showVersion()
 		return ExitStatusOK, nil
 	case cliFlags.ShowAuthors:
-		fmt.Println(authorsMessage)
+		showAuthors()
 		return ExitStatusOK, nil
 	case cliFlags.ShowConfiguration:
 		showConfiguration(configuration)
