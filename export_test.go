@@ -35,7 +35,8 @@ var (
 	DeleteRecordFromTable             = deleteRecordFromTable
 
 	// functions from the ccx_notification_writer.go source file
-	ShowVersion       = showVersion
-	ShowAuthors       = showAuthors
-	ShowConfiguration = showConfiguration
+	ShowVersion         = showVersion
+	ShowAuthors         = showAuthors
+	ShowConfiguration   = showConfiguration
+	DoSelectedOperation = doSelectedOperation
 )
