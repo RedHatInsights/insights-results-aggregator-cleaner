@@ -20,11 +20,39 @@ package main_test
 // https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/cleaner_test.html
 
 import (
+	"github.com/rs/zerolog"
+	//"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
+	"github.com/tisnik/go-capture"
 	"testing"
 
 	main "github.com/RedHatInsights/insights-results-aggregator-cleaner"
 )
+
+func init() {
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+}
+
+func checkCapture(t *testing.T, err error) {
+	if err != nil {
+		t.Fatal("Unable to capture standard output", err)
+	}
+}
+
+// TestShowVersion checks the function showVersion
+func TestShowVersion(t *testing.T) {
+	const expected = "Insights Results Aggregator Cleaner version 1.0\n"
+
+	// try to call the tested function and capture its output
+	output, err := capture.StandardOutput(func() {
+		main.ShowVersion()
+	})
+
+	// check the captured text
+	checkCapture(t, err)
+
+	assert.Contains(t, output, expected)
+}
 
 func TestIsValidUUID(t *testing.T) {
 	type UUID struct {
