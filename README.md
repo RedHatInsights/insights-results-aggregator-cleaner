@@ -10,6 +10,8 @@
 <!-- vim-markdown-toc GFM -->
 
 * [Description](#description)
+* [Documentation](#documentation)
+* [Contribution](#contribution)
     * [Usage](#usage)
     * [Default operation](#default-operation)
     * [Data cleanup](#data-cleanup)
@@ -18,6 +20,7 @@
     * [Building](#building)
     * [Makefile targets](#makefile-targets)
     * [Configuration](#configuration)
+* [BDD tests](#bdd-tests)
     * [Usage](#usage-1)
         * [Output example](#output-example)
 * [Database structure](#database-structure)
@@ -51,6 +54,16 @@ database.
 
 Additionally the service can delete records for provided list of clusters. This
 means the clusters can be deleted on demand and in controlled environment.
+
+## Documentation
+
+Documentation is hosted on Github Pages <https://redhatinsights.github.io/insights-results-aggregator-cleaner/>.
+Sources are located in [docs](https://github.com/RedHatInsights/insights-results-aggregator-cleaner/tree/master/docs).
+
+## Contribution
+
+Please look into document [CONTRIBUTING.md](CONTRIBUTING.md) that contains all information about how to
+contribute to this project.
 
 ### Usage
 
