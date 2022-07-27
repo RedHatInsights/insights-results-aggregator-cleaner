@@ -10,6 +10,8 @@
 <!-- vim-markdown-toc GFM -->
 
 * [Description](#description)
+* [Documentation](#documentation)
+* [Contribution](#contribution)
     * [Usage](#usage)
     * [Default operation](#default-operation)
     * [Data cleanup](#data-cleanup)
@@ -18,8 +20,9 @@
     * [Building](#building)
     * [Makefile targets](#makefile-targets)
     * [Configuration](#configuration)
-    * [Usage](#usage-1)
-        * [Output example](#output-example)
+* [BDD tests](#bdd-tests)
+* [Start the service](#start-the-service)
+    * [Output example](#output-example)
 * [Database structure](#database-structure)
     * [Table `report`](#table-report)
     * [Table `cluster_rule_toggle`](#table-cluster_rule_toggle)
@@ -52,7 +55,17 @@ database.
 Additionally the service can delete records for provided list of clusters. This
 means the clusters can be deleted on demand and in controlled environment.
 
-### Usage
+## Documentation
+
+Documentation is hosted on Github Pages <https://redhatinsights.github.io/insights-results-aggregator-cleaner/>.
+Sources are located in [docs](https://github.com/RedHatInsights/insights-results-aggregator-cleaner/tree/master/docs).
+
+## Contribution
+
+Please look into document [CONTRIBUTING.md](CONTRIBUTING.md) that contains all information about how to
+contribute to this project.
+
+### Start the service
 
 ```
 Usage of cleaner:
@@ -182,6 +195,19 @@ INSIGHTS_RESULTS_CLEANER__LOGGING__DEBUG
 INSIGHTS_RESULTS_CLEANER__LOGGING__LOG_DEVEL
 INSIGHTS_RESULTS_CLEANER__CLEANER__MAX_AGE
 ```
+
+## BDD tests
+
+Behaviour tests for this service are included in [Insights Behavioral
+Spec](https://github.com/RedHatInsights/insights-behavioral-spec) repository.
+In order to run these tests, the following steps need to be made:
+
+1. clone the [Insights Behavioral Spec](https://github.com/RedHatInsights/insights-behavioral-spec) repository
+1. go into the cloned subdirectory `insights-behavioral-spec`
+1. run the `cleaner_tests.sh` from this subdirectory
+
+List of all test scenarios prepared for this service is available at
+<https://github.com/RedHatInsights/insights-behavioral-spec#insights-results-aggregator-cleaner-service>
 
 ### Usage
 
