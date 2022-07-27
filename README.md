@@ -12,7 +12,7 @@
 * [Description](#description)
 * [Documentation](#documentation)
 * [Contribution](#contribution)
-    * [Usage](#usage)
+* [Start the service](#start-the-service)
     * [Default operation](#default-operation)
     * [Data cleanup](#data-cleanup)
     * [Test data generation](#test-data-generation)
@@ -21,7 +21,7 @@
     * [Makefile targets](#makefile-targets)
     * [Configuration](#configuration)
 * [BDD tests](#bdd-tests)
-* [Start the service](#start-the-service)
+* [Usage](#usage)
     * [Output example](#output-example)
 * [Database structure](#database-structure)
     * [Table `report`](#table-report)
@@ -33,8 +33,8 @@
     * [Table `rule_hit`](#table-rule_hit)
     * [Table `recommendation`](#table-recommendation)
     * [Database tables affected by this service](#database-tables-affected-by-this-service)
-* [Documentation](#documentation)
-* [Contribution](#contribution)
+* [Documentation](#documentation-1)
+* [Contribution](#contribution-1)
 * [Package manifest](#package-manifest)
 
 <!-- vim-markdown-toc -->
@@ -65,7 +65,7 @@ Sources are located in [docs](https://github.com/RedHatInsights/insights-results
 Please look into document [CONTRIBUTING.md](CONTRIBUTING.md) that contains all information about how to
 contribute to this project.
 
-### Start the service
+## Start the service
 
 ```
 Usage of cleaner:
@@ -209,7 +209,7 @@ In order to run these tests, the following steps need to be made:
 List of all test scenarios prepared for this service is available at
 <https://github.com/RedHatInsights/insights-behavioral-spec#insights-results-aggregator-cleaner-service>
 
-### Usage
+## Usage
 
 Just the service needs to be started:
 
@@ -217,7 +217,7 @@ Just the service needs to be started:
 ./insights-results-aggregator-cleaner
 ```
 
-#### Output example
+### Output example
 
 * Logging is set to `true`
 
