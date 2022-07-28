@@ -302,6 +302,8 @@ func displayAllOldRecords(connection *sql.DB, maxAge, output string) error {
 	return performListOfOldReports(connection, maxAge, writer)
 }
 
+// performListOfOldReports read and displays old records read from reported_at
+// table
 func performListOfOldReports(connection *sql.DB, maxAge string, writer *bufio.Writer) error {
 	query := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW() - $1::INTERVAL ORDER BY reported_at"
 	rows, err := connection.Query(query, maxAge)
