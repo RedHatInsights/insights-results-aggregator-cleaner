@@ -292,7 +292,8 @@ func cleanup(configuration ConfigStruct, connection *sql.DB, cliFlags CliFlags) 
 	return ExitStatusOK, nil
 }
 
-// detectMultipleRuleDisable function detects clusters that have the same rule(s) disabled by different users
+// detectMultipleRuleDisable function detects clusters that have the same
+// rule(s) disabled by different users
 func detectMultipleRuleDisable(connection *sql.DB, cliFlags CliFlags) (int, error) {
 	err := displayMultipleRuleDisable(connection, cliFlags.Output)
 	if err != nil {
