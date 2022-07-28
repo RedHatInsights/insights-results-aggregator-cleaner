@@ -53,7 +53,8 @@ func TestLoadDefaultConfiguration(t *testing.T) {
 	mustLoadConfiguration("nonExistingEnvVar")
 }
 
-// TestLoadConfigurationFromEnvVariable tests loading the config. file for testing from an environment variable
+// TestLoadConfigurationFromEnvVariable tests loading the config. file for
+// testing from an environment variable
 func TestLoadConfigurationFromEnvVariable(t *testing.T) {
 	os.Clearenv()
 
@@ -61,19 +62,22 @@ func TestLoadConfigurationFromEnvVariable(t *testing.T) {
 	mustLoadConfiguration("INSIGHTS_RESULTS_CLEANER_CONFIG_FILE")
 }
 
-// TestLoadConfigurationNonEnvVarUnknownConfigFile tests loading an unexisting config file when no environment variable is provided
+// TestLoadConfigurationNonEnvVarUnknownConfigFile tests loading an unexisting
+// config file when no environment variable is provided
 func TestLoadConfigurationNonEnvVarUnknownConfigFile(t *testing.T) {
 	_, err := main.LoadConfiguration("", "foobar")
 	assert.Nil(t, err)
 }
 
-// TestLoadConfigurationBadConfigFile tests loading an unexisting config file when no environment variable is provided
+// TestLoadConfigurationBadConfigFile tests loading an unexisting config file
+// when no environment variable is provided
 func TestLoadConfigurationBadConfigFile(t *testing.T) {
 	_, err := main.LoadConfiguration("", "tests/config3")
 	assert.Contains(t, err.Error(), `fatal error config file: While parsing config:`)
 }
 
-// TestLoadingConfigurationEnvVariableBadValueNoDefaultConfig tests loading a non-existent configuration file set in environment
+// TestLoadingConfigurationEnvVariableBadValueNoDefaultConfig tests loading a
+// non-existent configuration file set in environment
 func TestLoadingConfigurationEnvVariableBadValueNoDefaultConfig(t *testing.T) {
 	os.Clearenv()
 
@@ -83,7 +87,8 @@ func TestLoadingConfigurationEnvVariableBadValueNoDefaultConfig(t *testing.T) {
 	assert.Contains(t, err.Error(), `fatal error config file: Config File "non existing file" Not Found in`)
 }
 
-// TestLoadingConfigurationEnvVariableBadValueNoDefaultConfig tests that if env var is provided, it must point to a valid config file
+// TestLoadingConfigurationEnvVariableBadValueNoDefaultConfig tests that if env
+// var is provided, it must point to a valid config file
 func TestLoadingConfigurationEnvVariableBadValueDefaultConfigFailure(t *testing.T) {
 	os.Clearenv()
 
@@ -93,7 +98,8 @@ func TestLoadingConfigurationEnvVariableBadValueDefaultConfigFailure(t *testing.
 	assert.Contains(t, err.Error(), `fatal error config file: Config File "non existing file" Not Found in`)
 }
 
-// TestLoadCleanerConfiguration tests loading the cleaner configuration sub-tree
+// TestLoadCleanerConfiguration tests loading the cleaner configuration
+// sub-tree
 func TestLoadCleanerConfiguration(t *testing.T) {
 	envVar := "INSIGHTS_RESULTS_CLEANER_CONFIG_FILE"
 
@@ -107,7 +113,8 @@ func TestLoadCleanerConfiguration(t *testing.T) {
 	assert.Equal(t, "cluster_list.txt", cleanerCfg.ClusterListFile)
 }
 
-// TestLoadStorageConfiguration tests loading the storage configuration sub-tree
+// TestLoadStorageConfiguration tests loading the storage configuration
+// sub-tree
 func TestLoadStorageConfiguration(t *testing.T) {
 	envVar := "INSIGHTS_RESULTS_CLEANER_CONFIG_FILE"
 	mustSetEnv(t, envVar, "tests/config2")
@@ -125,7 +132,8 @@ func TestLoadStorageConfiguration(t *testing.T) {
 	assert.Equal(t, "", storageCfg.PGParams)
 }
 
-// TestLoadLoggingConfiguration tests loading the logging configuration sub-tree
+// TestLoadLoggingConfiguration tests loading the logging configuration
+// sub-tree
 func TestLoadLoggingConfiguration(t *testing.T) {
 	envVar := "INSIGHTS_RESULTS_CLEANER_CONFIG_FILE"
 	mustSetEnv(t, envVar, "tests/config2")
