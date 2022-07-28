@@ -221,7 +221,8 @@ func GetCleanerConfiguration(config ConfigStruct) CleanerConfiguration {
 	return config.Cleaner
 }
 
-// updateConfigFromClowder updates the current config with the values defined in clowder
+// updateConfigFromClowder updates the current config with the values defined
+// in Clowder
 func updateConfigFromClowder(c *ConfigStruct) error {
 	if !clowder.IsClowderEnabled() || clowder.LoadedConfig == nil {
 		// can not use Zerolog at this moment!
