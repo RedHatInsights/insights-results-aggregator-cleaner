@@ -153,6 +153,7 @@ test                 Run the unit tests
 cover                Display text coverage in Web browser
 coverage             Display test coverage in terminal
 before_commit        Checks done before commit
+function_list        List all functions in generated binary file
 help                 Show this help screen
 ```
 
