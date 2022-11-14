@@ -11,7 +11,7 @@ default: build
 clean: ## Run go clean
 	@go clean
 
-build: ${BINARY} ## Keep this rule for compatibility
+build: ${BINARY} ## Build binary containing service executable
 
 ${BINARY}: ${SOURCES}
 	./build.sh
@@ -90,6 +90,9 @@ help: ## Show this help screen
 	@grep -E '^[ a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 	@echo ''
+
+function_list: ${BINARY} ## List all functions in generated binary file
+	go tool objdump ${BINARY} | grep ^TEXT | sed "s/^TEXT\s//g"
 
 docs/packages/%.html: %.go
 	mkdir -p $(dir $@)
