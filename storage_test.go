@@ -759,6 +759,9 @@ func TestFillInDatabaseByTestData(t *testing.T) {
 	mock.ExpectClose()
 
 	err = cleaner.FillInDatabaseByTestData(connection)
+	if err != nil {
+		t.Errorf("error was not expected: %s", err)
+	}
 
 	err = connection.Close()
 	if err != nil {
@@ -798,6 +801,9 @@ func TestPerformCleanupInDB(t *testing.T) {
 	mock.ExpectClose()
 
 	_, err = cleaner.PerformCleanupInDB(connection, clusterNames)
+	if err != nil {
+		t.Errorf("error was not expected: %s", err)
+	}
 
 	err = connection.Close()
 	if err != nil {
