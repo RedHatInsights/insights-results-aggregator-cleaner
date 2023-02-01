@@ -75,9 +75,7 @@ func expectOrgIDQuery(mock sqlmock.Sqlmock) {
 func TestReadOrgIDNoResults(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	// prepare mocked result for SQL query
 	rows := sqlmock.NewRows([]string{})
@@ -89,9 +87,7 @@ func TestReadOrgIDNoResults(t *testing.T) {
 
 	// call the tested function
 	org_id, err := cleaner.ReadOrgID(connection, "123e4567-e89b-12d3-a456-426614174000")
-	if err != nil {
-		t.Errorf("error was not expected while updating stats: %s", err)
-	}
+	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check the org ID returned from tested function
 	if org_id != -1 {
@@ -109,18 +105,14 @@ func TestReadOrgIDNoResults(t *testing.T) {
 func TestReadOrgIDResult(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	// prepare mocked result for SQL query
 	expectOrgIDQuery(mock)
 
 	// call the tested function
 	org_id, err := cleaner.ReadOrgID(connection, "123e4567-e89b-12d3-a456-426614174000")
-	if err != nil {
-		t.Errorf("error was not expected while updating stats: %s", err)
-	}
+	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check the org ID returned from tested function
 	if org_id != defaultOrgID {
@@ -141,9 +133,7 @@ func TestReadOrgIDOnError(t *testing.T) {
 
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	// expected query performed by tested function
 	expectedQuery := "select org_id from report where cluster = \\$1"
@@ -178,9 +168,7 @@ func TestReadOrgIDOnError(t *testing.T) {
 func TestPerformDisplayMultipleRuleDisableNoResults(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	// prepare mocked result for SQL query
 	rows := sqlmock.NewRows([]string{})
@@ -200,9 +188,7 @@ func TestPerformDisplayMultipleRuleDisableNoResults(t *testing.T) {
 `
 	// call the tested function
 	err = cleaner.PerformDisplayMultipleRuleDisable(connection, nil, query1, "cluster_rule_toggle")
-	if err != nil {
-		t.Errorf("error was not expected while updating stats: %s", err)
-	}
+	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check if DB can be closed successfully
 	checkConnectionClose(t, connection)
@@ -219,9 +205,7 @@ func TestPerformDisplayMultipleRuleDisableOnError(t *testing.T) {
 
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	// expected query performed by tested function
 	expectedQuery := "select cluster_id, rule_id, count\\(\\*\\) as cnt from cluster_rule_toggle group by cluster_id, rule_id having count\\(\\*\\)>1 order by cnt desc;"
@@ -259,9 +243,7 @@ func TestPerformDisplayMultipleRuleDisableOnError(t *testing.T) {
 func TestPerformDisplayMultipleRuleDisableOnScanError(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	// prepare mocked result for SQL query
 	rows1 := sqlmock.NewRows([]string{"cluster_id", "rule_id", "cnt"})
@@ -301,9 +283,7 @@ func TestPerformDisplayMultipleRuleDisableOnScanError(t *testing.T) {
 func TestPerformDisplayMultipleRuleDisableResults(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	// prepare mocked result for SQL query
 	rows1 := sqlmock.NewRows([]string{"cluster_id", "rule_id", "cnt"})
@@ -328,9 +308,7 @@ func TestPerformDisplayMultipleRuleDisableResults(t *testing.T) {
 `
 	// call the tested function
 	err = cleaner.PerformDisplayMultipleRuleDisable(connection, nil, query1, "cluster_rule_toggle")
-	if err != nil {
-		t.Errorf("error was not expected while updating stats: %s", err)
-	}
+	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check if DB can be closed successfully
 	checkConnectionClose(t, connection)
@@ -344,9 +322,7 @@ func TestPerformDisplayMultipleRuleDisableResults(t *testing.T) {
 func TestDisplayMultipleRuleDisableResultsScanError(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	// prepare mocked result for SQL query
 	toggleRows := sqlmock.NewRows([]string{"cluster_id", "rule_id", "cnt"})
@@ -378,9 +354,7 @@ func TestDisplayMultipleRuleDisableOnError(t *testing.T) {
 
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	// expected query performed by tested function
 	toggleQuery := "select cluster_id, rule_id, count\\(\\*\\) as cnt from cluster_rule_toggle group by cluster_id, rule_id having count\\(\\*\\)>1 order by cnt desc;"
@@ -412,9 +386,7 @@ func TestDisplayMultipleRuleDisableOnError(t *testing.T) {
 func TestDisplayMultipleRuleDisableResultsNoOutput(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	// prepare mocked result for SQL query
 	toggleRows := sqlmock.NewRows([]string{"cluster_id", "rule_id", "cnt"})
@@ -443,9 +415,7 @@ func TestDisplayMultipleRuleDisableResultsNoOutput(t *testing.T) {
 
 	// call the tested function without filename (only printed in logs)
 	err = cleaner.DisplayMultipleRuleDisable(connection, "")
-	if err != nil {
-		t.Errorf("error was not expected while updating stats: %s", err)
-	}
+	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check if DB can be closed successfully
 	checkConnectionClose(t, connection)
@@ -462,9 +432,7 @@ func TestDisplayMultipleRuleDisableResultsFileOutput(t *testing.T) {
 
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	// prepare mocked result for SQL query
 	toggleRows := sqlmock.NewRows([]string{"cluster_id", "rule_id", "cnt"})
@@ -493,9 +461,7 @@ func TestDisplayMultipleRuleDisableResultsFileOutput(t *testing.T) {
 
 	// call the tested function with filename
 	err = cleaner.DisplayMultipleRuleDisable(connection, outFile)
-	if err != nil {
-		t.Errorf("error was not expected while updating stats: %s", err)
-	}
+	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check if DB can be closed successfully
 	checkConnectionClose(t, connection)
@@ -545,9 +511,7 @@ func TestDisplayMultipleRuleDisableResultsFileOutput(t *testing.T) {
 func TestDisplayMultipleRuleDisableResultsFileError(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 	// prepare mocked result for SQL query
 	toggleRows := sqlmock.NewRows([]string{"cluster_id", "rule_id", "cnt"})
 	toggleRows.AddRow(cluster1ID, rule1ID, 1)
@@ -574,9 +538,7 @@ func TestDisplayMultipleRuleDisableResultsFileError(t *testing.T) {
 
 	// call the tested function with invalid filename
 	err = cleaner.DisplayMultipleRuleDisable(connection, "/")
-	if err != nil {
-		t.Errorf("error was not expected while updating stats: %s", err)
-	}
+	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check if DB can be closed successfully
 	checkConnectionClose(t, connection)
@@ -590,9 +552,7 @@ func TestDisplayMultipleRuleDisableResultsFileError(t *testing.T) {
 func TestPerformListOfOldReportsNoResults(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	// prepare mocked result for SQL query
 	rows := sqlmock.NewRows([]string{})
@@ -604,9 +564,7 @@ func TestPerformListOfOldReportsNoResults(t *testing.T) {
 
 	// call the tested function
 	err = cleaner.PerformListOfOldReports(connection, "10", nil)
-	if err != nil {
-		t.Errorf("error was not expected while updating stats: %s", err)
-	}
+	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check if DB can be closed successfully
 	checkConnectionClose(t, connection)
@@ -620,9 +578,7 @@ func TestPerformListOfOldReportsNoResults(t *testing.T) {
 func TestPerformListOfOldReportsResults(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	// prepare mocked result for SQL query
 	rows := sqlmock.NewRows([]string{"cluster", "reported_at", "last_checked"})
@@ -637,9 +593,7 @@ func TestPerformListOfOldReportsResults(t *testing.T) {
 
 	// call the tested function
 	err = cleaner.PerformListOfOldReports(connection, "10", nil)
-	if err != nil {
-		t.Errorf("error was not expected while updating stats: %s", err)
-	}
+	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check if DB can be closed successfully
 	checkConnectionClose(t, connection)
@@ -653,9 +607,7 @@ func TestPerformListOfOldReportsResults(t *testing.T) {
 func TestPerformListOfOldScanError(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	// prepare mocked result for SQL query
 	rows := sqlmock.NewRows([]string{"cluster", "reported_at", "last_checked"})
@@ -687,9 +639,7 @@ func TestPerformListOfOldDBError(t *testing.T) {
 
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	// expected query performed by tested function
 	expectedQuery := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
@@ -716,9 +666,7 @@ func TestPerformListOfOldDBError(t *testing.T) {
 func TestDisplayAllOldRecordsNoOutput(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	// prepare mocked result for SQL query
 	rows := sqlmock.NewRows([]string{"cluster", "reported_at", "last_checked"})
@@ -733,9 +681,7 @@ func TestDisplayAllOldRecordsNoOutput(t *testing.T) {
 
 	// call the tested function without filename (stdout)
 	err = cleaner.DisplayAllOldRecords(connection, "10", "")
-	if err != nil {
-		t.Errorf("error was not expected while updating stats: %s", err)
-	}
+	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check if DB can be closed successfully
 	checkConnectionClose(t, connection)
@@ -751,9 +697,7 @@ func TestDisplayAllOldRecordsFileOutput(t *testing.T) {
 
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	// prepare mocked result for SQL query
 	rows := sqlmock.NewRows([]string{"cluster", "reported_at", "last_checked"})
@@ -769,9 +713,7 @@ func TestDisplayAllOldRecordsFileOutput(t *testing.T) {
 
 	// call the tested function without filename (stdout)
 	err = cleaner.DisplayAllOldRecords(connection, "10", outFile)
-	if err != nil {
-		t.Errorf("error was not expected while updating stats: %s", err)
-	}
+	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check if DB can be closed successfully
 	checkConnectionClose(t, connection)
@@ -821,9 +763,7 @@ func TestDisplayAllOldRecordsFileOutput(t *testing.T) {
 func TestDisplayAllOldRecordsWithFileError(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	// prepare mocked result for SQL query
 	rows := sqlmock.NewRows([]string{"cluster", "reported_at", "last_checked"})
@@ -838,9 +778,7 @@ func TestDisplayAllOldRecordsWithFileError(t *testing.T) {
 
 	// call the tested function with invalid filename ("/")
 	err = cleaner.DisplayAllOldRecords(connection, "10", "/")
-	if err != nil {
-		t.Errorf("error was not expected while updating stats: %s", err)
-	}
+	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check if DB can be closed successfully
 	checkConnectionClose(t, connection)
@@ -857,9 +795,7 @@ func TestPerformListOfOldReportsOnError(t *testing.T) {
 
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	// expected query performed by tested function
 	expectedQuery := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
@@ -889,9 +825,7 @@ func TestPerformListOfOldReportsOnError(t *testing.T) {
 func TestDeleteRecordFromTable(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	// expected query performed by tested function
 	expectedExec := "DELETE FROM table_x WHERE key_x = \\$"
@@ -900,9 +834,7 @@ func TestDeleteRecordFromTable(t *testing.T) {
 
 	// call the tested function
 	affected, err := cleaner.DeleteRecordFromTable(connection, "table_x", "key_x", "key_value")
-	if err != nil {
-		t.Errorf("error was not expected while updating stats: %s", err)
-	}
+	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// test number of affected rows
 	if affected != 1 {
@@ -924,9 +856,7 @@ func TestDeleteRecordFromTableOnError(t *testing.T) {
 
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	// expected query performed by tested function
 	expectedExec := "DELETE FROM table_x WHERE key_x = \\$"
@@ -961,9 +891,7 @@ func TestDeleteRecordFromTableOnError(t *testing.T) {
 func TestPerformVacuumDB(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	// expected query performed by tested function
 	expectedExec := "DELETE FROM table_x WHERE key_x = \\$"
@@ -976,9 +904,7 @@ func TestPerformVacuumDB(t *testing.T) {
 
 	// call the tested function
 	affected, err := cleaner.DeleteRecordFromTable(connection, "table_x", "key_x", "key_value")
-	if err != nil {
-		t.Errorf("error was not expected while updating stats: %s", err)
-	}
+	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// test number of affected rows
 	if affected != 1 {
@@ -986,9 +912,7 @@ func TestPerformVacuumDB(t *testing.T) {
 	}
 
 	err = cleaner.PerformVacuumDB(connection)
-	if err != nil {
-		t.Errorf("error was not expected: %s", err)
-	}
+	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check if DB can be closed successfully
 	checkConnectionClose(t, connection)
@@ -1002,9 +926,7 @@ func TestPerformVacuumDB(t *testing.T) {
 func TestFillInDatabaseByTestData(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	clusterNames := [...]string{
 		"00000000-0000-0000-0000-000000000000",
@@ -1023,9 +945,7 @@ func TestFillInDatabaseByTestData(t *testing.T) {
 	mock.ExpectClose()
 
 	err = cleaner.FillInDatabaseByTestData(connection)
-	if err != nil {
-		t.Errorf("error was not expected: %s", err)
-	}
+	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check if DB can be closed successfully
 	checkConnectionClose(t, connection)
@@ -1041,9 +961,7 @@ func TestPerformCleanupInDB(t *testing.T) {
 
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
+	assert.NoError(t, err, "error creating SQL mock")
 
 	clusterNames := cleaner.ClusterList{
 		"00000000-0000-0000-0000-000000000000",
@@ -1065,9 +983,7 @@ func TestPerformCleanupInDB(t *testing.T) {
 	mock.ExpectClose()
 
 	deletedRows, err := cleaner.PerformCleanupInDB(connection, clusterNames)
-	if err != nil {
-		t.Errorf("error was not expected: %s", err)
-	}
+	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check tables have correct number of deleted rows for each table
 	for tableName, deletedRowCount := range deletedRows {
