@@ -533,7 +533,7 @@ func TestDisplayMultipleRuleDisableResultsFileOutput(t *testing.T) {
 	assert.Equal(t, ruleFeedbackLine[2], rule1ID)
 	assert.Equal(t, ruleFeedbackLine[3], "1")
 
-	outputFile.Close()
+	err = outputFile.Close()
 	assert.NoError(t, err)
 	// delete test file from filesystem
 	err = os.Remove(outFile)
@@ -809,7 +809,7 @@ func TestDisplayAllOldRecordsFileOutput(t *testing.T) {
 	assert.Equal(t, line2[2], updatedAt.Format(time.RFC3339))
 	assert.Equal(t, line2[3], "1")
 
-	outputFile.Close()
+	err = outputFile.Close()
 	assert.NoError(t, err)
 	// delete test file from filesystem
 	err = os.Remove(outFile)
