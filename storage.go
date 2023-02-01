@@ -106,7 +106,7 @@ func initDatabaseConnection(configuration StorageConfiguration) (*sql.DB, error)
 // multiple users have disabled some rules.
 func displayMultipleRuleDisable(connection *sql.DB, output string) error {
 	var fout *os.File = nil
-	writer := bufio.NewWriter(os.Stdout)
+	var writer *bufio.Writer = nil
 
 	if output != "" {
 		// create output file
@@ -264,7 +264,7 @@ func readOrgID(connection *sql.DB, clusterName string) (int, error) {
 // older than the specified time duration. Those records are simply displayed.
 func displayAllOldRecords(connection *sql.DB, maxAge, output string) error {
 	var fout *os.File = nil
-	writer := bufio.NewWriter(os.Stdout)
+	var writer *bufio.Writer = nil
 
 	if output != "" {
 		// create output file

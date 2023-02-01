@@ -20,14 +20,56 @@ package main_test
 // https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/database_test.html
 
 import (
+	"bufio"
+	"database/sql"
 	"errors"
 	"fmt"
+	"os"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	cleaner "github.com/RedHatInsights/insights-results-aggregator-cleaner"
+	"github.com/stretchr/testify/assert"
 )
+
+const (
+	cluster1ID   = "123e4567-e89b-12d3-a456-426614173998"
+	cluster2ID   = "567e4567-4321-12d3-a456-426614173777"
+	rule1ID      = "rule.test|KEY"
+	defaultOrgID = 42
+)
+
+// checkConnectionClose function performs mocked DB closing operation and checks
+// if the connection is properly closed from unit tests.
+func checkConnectionClose(t *testing.T, connection *sql.DB) {
+	// connection to mocked DB needs to be closed properly
+	err := connection.Close()
+
+	assert.NoError(t, err)
+}
+
+// checkAllExpectations function checks if all database-related operations have
+// been really met.
+func checkAllExpectations(t *testing.T, mock sqlmock.Sqlmock) {
+	// check if all expectations were met
+	err := mock.ExpectationsWereMet()
+
+	assert.NoError(t, err)
+}
+
+// expectOrgIDQuery mocks an expect of a repetetive query to check whether cluster
+// belongs to given org
+func expectOrgIDQuery(mock sqlmock.Sqlmock) {
+	// prepare mocked result for SQL query
+	rows := sqlmock.NewRows([]string{"org_id"})
+	rows.AddRow(defaultOrgID)
+
+	// expected query performed by tested function
+	expectedQuery := "select org_id from report where cluster = \\$1"
+	mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
+}
 
 // TestReadOrgIDNoResults checks the function readOrgID.
 func TestReadOrgIDNoResults(t *testing.T) {
@@ -56,16 +98,11 @@ func TestReadOrgIDNoResults(t *testing.T) {
 		t.Errorf("wrong org_id returned: %d", org_id)
 	}
 
-	err = connection.Close()
-	if err != nil {
-		t.Fatalf("error during closing connection: %v", err)
-	}
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
 
-	// check if all expectations were met
-	err = mock.ExpectationsWereMet()
-	if err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
 }
 
 // TestReadOrgIDResults checks the function readOrgID.
@@ -77,12 +114,7 @@ func TestReadOrgIDResult(t *testing.T) {
 	}
 
 	// prepare mocked result for SQL query
-	rows := sqlmock.NewRows([]string{"org_id"})
-	rows.AddRow(42)
-
-	// expected query performed by tested function
-	expectedQuery := "select org_id from report where cluster = \\$1"
-	mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
+	expectOrgIDQuery(mock)
 
 	// call the tested function
 	org_id, err := cleaner.ReadOrgID(connection, "123e4567-e89b-12d3-a456-426614174000")
@@ -91,20 +123,15 @@ func TestReadOrgIDResult(t *testing.T) {
 	}
 
 	// check the org ID returned from tested function
-	if org_id != 42 {
+	if org_id != defaultOrgID {
 		t.Errorf("wrong org_id returned: %d", org_id)
 	}
 
-	err = connection.Close()
-	if err != nil {
-		t.Fatalf("error during closing connection: %v", err)
-	}
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
 
-	// check if all expectations were met
-	err = mock.ExpectationsWereMet()
-	if err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
 }
 
 // TestReadOrgIDOnError checks error handling in function readOrgID.
@@ -139,16 +166,11 @@ func TestReadOrgIDOnError(t *testing.T) {
 		t.Errorf("different error was returned: %v", err)
 	}
 
-	err = connection.Close()
-	if err != nil {
-		t.Fatalf("error during closing connection: %v", err)
-	}
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
 
-	// check if all expectations were met
-	err = mock.ExpectationsWereMet()
-	if err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
 }
 
 // TestPerformDisplayMultipleRuleDisableNoResults checks the basic behaviour of
@@ -182,16 +204,11 @@ func TestPerformDisplayMultipleRuleDisableNoResults(t *testing.T) {
 		t.Errorf("error was not expected while updating stats: %s", err)
 	}
 
-	err = connection.Close()
-	if err != nil {
-		t.Fatalf("error during closing connection: %v", err)
-	}
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
 
-	// check if all expectations were met
-	err = mock.ExpectationsWereMet()
-	if err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
 }
 
 // TestPerformDisplayMultipleRuleDisableOnError checks the error handling
@@ -230,20 +247,57 @@ func TestPerformDisplayMultipleRuleDisableOnError(t *testing.T) {
 		t.Errorf("different error was returned: %v", err)
 	}
 
-	err = connection.Close()
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
+// TestPerformDisplayMultipleRuleDisableOnScanError checks the error handling
+// ability in performDisplayMultipleRuleDisable function regarding wrong values returned from query.
+func TestPerformDisplayMultipleRuleDisableOnScanError(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
 	if err != nil {
-		t.Fatalf("error during closing connection: %v", err)
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 
-	// check if all expectations were met
-	err = mock.ExpectationsWereMet()
-	if err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
+	// prepare mocked result for SQL query
+	rows1 := sqlmock.NewRows([]string{"cluster_id", "rule_id", "cnt"})
+	rows1.AddRow(nil, rule1ID, 1)
+
+	// expected query performed by tested function
+	expectedQuery1 := "select cluster_id, rule_id, count\\(\\*\\) as cnt from cluster_rule_toggle group by cluster_id, rule_id having count\\(\\*\\)>1 order by cnt desc;"
+	mock.ExpectQuery(expectedQuery1).WillReturnRows(rows1)
+
+	// org_id query is not expected, as the first query should fail
+
+	mock.ExpectClose()
+
+	// first query to be performed
+	query1 := `
+                select cluster_id, rule_id, count(*) as cnt
+                  from cluster_rule_toggle
+                 group by cluster_id, rule_id
+                having count(*)>1
+                 order by cnt desc;
+`
+	// call the tested function
+	err = cleaner.PerformDisplayMultipleRuleDisable(connection, nil, query1, "cluster_rule_toggle")
+	// must throw error
+	assert.Error(t, err)
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
 }
 
 // TestPerformDisplayMultipleRuleDisableResults checks the basic behaviour of
-// performDisplayMultipleRuleDisable function with results returned.
+// performDisplayMultipleRuleDisable function with results returned. Contents
+// of generated file(s) is checked in displayMultipleRuleDisableResulsts test cases
 func TestPerformDisplayMultipleRuleDisableResults(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
@@ -253,19 +307,15 @@ func TestPerformDisplayMultipleRuleDisableResults(t *testing.T) {
 
 	// prepare mocked result for SQL query
 	rows1 := sqlmock.NewRows([]string{"cluster_id", "rule_id", "cnt"})
-	rows1.AddRow("123e4567-e89b-12d3-a456-426614173998", "rule.test|KEY", 1)
+	rows1.AddRow(cluster1ID, rule1ID, 1)
 
 	// expected query performed by tested function
 	expectedQuery1 := "select cluster_id, rule_id, count\\(\\*\\) as cnt from cluster_rule_toggle group by cluster_id, rule_id having count\\(\\*\\)>1 order by cnt desc;"
 	mock.ExpectQuery(expectedQuery1).WillReturnRows(rows1)
 
 	// prepare mocked result for SQL query
-	rows2 := sqlmock.NewRows([]string{"org_id"})
-	rows2.AddRow(42)
+	expectOrgIDQuery(mock)
 
-	// expected query performed by tested function
-	expectedQuery2 := "select org_id from report where cluster = \\$1"
-	mock.ExpectQuery(expectedQuery2).WillReturnRows(rows2)
 	mock.ExpectClose()
 
 	// first query to be performed
@@ -282,21 +332,16 @@ func TestPerformDisplayMultipleRuleDisableResults(t *testing.T) {
 		t.Errorf("error was not expected while updating stats: %s", err)
 	}
 
-	err = connection.Close()
-	if err != nil {
-		t.Fatalf("error during closing connection: %v", err)
-	}
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
 
-	// check if all expectations were met
-	err = mock.ExpectationsWereMet()
-	if err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
 }
 
-// TestDisplayMultipleRuleDisableResultsStringOutput checks the basic behaviour of
-// displayMultipleRuleDisable function with results returned, printing to std out.
-func TestDisplayMultipleRuleDisableResultsStringOutput(t *testing.T) {
+// TestDisplayMultipleRuleDisableResultsScanError checks the basic behaviour of
+// displayMultipleRuleDisable function with results returned without defining the filenames.
+func TestDisplayMultipleRuleDisableResultsScanError(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
 	if err != nil {
@@ -305,58 +350,198 @@ func TestDisplayMultipleRuleDisableResultsStringOutput(t *testing.T) {
 
 	// prepare mocked result for SQL query
 	toggleRows := sqlmock.NewRows([]string{"cluster_id", "rule_id", "cnt"})
-	toggleRows.AddRow("123e4567-e89b-12d3-a456-426614173998", "rule.test|KEY", 1)
+	toggleRows.AddRow(nil, rule1ID, 1)
+
+	// expected query performed by tested function
+	toggleQuery := "select cluster_id, rule_id, count\\(\\*\\) as cnt from cluster_rule_toggle group by cluster_id, rule_id having count\\(\\*\\)>1 order by cnt desc;"
+	mock.ExpectQuery(toggleQuery).WillReturnRows(toggleRows)
+
+	// another org_id query
+	mock.ExpectClose()
+
+	// call the tested function without filename (only printed in logs)
+	err = cleaner.DisplayMultipleRuleDisable(connection, "")
+	assert.Error(t, err)
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
+// TestDisplayMultipleRuleDisableOnError checks the error handling
+// ability in displayMultipleRuleDisable function.
+func TestDisplayMultipleRuleDisableOnError(t *testing.T) {
+	// error to be thrown
+	mockedError := errors.New("mocked error")
+
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	// expected query performed by tested function
+	toggleQuery := "select cluster_id, rule_id, count\\(\\*\\) as cnt from cluster_rule_toggle group by cluster_id, rule_id having count\\(\\*\\)>1 order by cnt desc;"
+	mock.ExpectQuery(toggleQuery).WillReturnError(mockedError)
+
+	// org_id query is not expected because first query should fail
+
+	mock.ExpectClose()
+
+	// call the tested function without filename (only printed in logs)
+	err = cleaner.DisplayMultipleRuleDisable(connection, "")
+
+	assert.Error(t, err)
+
+	// check if the error is correct
+	if err != mockedError {
+		t.Errorf("different error was returned: %v", err)
+	}
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
+// TestDisplayMultipleRuleDisableResultsNoOutput checks the basic behaviour of
+// displayMultipleRuleDisable function with results returned without defining the filenames.
+func TestDisplayMultipleRuleDisableResultsNoOutput(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	// prepare mocked result for SQL query
+	toggleRows := sqlmock.NewRows([]string{"cluster_id", "rule_id", "cnt"})
+	toggleRows.AddRow(cluster1ID, rule1ID, 1)
 
 	// expected query performed by tested function
 	toggleQuery := "select cluster_id, rule_id, count\\(\\*\\) as cnt from cluster_rule_toggle group by cluster_id, rule_id having count\\(\\*\\)>1 order by cnt desc;"
 	mock.ExpectQuery(toggleQuery).WillReturnRows(toggleRows)
 
 	// prepare mocked org_id query result for SQL query
-	orgIDRows := sqlmock.NewRows([]string{"org_id"})
-	orgIDRows.AddRow(1)
-
-	// expected query performed by tested function
-	orgIDQuery := "select org_id from report where cluster = \\$1"
-	mock.ExpectQuery(orgIDQuery).WillReturnRows(orgIDRows)
+	expectOrgIDQuery(mock)
 
 	// prepare mocked result for SQL query
 	feedbackRows := sqlmock.NewRows([]string{"cluster_id", "rule_id", "cnt"})
-	feedbackRows.AddRow("123e4567-e89b-12d3-a456-426614173998", "rule.test|KEY", 1)
+	feedbackRows.AddRow(cluster2ID, rule1ID, 1)
 
 	// expected query performed by tested function
 	feedbackQuery := "select cluster_id, rule_id, count\\(\\*\\) as cnt from cluster_user_rule_disable_feedback group by cluster_id, rule_id having count\\(\\*\\)>1 order by cnt desc;"
 	mock.ExpectQuery(feedbackQuery).WillReturnRows(feedbackRows)
 
 	// prepare mocked org_id query result for SQL query
-	orgIDRows2 := sqlmock.NewRows([]string{"org_id"})
-	orgIDRows2.AddRow(1)
+	expectOrgIDQuery(mock)
 
-	// expected query performed by tested function
-	orgIDQuery2 := "select org_id from report where cluster = \\$1"
-	mock.ExpectQuery(orgIDQuery2).WillReturnRows(orgIDRows2)
 	// another org_id query
 	mock.ExpectClose()
 
-	// call the tested function without filename (stdout)
+	// call the tested function without filename (only printed in logs)
 	err = cleaner.DisplayMultipleRuleDisable(connection, "")
 	if err != nil {
 		t.Errorf("error was not expected while updating stats: %s", err)
 	}
 
-	err = connection.Close()
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
+// TestDisplayMultipleRuleDisableResultsFileOutput checks the basic behaviour of
+// displayMultipleRuleDisable function with results returned and checks whether
+// the files were generated correctly.
+func TestDisplayMultipleRuleDisableResultsFileOutput(t *testing.T) {
+	const outFile = "testdisable.out"
+
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
 	if err != nil {
-		t.Fatalf("error during closing connection: %v", err)
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 
-	// check if all expectations were met
-	err = mock.ExpectationsWereMet()
+	// prepare mocked result for SQL query
+	toggleRows := sqlmock.NewRows([]string{"cluster_id", "rule_id", "cnt"})
+	toggleRows.AddRow(cluster1ID, rule1ID, 1)
+
+	// expected query performed by tested function
+	toggleQuery := "select cluster_id, rule_id, count\\(\\*\\) as cnt from cluster_rule_toggle group by cluster_id, rule_id having count\\(\\*\\)>1 order by cnt desc;"
+	mock.ExpectQuery(toggleQuery).WillReturnRows(toggleRows)
+
+	// prepare mocked org_id query result for SQL query
+	expectOrgIDQuery(mock)
+
+	// prepare mocked result for SQL query
+	feedbackRows := sqlmock.NewRows([]string{"cluster_id", "rule_id", "cnt"})
+	feedbackRows.AddRow(cluster2ID, rule1ID, 1)
+
+	// expected query performed by tested function
+	feedbackQuery := "select cluster_id, rule_id, count\\(\\*\\) as cnt from cluster_user_rule_disable_feedback group by cluster_id, rule_id having count\\(\\*\\)>1 order by cnt desc;"
+	mock.ExpectQuery(feedbackQuery).WillReturnRows(feedbackRows)
+
+	// prepare mocked org_id query result for SQL query
+	expectOrgIDQuery(mock)
+
+	// another org_id query
+	mock.ExpectClose()
+
+	// call the tested function with filename
+	err = cleaner.DisplayMultipleRuleDisable(connection, outFile)
 	if err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
+		t.Errorf("error was not expected while updating stats: %s", err)
 	}
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+
+	// check contents of the output file
+	outputFile, err := os.Open(outFile)
+	assert.NoError(t, err)
+
+	scanner := bufio.NewScanner(outputFile)
+
+	var lines []string
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+
+	// two lines must be in the file
+	assert.Len(t, lines, 2)
+
+	// 4 comma separated values
+	ruleToggleLine := strings.Split(lines[0], ",")
+	assert.Len(t, ruleToggleLine, 4)
+
+	// check elements in csv
+	assert.Equal(t, ruleToggleLine[0], fmt.Sprint(defaultOrgID))
+	assert.Equal(t, ruleToggleLine[1], cluster1ID)
+	assert.Equal(t, ruleToggleLine[2], rule1ID)
+	assert.Equal(t, ruleToggleLine[3], "1")
+
+	ruleFeedbackLine := strings.Split(lines[1], ",")
+	assert.Equal(t, ruleFeedbackLine[0], fmt.Sprint(defaultOrgID))
+	assert.Equal(t, ruleFeedbackLine[1], cluster2ID)
+	assert.Equal(t, ruleFeedbackLine[2], rule1ID)
+	assert.Equal(t, ruleFeedbackLine[3], "1")
+
+	outputFile.Close()
+	assert.NoError(t, err)
+	// delete test file from filesystem
+	err = os.Remove(outFile)
+	assert.NoError(t, err)
 }
 
 // TestDisplayMultipleRuleDisableResultsFileError checks the basic behaviour of
-// displayMultipleRuleDisable function with results returned, printing to std out.
+// displayMultipleRuleDisable function with results returned and an invalid filename
 func TestDisplayMultipleRuleDisableResultsFileError(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
@@ -365,36 +550,26 @@ func TestDisplayMultipleRuleDisableResultsFileError(t *testing.T) {
 	}
 	// prepare mocked result for SQL query
 	toggleRows := sqlmock.NewRows([]string{"cluster_id", "rule_id", "cnt"})
-	toggleRows.AddRow("123e4567-e89b-12d3-a456-426614173998", "rule.test|KEY", 1)
+	toggleRows.AddRow(cluster1ID, rule1ID, 1)
 
 	// expected query performed by tested function
 	toggleQuery := "select cluster_id, rule_id, count\\(\\*\\) as cnt from cluster_rule_toggle group by cluster_id, rule_id having count\\(\\*\\)>1 order by cnt desc;"
 	mock.ExpectQuery(toggleQuery).WillReturnRows(toggleRows)
 
 	// prepare mocked org_id query result for SQL query
-	orgIDRows := sqlmock.NewRows([]string{"org_id"})
-	orgIDRows.AddRow(1)
-
-	// expected query performed by tested function
-	orgIDQuery := "select org_id from report where cluster = \\$1"
-	mock.ExpectQuery(orgIDQuery).WillReturnRows(orgIDRows)
+	expectOrgIDQuery(mock)
 
 	// prepare mocked result for SQL query
 	feedbackRows := sqlmock.NewRows([]string{"cluster_id", "rule_id", "cnt"})
-	feedbackRows.AddRow("123e4567-e89b-12d3-a456-426614173998", "rule.test|KEY", 1)
+	feedbackRows.AddRow(cluster1ID, rule1ID, 1)
 
 	// expected query performed by tested function
 	feedbackQuery := "select cluster_id, rule_id, count\\(\\*\\) as cnt from cluster_user_rule_disable_feedback group by cluster_id, rule_id having count\\(\\*\\)>1 order by cnt desc;"
 	mock.ExpectQuery(feedbackQuery).WillReturnRows(feedbackRows)
 
 	// prepare mocked org_id query result for SQL query
-	orgIDRows2 := sqlmock.NewRows([]string{"org_id"})
-	orgIDRows2.AddRow(1)
+	expectOrgIDQuery(mock)
 
-	// expected query performed by tested function
-	orgIDQuery2 := "select org_id from report where cluster = \\$1"
-	mock.ExpectQuery(orgIDQuery2).WillReturnRows(orgIDRows2)
-	// another org_id query
 	mock.ExpectClose()
 
 	// call the tested function with invalid filename
@@ -403,16 +578,11 @@ func TestDisplayMultipleRuleDisableResultsFileError(t *testing.T) {
 		t.Errorf("error was not expected while updating stats: %s", err)
 	}
 
-	err = connection.Close()
-	if err != nil {
-		t.Fatalf("error during closing connection: %v", err)
-	}
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
 
-	// check if all expectations were met
-	err = mock.ExpectationsWereMet()
-	if err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
 }
 
 // TestPerformListOfOldReportsNoResults checks the basic behaviour of
@@ -438,16 +608,11 @@ func TestPerformListOfOldReportsNoResults(t *testing.T) {
 		t.Errorf("error was not expected while updating stats: %s", err)
 	}
 
-	err = connection.Close()
-	if err != nil {
-		t.Fatalf("error during closing connection: %v", err)
-	}
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
 
-	// check if all expectations were met
-	err = mock.ExpectationsWereMet()
-	if err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
 }
 
 // TestPerformListOfOldReportsResults checks the basic behaviour of
@@ -463,7 +628,7 @@ func TestPerformListOfOldReportsResults(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"cluster", "reported_at", "last_checked"})
 	reportedAt := time.Now()
 	updatedAt := time.Now()
-	rows.AddRow("123e4567-e89b-12d3-a456-426614173998", reportedAt, updatedAt)
+	rows.AddRow(cluster1ID, reportedAt, updatedAt)
 
 	// expected query performed by tested function
 	expectedQuery := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
@@ -476,21 +641,16 @@ func TestPerformListOfOldReportsResults(t *testing.T) {
 		t.Errorf("error was not expected while updating stats: %s", err)
 	}
 
-	err = connection.Close()
-	if err != nil {
-		t.Fatalf("error during closing connection: %v", err)
-	}
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
 
-	// check if all expectations were met
-	err = mock.ExpectationsWereMet()
-	if err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
 }
 
-// TestDisplayAllOldRecordsWithWriter checks the basic behaviour of
-// displayAllOldRecords function.
-func TestDisplayAllOldRecordsWithWriter(t *testing.T) {
+// TestPerformListOfOldScanError checks the basic behaviour of
+// performListOfOldReports function.
+func TestPerformListOfOldScanError(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
 	if err != nil {
@@ -501,7 +661,70 @@ func TestDisplayAllOldRecordsWithWriter(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"cluster", "reported_at", "last_checked"})
 	reportedAt := time.Now()
 	updatedAt := time.Now()
-	rows.AddRow("123e4567-e89b-12d3-a456-426614173998", reportedAt, updatedAt)
+	rows.AddRow(nil, reportedAt, updatedAt)
+
+	// expected query performed by tested function
+	expectedQuery := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
+	mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
+	mock.ExpectClose()
+
+	// call the tested function
+	err = cleaner.PerformListOfOldReports(connection, "10", nil)
+	assert.Error(t, err)
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
+// TestPerformListOfOldDBError checks the basic behaviour of
+// performListOfOldReports function.
+func TestPerformListOfOldDBError(t *testing.T) {
+	// error to be thrown
+	mockedError := errors.New("mocked error")
+
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	// expected query performed by tested function
+	expectedQuery := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
+	mock.ExpectQuery(expectedQuery).WillReturnError(mockedError)
+	mock.ExpectClose()
+
+	// call the tested function
+	err = cleaner.PerformListOfOldReports(connection, "10", nil)
+	assert.Error(t, err)
+
+	if err != mockedError {
+		t.Errorf("different error was returned: %v", err)
+	}
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
+// TestDisplayAllOldRecordsNoOutput checks the basic behaviour of
+// displayAllOldRecords function without a filename defined.
+func TestDisplayAllOldRecordsNoOutput(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	// prepare mocked result for SQL query
+	rows := sqlmock.NewRows([]string{"cluster", "reported_at", "last_checked"})
+	reportedAt := time.Now()
+	updatedAt := time.Now()
+	rows.AddRow(cluster1ID, reportedAt, updatedAt)
 
 	// expected query performed by tested function
 	expectedQuery := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
@@ -514,16 +737,83 @@ func TestDisplayAllOldRecordsWithWriter(t *testing.T) {
 		t.Errorf("error was not expected while updating stats: %s", err)
 	}
 
-	err = connection.Close()
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
+// TestDisplayAllOldRecordsFileOutput checks the basic behaviour of
+// displayAllOldRecords function without a filename defined.
+func TestDisplayAllOldRecordsFileOutput(t *testing.T) {
+	const outFile = "testold.out"
+
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
 	if err != nil {
-		t.Fatalf("error during closing connection: %v", err)
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 
-	// check if all expectations were met
-	err = mock.ExpectationsWereMet()
+	// prepare mocked result for SQL query
+	rows := sqlmock.NewRows([]string{"cluster", "reported_at", "last_checked"})
+	reportedAt := time.Now()
+	updatedAt := time.Now()
+	rows.AddRow(cluster1ID, reportedAt, updatedAt)
+	rows.AddRow(cluster2ID, reportedAt, updatedAt)
+
+	// expected query performed by tested function
+	expectedQuery := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
+	mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
+	mock.ExpectClose()
+
+	// call the tested function without filename (stdout)
+	err = cleaner.DisplayAllOldRecords(connection, "10", outFile)
 	if err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
+		t.Errorf("error was not expected while updating stats: %s", err)
 	}
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+
+	// check contents of the output file
+	outputFile, err := os.Open(outFile)
+	assert.NoError(t, err)
+
+	scanner := bufio.NewScanner(outputFile)
+
+	var lines []string
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+
+	// two lines must be in the file
+	assert.Len(t, lines, 2)
+
+	// 4 comma separated values
+	line1 := strings.Split(lines[0], ",")
+	assert.Len(t, line1, 4)
+
+	// check elements in csv
+	assert.Equal(t, line1[0], cluster1ID)
+	assert.Equal(t, line1[1], reportedAt.Format(time.RFC3339))
+	assert.Equal(t, line1[2], updatedAt.Format(time.RFC3339))
+	assert.Equal(t, line1[3], "1")
+
+	line2 := strings.Split(lines[1], ",")
+	assert.Equal(t, line2[0], cluster2ID)
+	assert.Equal(t, line2[1], reportedAt.Format(time.RFC3339))
+	assert.Equal(t, line2[2], updatedAt.Format(time.RFC3339))
+	assert.Equal(t, line2[3], "1")
+
+	outputFile.Close()
+	assert.NoError(t, err)
+	// delete test file from filesystem
+	err = os.Remove(outFile)
+	assert.NoError(t, err)
 }
 
 // TestDisplayAllOldRecordsWithFileError checks the basic behaviour of
@@ -539,7 +829,7 @@ func TestDisplayAllOldRecordsWithFileError(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"cluster", "reported_at", "last_checked"})
 	reportedAt := time.Now()
 	updatedAt := time.Now()
-	rows.AddRow("123e4567-e89b-12d3-a456-426614173998", reportedAt, updatedAt)
+	rows.AddRow(cluster1ID, reportedAt, updatedAt)
 
 	// expected query performed by tested function
 	expectedQuery := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
@@ -552,16 +842,11 @@ func TestDisplayAllOldRecordsWithFileError(t *testing.T) {
 		t.Errorf("error was not expected while updating stats: %s", err)
 	}
 
-	err = connection.Close()
-	if err != nil {
-		t.Fatalf("error during closing connection: %v", err)
-	}
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
 
-	// check if all expectations were met
-	err = mock.ExpectationsWereMet()
-	if err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
 }
 
 // TestPerformListOfOldReportsOnError checks the error handling
@@ -592,16 +877,11 @@ func TestPerformListOfOldReportsOnError(t *testing.T) {
 		t.Errorf("different error was returned: %v", err)
 	}
 
-	err = connection.Close()
-	if err != nil {
-		t.Fatalf("error during closing connection: %v", err)
-	}
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
 
-	// check if all expectations were met
-	err = mock.ExpectationsWereMet()
-	if err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
 }
 
 // TestDeleteRecordFromTable checks the basic behaviour of
@@ -629,16 +909,11 @@ func TestDeleteRecordFromTable(t *testing.T) {
 		t.Errorf("wrong number of rows affected: %d", affected)
 	}
 
-	err = connection.Close()
-	if err != nil {
-		t.Fatalf("error during closing connection: %v", err)
-	}
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
 
-	// check if all expectations were met
-	err = mock.ExpectationsWereMet()
-	if err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
 }
 
 // TestDeleteRecordFromTableOnError checks the error handling in
@@ -674,16 +949,11 @@ func TestDeleteRecordFromTableOnError(t *testing.T) {
 		t.Errorf("different error was returned: %v", err)
 	}
 
-	err = connection.Close()
-	if err != nil {
-		t.Fatalf("error during closing connection: %v", err)
-	}
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
 
-	// check if all expectations were met
-	err = mock.ExpectationsWereMet()
-	if err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
 }
 
 // TestPerformVacuumDB checks the basic behaviour of
@@ -720,16 +990,11 @@ func TestPerformVacuumDB(t *testing.T) {
 		t.Errorf("error was not expected: %s", err)
 	}
 
-	err = connection.Close()
-	if err != nil {
-		t.Fatalf("error during closing connection: %v", err)
-	}
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
 
-	// check if all expectations were met
-	err = mock.ExpectationsWereMet()
-	if err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
 }
 
 // TestFillInDatabaseByTestData checks the basic behaviour of
@@ -753,7 +1018,6 @@ func TestFillInDatabaseByTestData(t *testing.T) {
 		mock.ExpectExec("INSERT INTO cluster_rule_user_feedback").WithArgs(clusterName).WillReturnResult(sqlmock.NewResult(1, 1))
 		mock.ExpectExec("INSERT INTO cluster_user_rule_disable_feedback").WithArgs(clusterName).WillReturnResult(sqlmock.NewResult(1, 1))
 		mock.ExpectExec("INSERT INTO rule_hit").WithArgs(clusterName).WillReturnResult(sqlmock.NewResult(1, 1))
-
 	}
 
 	mock.ExpectClose()
@@ -763,21 +1027,18 @@ func TestFillInDatabaseByTestData(t *testing.T) {
 		t.Errorf("error was not expected: %s", err)
 	}
 
-	err = connection.Close()
-	if err != nil {
-		t.Fatalf("error during closing connection: %v", err)
-	}
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
 
-	// check if all expectations were met
-	err = mock.ExpectationsWereMet()
-	if err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
 }
 
 // TestPerformCleanupInDB checks the basic behaviour of
 // performCleanupInDB function.
 func TestPerformCleanupInDB(t *testing.T) {
+	expectedResult := make(map[string]int)
+
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
 	if err != nil {
@@ -795,24 +1056,27 @@ func TestPerformCleanupInDB(t *testing.T) {
 			// expected query performed by tested function
 			expectedExec := fmt.Sprintf("DELETE FROM %v WHERE %v = \\$", tableAndKey.TableName, tableAndKey.KeyName)
 			mock.ExpectExec(expectedExec).WithArgs(clusterName).WillReturnResult(sqlmock.NewResult(1, 2))
+
+			// two deleted rows for each cluster
+			expectedResult[tableAndKey.TableName] += 2
 		}
 	}
 
 	mock.ExpectClose()
 
-	_, err = cleaner.PerformCleanupInDB(connection, clusterNames)
+	deletedRows, err := cleaner.PerformCleanupInDB(connection, clusterNames)
 	if err != nil {
 		t.Errorf("error was not expected: %s", err)
 	}
 
-	err = connection.Close()
-	if err != nil {
-		t.Fatalf("error during closing connection: %v", err)
+	// check tables have correct number of deleted rows for each table
+	for tableName, deletedRowCount := range deletedRows {
+		assert.Equal(t, expectedResult[tableName], deletedRowCount)
 	}
 
-	// check if all expectations were met
-	err = mock.ExpectationsWereMet()
-	if err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
 }
