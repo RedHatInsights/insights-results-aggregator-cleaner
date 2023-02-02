@@ -117,7 +117,6 @@ func displayMultipleRuleDisable(connection *sql.DB, output string) error {
 		}
 		// an object used to write to file
 		writer = bufio.NewWriter(fout)
-
 	}
 
 	defer func() {

@@ -29,11 +29,18 @@ package main
 // https://medium.com/@robiplus/golang-trick-export-for-test-aa16cbd7b8cd
 // to see why this trick is needed.
 var (
+	TablesAndKeys = tablesAndKeys
+
 	// functions from the storage.go source file
 	ReadOrgID                         = readOrgID
+	DisplayMultipleRuleDisable        = displayMultipleRuleDisable
+	DisplayAllOldRecords              = displayAllOldRecords
 	PerformDisplayMultipleRuleDisable = performDisplayMultipleRuleDisable
 	PerformListOfOldReports           = performListOfOldReports
 	DeleteRecordFromTable             = deleteRecordFromTable
+	PerformCleanupInDB                = performCleanupInDB
+	PerformVacuumDB                   = performVacuumDB
+	FillInDatabaseByTestData          = fillInDatabaseByTestData
 
 	// functions from the ccx_notification_writer.go source file
 	ShowVersion         = showVersion
