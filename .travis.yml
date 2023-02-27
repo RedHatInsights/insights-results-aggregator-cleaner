@@ -42,8 +42,21 @@ jobs:
         - go tool cover -func=coverage.out
       after_success:
         - bash <(curl -s https://codecov.io/bash)
+    - stage: bdd tests
+      services:
+        - docker
+      before_script:
+        - go build
+        - wget -O docker-compose.yml https://raw.githubusercontent.com/RedHatInsights/insights-behavioral-spec/main/docker-compose.yml
+        - POSTGRES_DB_NAME=test docker-compose up -d
+        - cid=$(docker ps | grep 'insights-behavioral-spec:ci' | cut -d ' ' -f 1)
+        - docker cp insights-results-aggregator-cleaner $cid:`docker exec $cid bash -c 'echo "$VIRTUAL_ENV_BIN"'`
+        - docker exec -u root $cid /bin/bash -c 'chmod +x $VIRTUAL_ENV_BIN/insights-results-aggregator-cleaner'
+      script:
+        - docker exec -it $cid /bin/bash -c 'export INSIGHTS_RESULTS_CLEANER__STORAGE__PG_DB_NAME=test INSIGHTS_RESULTS_CLEANER__STORAGE__PG_HOST=$DB_HOST INSIGHTS_RESULTS_CLEANER__STORAGE__PG_PORT=$DB_PORT INSIGHTS_RESULTS_CLEANER__STORAGE__PG_USERNAME=$DB_USER INSIGHTS_RESULTS_CLEANER__STORAGE__PG_PASSWORD=$DB_PASS INSIGHTS_RESULTS_CLEANER__STORAGE__DB_DRIVER=postgres INSIGHTS_RESULTS_CLEANER__STORAGE__PG_PARAMS="sslmode=disable" && env && make cleaner-tests'
 
 stages:
   - build
   - style
   - unit tests
+  - bdd tests
