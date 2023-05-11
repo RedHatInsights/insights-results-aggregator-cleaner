@@ -5,10 +5,10 @@ go 1.18
 require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/DATA-DOG/go-sqlmock v1.5.0
-	github.com/RedHatInsights/insights-operator-utils v1.14.0
+	github.com/RedHatInsights/insights-operator-utils v1.4.3
 	github.com/google/uuid v1.2.0
-	github.com/lib/pq v1.9.0
-	github.com/mattn/go-sqlite3 v2.0.3+incompatible
+	github.com/lib/pq v1.10.9
+	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/redhatinsights/app-common-go v1.5.1
 	github.com/rs/zerolog v1.20.0
