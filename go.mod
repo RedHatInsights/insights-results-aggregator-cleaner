@@ -13,7 +13,7 @@ require (
 	github.com/redhatinsights/app-common-go v1.5.1
 	github.com/rs/zerolog v1.29.1
 	github.com/spf13/viper v1.7.1
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.8.2
 	github.com/tisnik/go-capture v1.0.1
 )
 
@@ -59,5 +59,5 @@ require (
 	gopkg.in/h2non/gock.v1 v1.0.15 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
