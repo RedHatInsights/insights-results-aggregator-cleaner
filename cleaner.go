@@ -392,7 +392,7 @@ func main() {
 	}
 
 	// initialize connection to database
-	connection, err := initDatabaseConnection(config.Storage)
+	connection, err := initDatabaseConnection(&config.Storage)
 	if err != nil {
 		log.Err(err).Msg("Connection to database not established")
 	}

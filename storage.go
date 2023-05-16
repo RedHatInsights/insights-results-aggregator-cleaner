@@ -1,5 +1,5 @@
 /*
-Copyright © 2021, 2022 Red Hat, Inc.
+Copyright © 2021, 2022, 2023 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ const (
 
 // initDatabaseConnection initializes driver, checks if it's supported and
 // initializes connection to the storage.
-func initDatabaseConnection(configuration StorageConfiguration) (*sql.DB, error) {
+func initDatabaseConnection(configuration *StorageConfiguration) (*sql.DB, error) {
 	driverName := configuration.Driver
 	dataSource := ""
 	log.Info().Str("driverName", configuration.Driver).Msg("DB connection configuration")
