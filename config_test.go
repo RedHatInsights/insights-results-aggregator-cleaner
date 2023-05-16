@@ -1,5 +1,5 @@
 /*
-Copyright © 2021, 2022 Red Hat, Inc.
+Copyright © 2021, 2022, 2023 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -107,7 +107,7 @@ func TestLoadCleanerConfiguration(t *testing.T) {
 	config, err := main.LoadConfiguration(envVar, "")
 	assert.Nil(t, err, "Failed loading configuration file from env var!")
 
-	cleanerCfg := main.GetCleanerConfiguration(config)
+	cleanerCfg := main.GetCleanerConfiguration(&config)
 
 	assert.Equal(t, "90 days", cleanerCfg.MaxAge)
 	assert.Equal(t, "cluster_list.txt", cleanerCfg.ClusterListFile)
@@ -121,7 +121,7 @@ func TestLoadStorageConfiguration(t *testing.T) {
 	config, err := main.LoadConfiguration(envVar, "")
 	assert.Nil(t, err, "Failed loading configuration file from env var!")
 
-	storageCfg := main.GetStorageConfiguration(config)
+	storageCfg := main.GetStorageConfiguration(&config)
 
 	assert.Equal(t, "sqlite3", storageCfg.Driver)
 	assert.Equal(t, "user", storageCfg.PGUsername)
@@ -140,7 +140,7 @@ func TestLoadLoggingConfiguration(t *testing.T) {
 	config, err := main.LoadConfiguration(envVar, "")
 	assert.Nil(t, err, "Failed loading configuration file from env var!")
 
-	loggingCfg := main.GetLoggingConfiguration(config)
+	loggingCfg := main.GetLoggingConfiguration(&config)
 
 	assert.Equal(t, true, loggingCfg.Debug)
 	assert.Equal(t, "", loggingCfg.LogLevel)

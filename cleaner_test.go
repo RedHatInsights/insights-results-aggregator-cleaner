@@ -1,5 +1,5 @@
 /*
-Copyright © 2021, 2022 Red Hat, Inc.
+Copyright © 2021, 2022, 2023 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ func TestShowConfiguration(t *testing.T) {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 		log.Logger = log.Output(zerolog.New(os.Stderr))
 
-		main.ShowConfiguration(configuration)
+		main.ShowConfiguration(&configuration)
 	})
 
 	// check the captured text
@@ -154,7 +154,7 @@ func TestDoSelectedOperationShowVersion(t *testing.T) {
 
 	// try to call the tested function and capture its output
 	output, err := capture.StandardOutput(func() {
-		code, err := main.DoSelectedOperation(configuration, nil, cliFlags)
+		code, err := main.DoSelectedOperation(&configuration, nil, cliFlags)
 		assert.Equal(t, code, main.ExitStatusOK)
 		assert.Nil(t, err)
 	})
@@ -178,7 +178,7 @@ func TestDoSelectedOperationShowAuthors(t *testing.T) {
 
 	// try to call the tested function and capture its output
 	output, err := capture.StandardOutput(func() {
-		code, err := main.DoSelectedOperation(configuration, nil, cliFlags)
+		code, err := main.DoSelectedOperation(&configuration, nil, cliFlags)
 		assert.Equal(t, code, main.ExitStatusOK)
 		assert.Nil(t, err)
 	})
@@ -206,7 +206,7 @@ func TestDoSelectedOperationShowConfiguration(t *testing.T) {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 		log.Logger = log.Output(zerolog.New(os.Stderr))
 
-		code, err := main.DoSelectedOperation(configuration, nil, cliFlags)
+		code, err := main.DoSelectedOperation(&configuration, nil, cliFlags)
 		assert.Equal(t, code, main.ExitStatusOK)
 		assert.Nil(t, err)
 	})
