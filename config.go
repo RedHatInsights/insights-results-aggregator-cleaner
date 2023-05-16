@@ -1,5 +1,5 @@
 /*
-Copyright © 2021, 2022 Red Hat, Inc.
+Copyright © 2021, 2022, 2023 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -207,17 +207,17 @@ func LoadConfiguration(configFileEnvVariableName, defaultConfigFile string) (Con
 }
 
 // GetStorageConfiguration returns storage configuration
-func GetStorageConfiguration(config ConfigStruct) StorageConfiguration {
+func GetStorageConfiguration(config *ConfigStruct) StorageConfiguration {
 	return config.Storage
 }
 
 // GetLoggingConfiguration returns logging configuration
-func GetLoggingConfiguration(config ConfigStruct) LoggingConfiguration {
+func GetLoggingConfiguration(config *ConfigStruct) LoggingConfiguration {
 	return config.Logging
 }
 
 // GetCleanerConfiguration returns cleaner configuration
-func GetCleanerConfiguration(config ConfigStruct) CleanerConfiguration {
+func GetCleanerConfiguration(config *ConfigStruct) CleanerConfiguration {
 	return config.Cleaner
 }
 

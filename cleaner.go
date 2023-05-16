@@ -1,5 +1,5 @@
 /*
-Copyright © 2021, 2022 Red Hat, Inc.
+Copyright © 2021, 2022, 2023 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -126,7 +126,7 @@ func readClusterList(filename, clusters string) (ClusterList, int, error) {
 }
 
 // showConfiguration function displays actual configuration.
-func showConfiguration(config ConfigStruct) {
+func showConfiguration(config *ConfigStruct) {
 	storageConfig := GetStorageConfiguration(config)
 	log.Info().
 		Str("Driver", storageConfig.Driver).
@@ -268,7 +268,7 @@ func vacuumDB(connection *sql.DB) (int, error) {
 }
 
 // cleanup function starts the cleanup operation
-func cleanup(configuration ConfigStruct, connection *sql.DB, cliFlags CliFlags) (int, error) {
+func cleanup(configuration *ConfigStruct, connection *sql.DB, cliFlags CliFlags) (int, error) {
 	// cleanup operation
 	clusterList, improperClusterCounter, err := readClusterList(
 		configuration.Cleaner.ClusterListFile,
@@ -316,7 +316,7 @@ func fillInDatabase(connection *sql.DB) (int, error) {
 }
 
 // displayOldRecords function displays old records in database
-func displayOldRecords(configuration ConfigStruct, connection *sql.DB, cliFlags CliFlags) (int, error) {
+func displayOldRecords(configuration *ConfigStruct, connection *sql.DB, cliFlags CliFlags) (int, error) {
 	err := displayAllOldRecords(connection,
 		configuration.Cleaner.MaxAge, cliFlags.Output)
 	if err != nil {
@@ -329,7 +329,7 @@ func displayOldRecords(configuration ConfigStruct, connection *sql.DB, cliFlags 
 
 // doSelectedOperation function performs selected operation: check data
 // retention, cleanup selected data, or fill-id database by test data
-func doSelectedOperation(configuration ConfigStruct, connection *sql.DB, cliFlags CliFlags) (int, error) {
+func doSelectedOperation(configuration *ConfigStruct, connection *sql.DB, cliFlags CliFlags) (int, error) {
 	switch {
 	case cliFlags.ShowVersion:
 		showVersion()
@@ -398,7 +398,7 @@ func main() {
 	}
 
 	// perform selected operation
-	exitStatus, err := doSelectedOperation(config, connection, cliFlags)
+	exitStatus, err := doSelectedOperation(&config, connection, cliFlags)
 	if err != nil {
 		log.Err(err).Msg("Operation failed")
 		os.Exit(exitStatus)
