@@ -307,7 +307,20 @@ func displayAllOldRecords(connection *sql.DB, maxAge, output string) error {
 		}
 	}()
 
-	return performListOfOldReports(connection, maxAge, writer)
+	// main function of this tool is ability to delete old reports
+	err := performListOfOldReports(connection, maxAge, writer)
+	// skip next operation on first error
+	if err != nil {
+		return err
+	}
+
+	// but we might be interested in other tables as well, especially advisor ratings
+	err = performListOfOldRatings(connection, maxAge)
+	// skip next operation on first error
+	if err != nil {
+		return err
+	}
+
 }
 
 // performListOfOldReports read and displays old records read from reported_at
@@ -365,6 +378,62 @@ func performListOfOldReports(connection *sql.DB, maxAge string, writer *bufio.Wr
 		count++
 	}
 	log.Info().Int("reports count", count).Msg("List of old reports end")
+	return nil
+}
+
+// performListOfOldRatings read and displays old Advisor ratings read from
+// advisor_ratings table
+func performListOfOldRatings(connection *sql.DB, maxAge string) error {
+	log.Info().Msg("List of old Advisor ratings begin")
+	rows, err := connection.Query(selectOldAdvisorRatings, maxAge)
+	if err != nil {
+		return err
+	}
+
+	// used to compute a real record age
+	now := time.Now()
+
+	// reports count
+	count := 0
+
+	// iterate over all old records
+	for rows.Next() {
+		var (
+			orgID         string
+			ruleFQDN      string
+			errorKey      string
+			ruleID        string
+			rating        int
+			lastUpdatedAt time.Time
+		)
+
+		// read one old record from the report table
+		if err := rows.Scan(&orgID, &ruleFQDN, &errorKey, &ruleID, &rating, &lastUpdatedAt); err != nil {
+			// close the result set in case of any error
+			if closeErr := rows.Close(); closeErr != nil {
+				log.Error().Err(closeErr).Msg(unableToCloseDBRowsHandle)
+			}
+			return err
+		}
+
+		// compute the real error age
+		age := int(math.Ceil(now.Sub(lastUpdatedAt).Hours() / 24)) // in days
+
+		// prepare for the report
+		lastUpdatedAtF := lastUpdatedAt.Format(time.RFC3339)
+
+		// just print the report
+		log.Info().
+			Str("organization", orgID).
+			Str("rule FQDN", ruleFQDN).
+			Str("error key", errorKey).
+			Int("rating", rating).
+			Str("updated at", lastUpdatedAtF).
+			Int("age", age).
+			Msg("Old Advisor rating")
+		count++
+	}
+	log.Info().Int("ratings count", count).Msg("List of old Advisor ratings end")
 	return nil
 }
 
