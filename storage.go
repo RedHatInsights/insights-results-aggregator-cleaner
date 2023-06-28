@@ -63,6 +63,15 @@ const (
 	writeToFileMsg = "Write to file"
 )
 
+// SQL commands
+const (
+	selectOldReports = `
+	    SELECT cluster, reported_at, last_checked_at
+	      FROM report
+	     WHERE reported_at < NOW() - $1::INTERVAL
+	     ORDER BY reported_at`
+)
+
 // initDatabaseConnection initializes driver, checks if it's supported and
 // initializes connection to the storage.
 func initDatabaseConnection(configuration *StorageConfiguration) (*sql.DB, error) {
@@ -304,8 +313,7 @@ func displayAllOldRecords(connection *sql.DB, maxAge, output string) error {
 // performListOfOldReports read and displays old records read from reported_at
 // table
 func performListOfOldReports(connection *sql.DB, maxAge string, writer *bufio.Writer) error {
-	query := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW() - $1::INTERVAL ORDER BY reported_at"
-	rows, err := connection.Query(query, maxAge)
+	rows, err := connection.Query(selectOldReports, maxAge)
 	if err != nil {
 		return err
 	}
