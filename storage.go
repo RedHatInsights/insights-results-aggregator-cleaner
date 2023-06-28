@@ -343,175 +343,184 @@ func displayAllOldRecords(connection *sql.DB, maxAge, output string) error {
 	return nil
 }
 
-// performListOfOldReports read and displays old records read from reported_at
-// table
-func performListOfOldReports(connection *sql.DB, maxAge string, writer *bufio.Writer) error {
-	log.Info().Msg("List of old reports begin")
-	rows, err := connection.Query(selectOldReports, maxAge)
+func listOldDatabaseRecords(connection *sql.DB, maxAge string,
+	writer *bufio.Writer, query string,
+	logEntry string, countLogEntry string,
+	callback func(rows *sql.Rows, writer *bufio.Writer) (int, error)) error {
+
+	log.Info().Msg(logEntry + " begin")
+	rows, err := connection.Query(query, maxAge)
 	if err != nil {
 		return err
 	}
 
-	// used to compute a real record age
-	now := time.Now()
-
-	// reports count
-	count := 0
-
-	// iterate over all old records
-	for rows.Next() {
-		var (
-			clusterName string
-			reported    time.Time
-			lastChecked time.Time
-		)
-
-		// read one old record from the report table
-		if err := rows.Scan(&clusterName, &reported, &lastChecked); err != nil {
-			// close the result set in case of any error
-			if closeErr := rows.Close(); closeErr != nil {
-				log.Error().Err(closeErr).Msg(unableToCloseDBRowsHandle)
-			}
-			return err
-		}
-
-		// compute the real record age
-		age := int(math.Ceil(now.Sub(reported).Hours() / 24)) // in days
-
-		// prepare for the report
-		reportedF := reported.Format(time.RFC3339)
-		lastCheckedF := lastChecked.Format(time.RFC3339)
-
-		// just print the report
-		log.Info().Str(clusterNameMsg, clusterName).
-			Str("reported", reportedF).
-			Str("lastChecked", lastCheckedF).
-			Int("age", age).
-			Msg("Old report")
-
-		if writer != nil {
-			_, err := fmt.Fprintf(writer, "%s,%s,%s,%d\n", clusterName, reportedF, lastCheckedF, age)
-			if err != nil {
-				log.Error().Err(err).Msg(writeToFileMsg)
-			}
-		}
-		count++
+	count, err := callback(rows, writer)
+	if err != nil {
+		log.Error().Err(err).Msg("Query error")
+		return err
 	}
-	log.Info().Int("reports count", count).Msg("List of old reports end")
+
+	log.Info().Int(countLogEntry, count).Msg(logEntry + " end")
 	return nil
+}
+
+// performListOfOldReports read and displays old records read from reported_at
+// table
+func performListOfOldReports(connection *sql.DB, maxAge string, writer *bufio.Writer) error {
+	return listOldDatabaseRecords(connection, maxAge, writer, selectOldReports, "List of old reports", "reports count",
+		func(rows *sql.Rows, writer *bufio.Writer) (int, error) {
+			// used to compute a real record age
+			now := time.Now()
+
+			// reports count
+			count := 0
+
+			// iterate over all old records
+			for rows.Next() {
+				var (
+					clusterName string
+					reported    time.Time
+					lastChecked time.Time
+				)
+
+				// read one old record from the report table
+				if err := rows.Scan(&clusterName, &reported, &lastChecked); err != nil {
+					// close the result set in case of any error
+					if closeErr := rows.Close(); closeErr != nil {
+						log.Error().Err(closeErr).Msg(unableToCloseDBRowsHandle)
+					}
+					return count, err
+				}
+
+				// compute the real record age
+				age := int(math.Ceil(now.Sub(reported).Hours() / 24)) // in days
+
+				// prepare for the report
+				reportedF := reported.Format(time.RFC3339)
+				lastCheckedF := lastChecked.Format(time.RFC3339)
+
+				// just print the report
+				log.Info().Str(clusterNameMsg, clusterName).
+					Str("reported", reportedF).
+					Str("lastChecked", lastCheckedF).
+					Int("age", age).
+					Msg("Old report")
+
+				if writer != nil {
+					_, err := fmt.Fprintf(writer, "%s,%s,%s,%d\n", clusterName, reportedF, lastCheckedF, age)
+					if err != nil {
+						log.Error().Err(err).Msg(writeToFileMsg)
+					}
+				}
+				count++
+			}
+			return count, nil
+		})
 }
 
 // performListOfOldRatings read and displays old Advisor ratings read from
 // advisor_ratings table
 func performListOfOldRatings(connection *sql.DB, maxAge string) error {
-	log.Info().Msg("List of old Advisor ratings begin")
-	rows, err := connection.Query(selectOldAdvisorRatings, maxAge)
-	if err != nil {
-		return err
-	}
+	return listOldDatabaseRecords(connection, maxAge, nil, selectOldAdvisorRatings, "List of old Advisor ratings", "ratings count",
+		func(rows *sql.Rows, writer *bufio.Writer) (int, error) {
+			// used to compute a real record age
+			now := time.Now()
 
-	// used to compute a real record age
-	now := time.Now()
+			// reports count
+			count := 0
 
-	// reports count
-	count := 0
+			// iterate over all old records
+			for rows.Next() {
+				var (
+					orgID         string
+					ruleFQDN      string
+					errorKey      string
+					ruleID        string
+					rating        int
+					lastUpdatedAt time.Time
+				)
 
-	// iterate over all old records
-	for rows.Next() {
-		var (
-			orgID         string
-			ruleFQDN      string
-			errorKey      string
-			ruleID        string
-			rating        int
-			lastUpdatedAt time.Time
-		)
+				// read one old record from the report table
+				if err := rows.Scan(&orgID, &ruleFQDN, &errorKey, &ruleID, &rating, &lastUpdatedAt); err != nil {
+					// close the result set in case of any error
+					if closeErr := rows.Close(); closeErr != nil {
+						log.Error().Err(closeErr).Msg(unableToCloseDBRowsHandle)
+					}
+					return count, err
+				}
 
-		// read one old record from the report table
-		if err := rows.Scan(&orgID, &ruleFQDN, &errorKey, &ruleID, &rating, &lastUpdatedAt); err != nil {
-			// close the result set in case of any error
-			if closeErr := rows.Close(); closeErr != nil {
-				log.Error().Err(closeErr).Msg(unableToCloseDBRowsHandle)
+				// compute the real error age
+				age := int(math.Ceil(now.Sub(lastUpdatedAt).Hours() / 24)) // in days
+
+				// prepare for the report
+				lastUpdatedAtF := lastUpdatedAt.Format(time.RFC3339)
+
+				// just print the report
+				log.Info().
+					Str("organization", orgID).
+					Str("rule FQDN", ruleFQDN).
+					Str("error key", errorKey).
+					Int("rating", rating).
+					Str("updated at", lastUpdatedAtF).
+					Int("age", age).
+					Msg("Old Advisor rating")
+				count++
 			}
-			return err
-		}
-
-		// compute the real error age
-		age := int(math.Ceil(now.Sub(lastUpdatedAt).Hours() / 24)) // in days
-
-		// prepare for the report
-		lastUpdatedAtF := lastUpdatedAt.Format(time.RFC3339)
-
-		// just print the report
-		log.Info().
-			Str("organization", orgID).
-			Str("rule FQDN", ruleFQDN).
-			Str("error key", errorKey).
-			Int("rating", rating).
-			Str("updated at", lastUpdatedAtF).
-			Int("age", age).
-			Msg("Old Advisor rating")
-		count++
-	}
-	log.Info().Int("ratings count", count).Msg("List of old Advisor ratings end")
-	return nil
+			return count, nil
+		})
 }
 
 // performListOfOldConsumerErrors read and displays consumer errors stored in
 // consumer_errors table
 func performListOfOldConsumerErrors(connection *sql.DB, maxAge string) error {
-	log.Info().Msg("List of old consumer errors begin")
-	rows, err := connection.Query(selectOldConsumerErrors, maxAge)
-	if err != nil {
-		return err
-	}
+	return listOldDatabaseRecords(connection, maxAge, nil, selectOldConsumerErrors, "List of old consumer errors", "errors count",
+		func(rows *sql.Rows, writer *bufio.Writer) (int, error) {
+			// used to compute a real record age
+			now := time.Now()
 
-	// used to compute a real record age
-	now := time.Now()
+			// reports count
+			count := 0
 
-	// reports count
-	count := 0
+			// iterate over all old records
+			for rows.Next() {
+				var (
+					topic      string
+					partition  int
+					offset     int
+					key        string
+					consumedAt time.Time
+					message    string
+				)
 
-	// iterate over all old records
-	for rows.Next() {
-		var (
-			topic      string
-			partition  int
-			offset     int
-			key        string
-			consumedAt time.Time
-			message    string
-		)
+				// read one old record from the report table
+				if err := rows.Scan(&topic, &partition, &offset, &key, &consumedAt, &message); err != nil {
+					// close the result set in case of any error
+					if closeErr := rows.Close(); closeErr != nil {
+						log.Error().Err(closeErr).Msg(unableToCloseDBRowsHandle)
+					}
+					return count, err
+				}
 
-		// read one old record from the report table
-		if err := rows.Scan(&topic, &partition, &offset, &key, &consumedAt, &message); err != nil {
-			// close the result set in case of any error
-			if closeErr := rows.Close(); closeErr != nil {
-				log.Error().Err(closeErr).Msg(unableToCloseDBRowsHandle)
+				// compute the real error age
+				age := int(math.Ceil(now.Sub(consumedAt).Hours() / 24)) // in days
+
+				// prepare for the report
+				consumedF := consumedAt.Format(time.RFC3339)
+
+				// just print the report
+				log.Info().
+					Str("topic", topic).
+					Int("partition", partition).
+					Int("offset", offset).
+					Str("key", key).
+					Str("message", message).
+					Str("consumed", consumedF).
+					Int("age", age).
+					Msg("Old consumer error")
+				count++
 			}
-			return err
-		}
-
-		// compute the real error age
-		age := int(math.Ceil(now.Sub(consumedAt).Hours() / 24)) // in days
-
-		// prepare for the report
-		consumedF := consumedAt.Format(time.RFC3339)
-
-		// just print the report
-		log.Info().
-			Str("topic", topic).
-			Int("partition", partition).
-			Int("offset", offset).
-			Str("key", key).
-			Str("message", message).
-			Str("consumed", consumedF).
-			Int("age", age).
-			Msg("Old consumer error")
-		count++
-	}
-	log.Info().Int("errors count", count).Msg("List of old consumer errors end")
-	return nil
+			return count, nil
+		})
 }
 
 // deleteRecordFromTable function deletes selected records (identified by
