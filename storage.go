@@ -70,6 +70,18 @@ const (
 	      FROM report
 	     WHERE reported_at < NOW() - $1::INTERVAL
 	     ORDER BY reported_at`
+
+	selectOldAdvisorRatings = `
+	    SELECT org_id, rule_fqdn, error_key, rule_id, rating, last_updated_at
+	      FROM advisor_ratings
+	     WHERE last_updated_at < NOW() - $1::INTERVAL
+	     ORDER BY last_updated_at`
+
+	selectOldConsumerErrors = `
+	    SELECT topic, partition, topic_offset, key, consumed_at, message
+	      FROM consumer_error
+	     WHERE consumed_at < NOW() - $1::INTERVAL
+	     ORDER BY consumed_at`
 )
 
 // initDatabaseConnection initializes driver, checks if it's supported and
@@ -321,6 +333,14 @@ func displayAllOldRecords(connection *sql.DB, maxAge, output string) error {
 		return err
 	}
 
+	// also but we might be interested in other consumer errors
+	err = performListOfOldConsumerErrors(connection, maxAge)
+	// skip next operation on first error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // performListOfOldReports read and displays old records read from reported_at
@@ -434,6 +454,63 @@ func performListOfOldRatings(connection *sql.DB, maxAge string) error {
 		count++
 	}
 	log.Info().Int("ratings count", count).Msg("List of old Advisor ratings end")
+	return nil
+}
+
+// performListOfOldConsumerErrors read and displays consumer errors stored in
+// consumer_errors table
+func performListOfOldConsumerErrors(connection *sql.DB, maxAge string) error {
+	log.Info().Msg("List of old consumer errors begin")
+	rows, err := connection.Query(selectOldConsumerErrors, maxAge)
+	if err != nil {
+		return err
+	}
+
+	// used to compute a real record age
+	now := time.Now()
+
+	// reports count
+	count := 0
+
+	// iterate over all old records
+	for rows.Next() {
+		var (
+			topic      string
+			partition  int
+			offset     int
+			key        string
+			consumedAt time.Time
+			message    string
+		)
+
+		// read one old record from the report table
+		if err := rows.Scan(&topic, &partition, &offset, &key, &consumedAt, &message); err != nil {
+			// close the result set in case of any error
+			if closeErr := rows.Close(); closeErr != nil {
+				log.Error().Err(closeErr).Msg(unableToCloseDBRowsHandle)
+			}
+			return err
+		}
+
+		// compute the real error age
+		age := int(math.Ceil(now.Sub(consumedAt).Hours() / 24)) // in days
+
+		// prepare for the report
+		consumedF := consumedAt.Format(time.RFC3339)
+
+		// just print the report
+		log.Info().
+			Str("topic", topic).
+			Int("partition", partition).
+			Int("offset", offset).
+			Str("key", key).
+			Str("message", message).
+			Str("consumed", consumedF).
+			Int("age", age).
+			Msg("Old consumer error")
+		count++
+	}
+	log.Info().Int("errors count", count).Msg("List of old consumer errors end")
 	return nil
 }
 
