@@ -313,6 +313,7 @@ func displayAllOldRecords(connection *sql.DB, maxAge, output string) error {
 // performListOfOldReports read and displays old records read from reported_at
 // table
 func performListOfOldReports(connection *sql.DB, maxAge string, writer *bufio.Writer) error {
+	log.Info().Msg("List of old reports begin")
 	rows, err := connection.Query(selectOldReports, maxAge)
 	if err != nil {
 		return err
@@ -320,6 +321,9 @@ func performListOfOldReports(connection *sql.DB, maxAge string, writer *bufio.Wr
 
 	// used to compute a real record age
 	now := time.Now()
+
+	// reports count
+	count := 0
 
 	// iterate over all old records
 	for rows.Next() {
@@ -358,7 +362,9 @@ func performListOfOldReports(connection *sql.DB, maxAge string, writer *bufio.Wr
 				log.Error().Err(err).Msg(writeToFileMsg)
 			}
 		}
+		count++
 	}
+	log.Info().Int("reports count", count).Msg("List of old reports end")
 	return nil
 }
 
