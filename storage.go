@@ -399,6 +399,10 @@ var tablesAndKeys = [...]TableAndKey{
 		TableName: "recommendation",
 		KeyName:   "cluster_id",
 	},
+	{
+		TableName: "report_info",
+		KeyName:   "cluster_id",
+	},
 	// must be at the end due to constraints
 	{
 		TableName: "report",
