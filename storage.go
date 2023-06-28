@@ -462,7 +462,7 @@ func performListOfOldRatings(connection *sql.DB, maxAge string) error {
 					Str("error key", errorKey).
 					Int("rating", rating).
 					Str("updated at", lastUpdatedAtF).
-					Int("age", age).
+					Int("rating age", age).
 					Msg("Old Advisor rating")
 				count++
 			}
@@ -515,7 +515,7 @@ func performListOfOldConsumerErrors(connection *sql.DB, maxAge string) error {
 					Str("key", key).
 					Str("message", message).
 					Str("consumed", consumedF).
-					Int("age", age).
+					Int("error age", age).
 					Msg("Old consumer error")
 				count++
 			}
