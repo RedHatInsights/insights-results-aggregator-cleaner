@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 Red Hat, Inc.
+Copyright © 2021, 2022, 2023 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -674,9 +674,16 @@ func TestDisplayAllOldRecordsNoOutput(t *testing.T) {
 	updatedAt := time.Now()
 	rows.AddRow(cluster1ID, reportedAt, updatedAt)
 
-	// expected query performed by tested function
-	expectedQuery := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
-	mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
+	// expected queries performed by tested function
+	expectedQuery1 := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
+	mock.ExpectQuery(expectedQuery1).WillReturnRows(rows)
+
+	expectedQuery2 := "SELECT org_id, rule_fqdn, error_key, rule_id, rating, last_updated_at FROM advisor_ratings WHERE last_updated_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY last_updated_at"
+	mock.ExpectQuery(expectedQuery2).WillReturnRows(rows)
+
+	expectedQuery3 := "SELECT topic, partition, topic_offset, key, consumed_at, message FROM consumer_error WHERE consumed_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY consumed_at"
+	mock.ExpectQuery(expectedQuery3).WillReturnRows(rows)
+
 	mock.ExpectClose()
 
 	// call the tested function without filename (stdout)
@@ -706,9 +713,16 @@ func TestDisplayAllOldRecordsFileOutput(t *testing.T) {
 	rows.AddRow(cluster1ID, reportedAt, updatedAt)
 	rows.AddRow(cluster2ID, reportedAt, updatedAt)
 
-	// expected query performed by tested function
-	expectedQuery := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
-	mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
+	// expected queries performed by tested function
+	expectedQuery1 := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
+	mock.ExpectQuery(expectedQuery1).WillReturnRows(rows)
+
+	expectedQuery2 := "SELECT org_id, rule_fqdn, error_key, rule_id, rating, last_updated_at FROM advisor_ratings WHERE last_updated_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY last_updated_at"
+	mock.ExpectQuery(expectedQuery2).WillReturnRows(rows)
+
+	expectedQuery3 := "SELECT topic, partition, topic_offset, key, consumed_at, message FROM consumer_error WHERE consumed_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY consumed_at"
+	mock.ExpectQuery(expectedQuery3).WillReturnRows(rows)
+
 	mock.ExpectClose()
 
 	// call the tested function without filename (stdout)
@@ -771,9 +785,16 @@ func TestDisplayAllOldRecordsWithFileError(t *testing.T) {
 	updatedAt := time.Now()
 	rows.AddRow(cluster1ID, reportedAt, updatedAt)
 
-	// expected query performed by tested function
-	expectedQuery := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
-	mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
+	// expected queries performed by tested function
+	expectedQuery1 := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
+	mock.ExpectQuery(expectedQuery1).WillReturnRows(rows)
+
+	expectedQuery2 := "SELECT org_id, rule_fqdn, error_key, rule_id, rating, last_updated_at FROM advisor_ratings WHERE last_updated_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY last_updated_at"
+	mock.ExpectQuery(expectedQuery2).WillReturnRows(rows)
+
+	expectedQuery3 := "SELECT topic, partition, topic_offset, key, consumed_at, message FROM consumer_error WHERE consumed_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY consumed_at"
+	mock.ExpectQuery(expectedQuery3).WillReturnRows(rows)
+
 	mock.ExpectClose()
 
 	// call the tested function with invalid filename ("/")
