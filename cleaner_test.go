@@ -251,6 +251,24 @@ func TestReadClusterListNoFile(t *testing.T) {
 	assert.Error(t, err)
 }
 
+// TestReadClusterListCLICase1 checks the function readClusterList from
+// cleaner.go using provided CLI arguments
+func TestReadClusterListCLICase1(t *testing.T) {
+	// just one cluster name is specified on CLI
+	input := "5d5892d4-1f74-4ccf-91af-548dfc9767aa"
+	clusterList, improperClusterCount, err := main.ReadClusterList("tests/cluster_list.txt", input)
+
+	// input is correct - no errors should be thrown
+	assert.NoError(t, err)
+
+	// check returned content
+	assert.Equal(t, improperClusterCount, 0)
+	assert.Len(t, clusterList, 1)
+
+	// finally check actual cluster names (only one name expected)
+	assert.Contains(t, clusterList, main.ClusterName(input))
+}
+
 // TestReadClusterListFromFile checks the function readClusterListFromFile from
 // cleaner.go using correct cluster list file with 5 correct clusters and 3
 // incorrect clusters.
