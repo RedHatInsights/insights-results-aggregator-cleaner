@@ -219,6 +219,108 @@ func TestDoSelectedOperationShowConfiguration(t *testing.T) {
 	assert.Contains(t, output, "Records max age")
 }
 
+// TestReadClusterList checks the function readClusterList from
+// cleaner.go using correct cluster list file
+func TestReadClusterList(t *testing.T) {
+	// cluster list file with 8 clusters in total:
+	// 5 correct cluster names
+	// 3 incorrect cluster names
+	clusterList, improperClusterCount, err := main.ReadClusterList("tests/cluster_list.txt", "")
+
+	// file is correct - no errors should be thrown
+	assert.NoError(t, err)
+
+	// check returned content
+	assert.Equal(t, improperClusterCount, 3)
+	assert.Len(t, clusterList, 5)
+
+	// finally check actual cluster names
+	assert.Contains(t, clusterList, main.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767aa"))
+	assert.Contains(t, clusterList, main.ClusterName("55d892d4-1f74-4ccf-91af-548dfc9767aa"))
+	assert.Contains(t, clusterList, main.ClusterName("5d5892d3-1f74-4ccf-91af-548dfc9767bb"))
+	assert.Contains(t, clusterList, main.ClusterName("00000000-0000-0000-0000-000000000000"))
+	assert.Contains(t, clusterList, main.ClusterName("11111111-1111-1111-1111-111111111111"))
+}
+
+// TestReadClusterListNoFile checks the function readClusterList from
+// cleaner.go in case the cluster list file does not exists
+func TestReadClusterListNoFile(t *testing.T) {
+	_, _, err := main.ReadClusterListFromFile("tests/this_does_not_exists.txt")
+
+	// in this case we expect error to be thrown
+	assert.Error(t, err)
+}
+
+// TestReadClusterListCLICase1 checks the function readClusterList from
+// cleaner.go using provided CLI arguments
+func TestReadClusterListCLICase1(t *testing.T) {
+	// just one cluster name is specified on CLI
+	input := "5d5892d4-1f74-4ccf-91af-548dfc9767aa"
+	clusterList, improperClusterCount, err := main.ReadClusterList("tests/cluster_list.txt", input)
+
+	// input is correct - no errors should be thrown
+	assert.NoError(t, err)
+
+	// check returned content
+	assert.Equal(t, improperClusterCount, 0)
+	assert.Len(t, clusterList, 1)
+
+	// finally check actual cluster names (only one name expected)
+	assert.Contains(t, clusterList, main.ClusterName(input))
+}
+
+// TestReadClusterList checks the function readClusterList from
+// cleaner.go using provided CLI arguments
+func TestReadClusterListCLICase2(t *testing.T) {
+	// two cluster names are specified on CLI
+	input := "5d5892d4-1f74-4ccf-91af-548dfc9767aa,ffffffff-1f74-4ccf-91af-548dfc9767aa"
+
+	// input is correct - no errors should be thrown
+	clusterList, improperClusterCount, err := main.ReadClusterList("tests/cluster_list.txt", input)
+
+	// both cluster names are correct
+	assert.NoError(t, err)
+
+	// check returned content
+	assert.Equal(t, improperClusterCount, 0)
+	assert.Len(t, clusterList, 2)
+
+	// finally check actual cluster names
+	assert.Contains(t, clusterList, main.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767aa"))
+	assert.Contains(t, clusterList, main.ClusterName("ffffffff-1f74-4ccf-91af-548dfc9767aa"))
+}
+
+// TestReadClusterList checks the function readClusterList from
+// cleaner.go using provided CLI arguments
+func TestReadClusterListCLICase3(t *testing.T) {
+	input := "5d5892d4-1f74-4ccf-91af-548dfc9767aa,this-is-not-correct"
+	clusterList, improperClusterCount, err := main.ReadClusterList("tests/cluster_list.txt", input)
+
+	// just the first cluster name is correct
+	assert.NoError(t, err)
+
+	// check returned content
+	assert.Equal(t, improperClusterCount, 1)
+	assert.Len(t, clusterList, 1)
+
+	// finally check actual cluster names (just one correct cluster name is expected)
+	assert.Contains(t, clusterList, main.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767aa"))
+}
+
+// TestReadClusterList checks the function readClusterList from
+// cleaner.go using provided CLI arguments
+func TestReadClusterListCLICase4(t *testing.T) {
+	input := "this-is-not-correct,this-also-is-not-correct"
+	clusterList, improperClusterCount, err := main.ReadClusterList("tests/cluster_list.txt", input)
+
+	// both cluster names are incorrect, but the whole algorithm does not throw an error
+	assert.NoError(t, err)
+
+	// check returned content
+	assert.Equal(t, improperClusterCount, 2)
+	assert.Len(t, clusterList, 0)
+}
+
 // TestReadClusterListFromFile checks the function readClusterListFromFile from
 // cleaner.go using correct cluster list file with 5 correct clusters and 3
 // incorrect clusters.
