@@ -342,3 +342,21 @@ func TestReadClusterListFromCLIArgumentTwoClusters(t *testing.T) {
 	assert.Contains(t, clusterList, main.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767aa"))
 	assert.Contains(t, clusterList, main.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767bb"))
 }
+
+// TestReadClusterListFromCLIArgumentImproperCluster check the function
+// readClusterListFromCLIArgument from cleaner.go
+func TestReadClusterListFromCLIArgumentImproperCluster(t *testing.T) {
+	// first cluster is correct, second one incorrect
+	input := "5d5892d4-1f74-4ccf-91af-548dfc9767aa,foo-bar-baz"
+	clusterList, improperClusterCount, err := main.ReadClusterListFromCLIArgument(input)
+
+	// no error should be thrown
+	assert.NoError(t, err)
+
+	// check returned content
+	assert.Equal(t, improperClusterCount, 1)
+	assert.Len(t, clusterList, 1)
+
+	// finally check actual cluster names (just one correct cluster name is expected)
+	assert.Contains(t, clusterList, main.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767aa"))
+}
