@@ -242,3 +242,13 @@ func TestReadClusterListFromFile(t *testing.T) {
 	assert.Contains(t, clusterList, main.ClusterName("00000000-0000-0000-0000-000000000000"))
 	assert.Contains(t, clusterList, main.ClusterName("11111111-1111-1111-1111-111111111111"))
 }
+
+// TestReadClusterListFromFileNoFile checks the function
+// readClusterListFromFile from cleaner.go in case the cluster list file does
+// not exists
+func TestReadClusterListFromFileNoFile(t *testing.T) {
+	_, _, err := main.ReadClusterListFromFile("tests/this_does_not_exists.txt")
+
+	// file does not exist -> error should be thrown
+	assert.Error(t, err)
+}
