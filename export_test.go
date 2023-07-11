@@ -1,5 +1,5 @@
 /*
-Copyright © 2021, 2022 Red Hat, Inc.
+Copyright © 2021, 2022, 2023 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -42,9 +42,10 @@ var (
 	PerformVacuumDB                   = performVacuumDB
 	FillInDatabaseByTestData          = fillInDatabaseByTestData
 
-	// functions from the ccx_notification_writer.go source file
-	ShowVersion         = showVersion
-	ShowAuthors         = showAuthors
-	ShowConfiguration   = showConfiguration
-	DoSelectedOperation = doSelectedOperation
+	// functions from the cleaner.go source file
+	ShowVersion             = showVersion
+	ShowAuthors             = showAuthors
+	ShowConfiguration       = showConfiguration
+	DoSelectedOperation     = doSelectedOperation
+	ReadClusterListFromFile = readClusterListFromFile
 )

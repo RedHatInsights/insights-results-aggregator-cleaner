@@ -218,3 +218,63 @@ func TestDoSelectedOperationShowConfiguration(t *testing.T) {
 	assert.Contains(t, output, "Level")
 	assert.Contains(t, output, "Records max age")
 }
+
+// TestReadClusterListFromFile checks the function readClusterListFromFile from
+// cleaner.go using correct cluster list file with 5 correct clusters and 3
+// incorrect clusters.
+func TestReadClusterListFromFile(t *testing.T) {
+	// cluster list file with 8 clusters in total:
+	// 5 correct cluster names
+	// 3 incorrect cluster names
+	clusterList, improperClusterCount, err := main.ReadClusterListFromFile("tests/cluster_list.txt")
+
+	// file is correct - no errors should be thrown
+	assert.NoError(t, err)
+
+	// check returned content
+	assert.Equal(t, improperClusterCount, 3)
+	assert.Len(t, clusterList, 5)
+
+	// finally check actual cluster names
+	assert.Contains(t, clusterList, main.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767aa"))
+	assert.Contains(t, clusterList, main.ClusterName("55d892d4-1f74-4ccf-91af-548dfc9767aa"))
+	assert.Contains(t, clusterList, main.ClusterName("5d5892d3-1f74-4ccf-91af-548dfc9767bb"))
+	assert.Contains(t, clusterList, main.ClusterName("00000000-0000-0000-0000-000000000000"))
+	assert.Contains(t, clusterList, main.ClusterName("11111111-1111-1111-1111-111111111111"))
+}
+
+// TestReadClusterListFromFileNoFile checks the function
+// readClusterListFromFile from cleaner.go in case the cluster list file does
+// not exists
+func TestReadClusterListFromFileNoFile(t *testing.T) {
+	_, _, err := main.ReadClusterListFromFile("tests/this_does_not_exists.txt")
+
+	// file does not exist -> error should be thrown
+	assert.Error(t, err)
+}
+
+// TestReadClusterListFromFileEmptyFile checks the function
+// readClusterListFromFile from cleaner.go in case the special /dev/null file is to be read
+func TestReadClusterListFromFileEmptyFile(t *testing.T) {
+	clusterList, improperClusterCount, err := main.ReadClusterListFromFile("tests/empty_cluster_list.txt")
+
+	// it's empty so no error should be reported
+	assert.NoError(t, err)
+
+	// and the content should be empty
+	assert.Equal(t, improperClusterCount, 0)
+	assert.Len(t, clusterList, 0)
+}
+
+// TestReadClusterListFromFileNullFile checks the function
+// readClusterListFromFile from cleaner.go in case the special /dev/null file is to be read
+func TestReadClusterListFromFileNullFile(t *testing.T) {
+	clusterList, improperClusterCount, err := main.ReadClusterListFromFile("/dev/null")
+
+	// it's empty so no error should be reported
+	assert.NoError(t, err)
+
+	// and the content should be empty
+	assert.Equal(t, improperClusterCount, 0)
+	assert.Len(t, clusterList, 0)
+}
