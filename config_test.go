@@ -24,6 +24,8 @@ import (
 
 	"testing"
 
+	clowder "github.com/redhatinsights/app-common-go/pkg/api/v1"
+
 	"github.com/RedHatInsights/insights-operator-utils/tests/helpers"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
@@ -35,6 +37,8 @@ func init() {
 	zerolog.SetGlobalLevel(zerolog.WarnLevel)
 }
 
+// mustLoadConfiguration function loads configuration file or the actual test
+// will fail
 func mustLoadConfiguration(envVar string) {
 	_, err := main.LoadConfiguration(envVar, "tests/config1")
 	if err != nil {
@@ -42,12 +46,15 @@ func mustLoadConfiguration(envVar string) {
 	}
 }
 
+// mustSetEnv function set specified environment variable or the actual test
+// will fail
 func mustSetEnv(t *testing.T, key, val string) {
 	err := os.Setenv(key, val)
 	helpers.FailOnError(t, err)
 }
 
-// TestLoadDefaultConfiguration loads a configuration file for testing
+// TestLoadDefaultConfiguration test loads a configuration file for testing
+// with check that load was correct
 func TestLoadDefaultConfiguration(t *testing.T) {
 	os.Clearenv()
 	mustLoadConfiguration("nonExistingEnvVar")
@@ -150,9 +157,20 @@ func TestLoadLoggingConfiguration(t *testing.T) {
 // file for testing from an environment variable. Clowder config is enabled in
 // this case.
 func TestLoadConfigurationFromEnvVariableClowderEnabled(t *testing.T) {
+	var testDB = "test_db"
 	os.Clearenv()
 
+	clowder.LoadedConfig = &clowder.AppConfig{
+		Database: &clowder.DatabaseConfig{
+			Name: testDB,
+		},
+	}
 	mustSetEnv(t, "INSIGHTS_RESULTS_CLEANER_CONFIG_FILE", "tests/config2")
 	mustSetEnv(t, "ACG_CONFIG", "tests/clowder_config.json")
-	mustLoadConfiguration("INSIGHTS_RESULTS_CLEANER_CONFIG_FILE")
+	config, err := main.LoadConfiguration("INSIGHTS_RESULTS_CLEANER_CONFIG_FILE", "tests/config1")
+	assert.NoError(t, err)
+
+	// check loaded configuration
+	dbCfg := main.GetStorageConfiguration(&config)
+	assert.Equal(t, testDB, dbCfg.PGDBName)
 }
