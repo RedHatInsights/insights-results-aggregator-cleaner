@@ -47,6 +47,7 @@ var (
 	ShowAuthors                    = showAuthors
 	ShowConfiguration              = showConfiguration
 	DoSelectedOperation            = doSelectedOperation
+	ReadClusterList                = readClusterList
 	ReadClusterListFromFile        = readClusterListFromFile
 	ReadClusterListFromCLIArgument = readClusterListFromCLIArgument
 )
