@@ -278,3 +278,16 @@ func TestReadClusterListFromFileNullFile(t *testing.T) {
 	assert.Equal(t, improperClusterCount, 0)
 	assert.Len(t, clusterList, 0)
 }
+
+// TestReadClusterListFromCLIArgumentEmptyInput check the function
+// readClusterListFromCLIArgument from cleaner.go
+func TestReadClusterListFromCLIArgumentEmptyInput(t *testing.T) {
+	clusterList, improperClusterCount, err := main.ReadClusterListFromCLIArgument("")
+
+	// it's empty so no error should be reported
+	assert.NoError(t, err)
+
+	// check returned content
+	assert.Equal(t, improperClusterCount, 1)
+	assert.Len(t, clusterList, 0)
+}
