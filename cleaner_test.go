@@ -265,3 +265,16 @@ func TestReadClusterListFromFileEmptyFile(t *testing.T) {
 	assert.Equal(t, improperClusterCount, 0)
 	assert.Len(t, clusterList, 0)
 }
+
+// TestReadClusterListFromFileNullFile checks the function
+// readClusterListFromFile from cleaner.go in case the special /dev/null file is to be read
+func TestReadClusterListFromFileNullFile(t *testing.T) {
+	clusterList, improperClusterCount, err := main.ReadClusterListFromFile("/dev/null")
+
+	// it's empty so no error should be reported
+	assert.NoError(t, err)
+
+	// and the content should be empty
+	assert.Equal(t, improperClusterCount, 0)
+	assert.Len(t, clusterList, 0)
+}
