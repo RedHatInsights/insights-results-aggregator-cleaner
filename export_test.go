@@ -43,9 +43,10 @@ var (
 	FillInDatabaseByTestData          = fillInDatabaseByTestData
 
 	// functions from the cleaner.go source file
-	ShowVersion             = showVersion
-	ShowAuthors             = showAuthors
-	ShowConfiguration       = showConfiguration
-	DoSelectedOperation     = doSelectedOperation
-	ReadClusterListFromFile = readClusterListFromFile
+	ShowVersion                    = showVersion
+	ShowAuthors                    = showAuthors
+	ShowConfiguration              = showConfiguration
+	DoSelectedOperation            = doSelectedOperation
+	ReadClusterListFromFile        = readClusterListFromFile
+	ReadClusterListFromCLIArgument = readClusterListFromCLIArgument
 )
