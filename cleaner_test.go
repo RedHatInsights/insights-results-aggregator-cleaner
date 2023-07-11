@@ -219,6 +219,29 @@ func TestDoSelectedOperationShowConfiguration(t *testing.T) {
 	assert.Contains(t, output, "Records max age")
 }
 
+// TestReadClusterList checks the function readClusterList from
+// cleaner.go using correct cluster list file
+func TestReadClusterList(t *testing.T) {
+	// cluster list file with 8 clusters in total:
+	// 5 correct cluster names
+	// 3 incorrect cluster names
+	clusterList, improperClusterCount, err := main.ReadClusterList("tests/cluster_list.txt", "")
+
+	// file is correct - no errors should be thrown
+	assert.NoError(t, err)
+
+	// check returned content
+	assert.Equal(t, improperClusterCount, 3)
+	assert.Len(t, clusterList, 5)
+
+	// finally check actual cluster names
+	assert.Contains(t, clusterList, main.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767aa"))
+	assert.Contains(t, clusterList, main.ClusterName("55d892d4-1f74-4ccf-91af-548dfc9767aa"))
+	assert.Contains(t, clusterList, main.ClusterName("5d5892d3-1f74-4ccf-91af-548dfc9767bb"))
+	assert.Contains(t, clusterList, main.ClusterName("00000000-0000-0000-0000-000000000000"))
+	assert.Contains(t, clusterList, main.ClusterName("11111111-1111-1111-1111-111111111111"))
+}
+
 // TestReadClusterListFromFile checks the function readClusterListFromFile from
 // cleaner.go using correct cluster list file with 5 correct clusters and 3
 // incorrect clusters.
