@@ -20,6 +20,8 @@ package main_test
 // https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/cleaner_test.html
 
 import (
+	"errors"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
@@ -643,4 +645,61 @@ func TestPrintSummaryTableTwoTablesDeletions(t *testing.T) {
 	if output != expected1 && output != expected2 {
 		t.Error("Unexpected output", output)
 	}
+}
+
+// TestVacuumDBPositiveCase check the function vacuumDB when the DB
+// operation pass without any error
+func TestVacuumDBPositiveCase(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	expectedVacuum := "VACUUM VERBOSE;"
+	mock.ExpectExec(expectedVacuum).WillReturnResult(sqlmock.NewResult(1, 1))
+
+	mock.ExpectClose()
+
+	// call the tested function
+	status, err := main.VacuumDB(connection)
+	assert.NoError(t, err, "error not expected while calling tested function")
+
+	// check the status
+	assert.Equal(t, status, main.ExitStatusOK)
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
+// TestVacuumDBNegativeCase check the function vacuumDB when the DB
+// operation pass without any error
+func TestVacuumDBNegativeCase(t *testing.T) {
+	// error to be thrown
+	mockedError := errors.New("mocked error")
+
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	expectedVacuum := "VACUUM VERBOSE;"
+	mock.ExpectExec(expectedVacuum).WillReturnError(mockedError)
+
+	mock.ExpectClose()
+
+	// call the tested function
+	status, err := main.VacuumDB(connection)
+
+	// error is expected
+	assert.Error(t, err, "error is expected while calling main.vacuumDB")
+
+	// check the status
+	assert.Equal(t, status, main.ExitStatusPerformVacuumError)
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
 }
