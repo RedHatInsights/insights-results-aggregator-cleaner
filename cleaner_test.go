@@ -555,3 +555,38 @@ func TestPrintSummaryTableImproperClusterEntries(t *testing.T) {
 	// check if captured text contains expected summary table
 	assert.Contains(t, output, expected)
 }
+
+// TestPrintSummaryTableOneTableDeletion check the behaviour of function
+// PrintSummaryTable for summary with one deletion in one table.
+func TestPrintSummaryTableOneTableDeletion(t *testing.T) {
+	const expected = `+--------------------------------+-------+
+|            SUMMARY             | COUNT |
++--------------------------------+-------+
+| Proper cluster entries         |     0 |
+| Improper cluster entries       |     0 |
+|                                |       |
+| Deletions from table 'TABLE_X' |     1 |
++--------------------------------+-------+
+|        TOTAL DELETIONS         |   1   |
++--------------------------------+-------+
+`
+
+	deletions := map[string]int{
+		"TABLE_X": 1,
+	}
+	// try to call the tested function and capture its output
+	output, err := capture.StandardOutput(func() {
+		summary := main.Summary{
+			ProperClusterEntries:   0,
+			ImproperClusterEntries: 0,
+			DeletionsForTable:      deletions,
+		}
+		main.PrintSummaryTable(summary)
+	})
+
+	// check the captured text
+	checkCapture(t, err)
+
+	// check if captured text contains expected summary table
+	assert.Contains(t, output, expected)
+}
