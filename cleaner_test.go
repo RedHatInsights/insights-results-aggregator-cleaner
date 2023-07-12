@@ -670,3 +670,34 @@ func TestVacuumDBPositiveCase(t *testing.T) {
 	// check all DB expectactions happened correctly
 	checkAllExpectations(t, mock)
 }
+
+// TestVacuumDBNegativeCase check the function vacuumDB when the DB
+// operation pass without any error
+func TestVacuumDBNegativeCase(t *testing.T) {
+	// error to be thrown
+	mockedError := errors.New("mocked error")
+
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	expectedVacuum := "VACUUM VERBOSE;"
+	mock.ExpectExec(expectedVacuum).WillReturnError(mockedError)
+
+	mock.ExpectClose()
+
+	// call the tested function
+	status, err := main.VacuumDB(connection)
+
+	// error is expected
+	assert.Error(t, err, "error is expected while calling main.vacuumDB")
+
+	// check the status
+	assert.Equal(t, status, main.ExitStatusPerformVacuumError)
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
