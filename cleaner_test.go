@@ -644,3 +644,29 @@ func TestPrintSummaryTableTwoTablesDeletions(t *testing.T) {
 		t.Error("Unexpected output", output)
 	}
 }
+
+// TestVacuumDBPositiveCase check the function vacuumDB when the DB
+// operation pass without any error
+func TestVacuumDBPositiveCase(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	expectedVacuum := "VACUUM VERBOSE;"
+	mock.ExpectExec(expectedVacuum).WillReturnResult(sqlmock.NewResult(1, 1))
+
+	mock.ExpectClose()
+
+	// call the tested function
+	status, err := main.VacuumDB(connection)
+	assert.NoError(t, err, "error not expected while calling tested function")
+
+	// check the status
+	assert.Equal(t, status, main.ExitStatusOK)
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
