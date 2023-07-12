@@ -590,3 +590,57 @@ func TestPrintSummaryTableOneTableDeletion(t *testing.T) {
 	// check if captured text contains expected summary table
 	assert.Contains(t, output, expected)
 }
+
+// TestPrintSummaryTableTwoTablesDeletions check the behaviour of function
+// PrintSummaryTable for summary with multiple deletions in two tables.
+func TestPrintSummaryTableTwoTablesDeletions(t *testing.T) {
+	// we work with map and there is no guarantees which order will be choosen in runtime
+	const expected1 = `+--------------------------------+-------+
+|            SUMMARY             | COUNT |
++--------------------------------+-------+
+| Proper cluster entries         |     0 |
+| Improper cluster entries       |     0 |
+|                                |       |
+| Deletions from table 'TABLE_X' |     1 |
+| Deletions from table 'TABLE_Y' |     2 |
++--------------------------------+-------+
+|        TOTAL DELETIONS         |   3   |
++--------------------------------+-------+
+`
+	const expected2 = `+--------------------------------+-------+
+|            SUMMARY             | COUNT |
++--------------------------------+-------+
+| Proper cluster entries         |     0 |
+| Improper cluster entries       |     0 |
+|                                |       |
+| Deletions from table 'TABLE_Y' |     2 |
+| Deletions from table 'TABLE_X' |     1 |
++--------------------------------+-------+
+|        TOTAL DELETIONS         |   3   |
++--------------------------------+-------+
+`
+
+	deletions := map[string]int{
+		"TABLE_X": 1,
+		"TABLE_Y": 2,
+	}
+	// try to call the tested function and capture its output
+	output, err := capture.StandardOutput(func() {
+		summary := main.Summary{
+			ProperClusterEntries:   0,
+			ImproperClusterEntries: 0,
+			DeletionsForTable:      deletions,
+		}
+		main.PrintSummaryTable(summary)
+	})
+
+	// check the captured text
+	checkCapture(t, err)
+
+	// check if captured text contains expected summary table
+	// again: we work with map and there is no guarantees which order will
+	// be choosen in runtime
+	if output != expected1 && output != expected2 {
+		t.Error("Unexpected output", output)
+	}
+}
