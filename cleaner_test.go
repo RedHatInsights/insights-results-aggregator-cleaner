@@ -20,6 +20,8 @@ package main_test
 // https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/cleaner_test.html
 
 import (
+	"errors"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
