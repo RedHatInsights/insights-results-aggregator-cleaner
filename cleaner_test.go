@@ -462,3 +462,185 @@ func TestReadClusterListFromCLIArgumentImproperCluster(t *testing.T) {
 	// finally check actual cluster names (just one correct cluster name is expected)
 	assert.Contains(t, clusterList, main.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767aa"))
 }
+
+// TestPrintSummaryTableBasicCase check the behaviour of function
+// PrintSummaryTable for summary with zero changes made in database.
+func TestPrintSummaryTableBasicCase(t *testing.T) {
+	const expected = `+--------------------------+-------+
+|         SUMMARY          | COUNT |
++--------------------------+-------+
+| Proper cluster entries   |     0 |
+| Improper cluster entries |     0 |
+|                          |       |
++--------------------------+-------+
+|     TOTAL DELETIONS      |   0   |
++--------------------------+-------+
+`
+
+	// try to call the tested function and capture its output
+	output, err := capture.StandardOutput(func() {
+		summary := main.Summary{
+			ProperClusterEntries:   0,
+			ImproperClusterEntries: 0,
+			DeletionsForTable:      make(map[string]int),
+		}
+		main.PrintSummaryTable(summary)
+	})
+
+	// check the captured text
+	checkCapture(t, err)
+
+	// check if captured text contains expected summary table
+	assert.Contains(t, output, expected)
+}
+
+// TestPrintSummaryTableProperClusterEntries check the behaviour of function
+// PrintSummaryTable for summary with non zero changes made in database.
+func TestPrintSummaryTableProperClusterEntries(t *testing.T) {
+	const expected = `+--------------------------+-------+
+|         SUMMARY          | COUNT |
++--------------------------+-------+
+| Proper cluster entries   |    42 |
+| Improper cluster entries |     0 |
+|                          |       |
++--------------------------+-------+
+|     TOTAL DELETIONS      |   0   |
++--------------------------+-------+
+`
+
+	// try to call the tested function and capture its output
+	output, err := capture.StandardOutput(func() {
+		summary := main.Summary{
+			ProperClusterEntries:   42,
+			ImproperClusterEntries: 0,
+			DeletionsForTable:      make(map[string]int),
+		}
+		main.PrintSummaryTable(summary)
+	})
+
+	// check the captured text
+	checkCapture(t, err)
+
+	// check if captured text contains expected summary table
+	assert.Contains(t, output, expected)
+}
+
+// TestPrintSummaryTableImproperClusterEntries check the behaviour of function
+// PrintSummaryTable for summary with non zero changes made in database.
+func TestPrintSummaryTableImproperClusterEntries(t *testing.T) {
+	const expected = `+--------------------------+-------+
+|         SUMMARY          | COUNT |
++--------------------------+-------+
+| Proper cluster entries   |     0 |
+| Improper cluster entries |    42 |
+|                          |       |
++--------------------------+-------+
+|     TOTAL DELETIONS      |   0   |
++--------------------------+-------+
+`
+
+	// try to call the tested function and capture its output
+	output, err := capture.StandardOutput(func() {
+		summary := main.Summary{
+			ProperClusterEntries:   0,
+			ImproperClusterEntries: 42,
+			DeletionsForTable:      make(map[string]int),
+		}
+		main.PrintSummaryTable(summary)
+	})
+
+	// check the captured text
+	checkCapture(t, err)
+
+	// check if captured text contains expected summary table
+	assert.Contains(t, output, expected)
+}
+
+// TestPrintSummaryTableOneTableDeletion check the behaviour of function
+// PrintSummaryTable for summary with one deletion in one table.
+func TestPrintSummaryTableOneTableDeletion(t *testing.T) {
+	const expected = `+--------------------------------+-------+
+|            SUMMARY             | COUNT |
++--------------------------------+-------+
+| Proper cluster entries         |     0 |
+| Improper cluster entries       |     0 |
+|                                |       |
+| Deletions from table 'TABLE_X' |     1 |
++--------------------------------+-------+
+|        TOTAL DELETIONS         |   1   |
++--------------------------------+-------+
+`
+
+	deletions := map[string]int{
+		"TABLE_X": 1,
+	}
+	// try to call the tested function and capture its output
+	output, err := capture.StandardOutput(func() {
+		summary := main.Summary{
+			ProperClusterEntries:   0,
+			ImproperClusterEntries: 0,
+			DeletionsForTable:      deletions,
+		}
+		main.PrintSummaryTable(summary)
+	})
+
+	// check the captured text
+	checkCapture(t, err)
+
+	// check if captured text contains expected summary table
+	assert.Contains(t, output, expected)
+}
+
+// TestPrintSummaryTableTwoTablesDeletions check the behaviour of function
+// PrintSummaryTable for summary with multiple deletions in two tables.
+func TestPrintSummaryTableTwoTablesDeletions(t *testing.T) {
+	// we work with map and there is no guarantees which order will be choosen in runtime
+	const expected1 = `+--------------------------------+-------+
+|            SUMMARY             | COUNT |
++--------------------------------+-------+
+| Proper cluster entries         |     0 |
+| Improper cluster entries       |     0 |
+|                                |       |
+| Deletions from table 'TABLE_X' |     1 |
+| Deletions from table 'TABLE_Y' |     2 |
++--------------------------------+-------+
+|        TOTAL DELETIONS         |   3   |
++--------------------------------+-------+
+`
+	const expected2 = `+--------------------------------+-------+
+|            SUMMARY             | COUNT |
++--------------------------------+-------+
+| Proper cluster entries         |     0 |
+| Improper cluster entries       |     0 |
+|                                |       |
+| Deletions from table 'TABLE_Y' |     2 |
+| Deletions from table 'TABLE_X' |     1 |
++--------------------------------+-------+
+|        TOTAL DELETIONS         |   3   |
++--------------------------------+-------+
+`
+
+	deletions := map[string]int{
+		"TABLE_X": 1,
+		"TABLE_Y": 2,
+	}
+	// try to call the tested function and capture its output
+	output, err := capture.StandardOutput(func() {
+		summary := main.Summary{
+			ProperClusterEntries:   0,
+			ImproperClusterEntries: 0,
+			DeletionsForTable:      deletions,
+		}
+		main.PrintSummaryTable(summary)
+	})
+
+	// check the captured text
+	checkCapture(t, err)
+
+	// check if captured text contains expected summary table
+	// again: we work with map and there is no guarantees which order will
+	// be choosen in runtime
+	if output != expected1 && output != expected2 {
+		t.Error("Unexpected output", output)
+	}
+}
