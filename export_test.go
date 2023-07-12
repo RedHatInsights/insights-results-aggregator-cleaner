@@ -50,4 +50,5 @@ var (
 	ReadClusterList                = readClusterList
 	ReadClusterListFromFile        = readClusterListFromFile
 	ReadClusterListFromCLIArgument = readClusterListFromCLIArgument
+	VacuumDB                       = vacuumDB
 )
