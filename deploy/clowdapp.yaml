@@ -20,7 +20,7 @@ objects:
         schedule: ${JOB_SCHEDULE}
         restartPolicy: Never
         concurrencyPolicy: Forbid
-        activeDeadlineSeconds: ${DEADLINE_TIMEOUT}
+        activeDeadlineSeconds: ${{DEADLINE_TIMEOUT}}
         podSpec:
           image: ${IMAGE}:${IMAGE_TAG}
           resources:
@@ -93,4 +93,4 @@ parameters:
   value: ccx-data-pipeline-db
 - name: DEADLINE_TIMEOUT
   description: Deadline for the job execution
-  value: 600
+  value: "600"
