@@ -462,3 +462,34 @@ func TestReadClusterListFromCLIArgumentImproperCluster(t *testing.T) {
 	// finally check actual cluster names (just one correct cluster name is expected)
 	assert.Contains(t, clusterList, main.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767aa"))
 }
+
+// TestPrintSummaryTableBasicCase check the behaviour of function
+// PrintSummaryTable for summary with zero changes made in database.
+func TestPrintSummaryTableBasicCase(t *testing.T) {
+	const expected = `+--------------------------+-------+
+|         SUMMARY          | COUNT |
++--------------------------+-------+
+| Proper cluster entries   |     0 |
+| Improper cluster entries |     0 |
+|                          |       |
++--------------------------+-------+
+|     TOTAL DELETIONS      |   0   |
++--------------------------+-------+
+`
+
+	// try to call the tested function and capture its output
+	output, err := capture.StandardOutput(func() {
+		summary := main.Summary{
+			ProperClusterEntries:   0,
+			ImproperClusterEntries: 0,
+			DeletionsForTable:      make(map[string]int),
+		}
+		main.PrintSummaryTable(summary)
+	})
+
+	// check the captured text
+	checkCapture(t, err)
+
+	// check if captured text contains expected summary table
+	assert.Contains(t, output, expected)
+}
