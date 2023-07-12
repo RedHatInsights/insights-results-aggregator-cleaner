@@ -674,7 +674,7 @@ func TestVacuumDBPositiveCase(t *testing.T) {
 }
 
 // TestVacuumDBNegativeCase check the function vacuumDB when the DB
-// operation pass without any error
+// operation pass with an error
 func TestVacuumDBNegativeCase(t *testing.T) {
 	// error to be thrown
 	mockedError := errors.New("mocked error")
@@ -702,4 +702,17 @@ func TestVacuumDBNegativeCase(t *testing.T) {
 
 	// check all DB expectactions happened correctly
 	checkAllExpectations(t, mock)
+}
+
+// TestVacuumDBNoConnection check the function vacuumDB when the
+// connection to DB is not established
+func TestVacuumDBNoConnection(t *testing.T) {
+	// call the tested function
+	status, err := main.VacuumDB(nil)
+
+	// error is expected
+	assert.Error(t, err, "error is expected while calling main.vacuumDB")
+
+	// check the status
+	assert.Equal(t, status, main.ExitStatusPerformVacuumError)
 }
