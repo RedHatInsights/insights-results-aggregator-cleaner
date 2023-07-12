@@ -40,6 +40,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -259,6 +260,13 @@ func PrintSummaryTable(summary Summary) {
 
 // vacuumDB function starts the database vacuuming operation
 func vacuumDB(connection *sql.DB) (int, error) {
+	// connection might be nil when DB init does not finish correctly
+	if connection == nil {
+		const message = "Connection to database was not established"
+		log.Error().Msg(message)
+		return ExitStatusPerformVacuumError, errors.New(message)
+	}
+
 	err := performVacuumDB(connection)
 	if err != nil {
 		log.Err(err).Msg("Performing vacuuming database")
