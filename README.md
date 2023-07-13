@@ -6,6 +6,7 @@
 [![GitHub Pages](https://img.shields.io/badge/%20-GitHub%20Pages-informational)](https://redhatinsights.github.io/insights-results-aggregator-cleaner/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/RedHatInsights/insights-results-aggregator-cleaner)](https://goreportcard.com/report/github.com/RedHatInsights/insights-results-aggregator-cleaner)
 [![Build Status](https://travis-ci.com/RedHatInsights/insights-results-aggregator-cleaner.svg?branch=master)](https://travis-ci.com/RedHatInsights/insights-results-aggregator-cleaner)
+[![codecov](https://codecov.io/gh/RedHatInsights/insights-results-aggregator-cleaner/branch/master/graph/badge.svg)](https://codecov.io/gh/RedHatInsights/insights-results-aggregator-cleaner)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/RedHatInsights/insights-results-aggregator-cleaner)
 [![License](https://img.shields.io/badge/license-Apache-blue)](https://github.com/RedHatInsights/insights-results-aggregator-cleaner/blob/master/LICENSE)
 
