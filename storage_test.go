@@ -1064,3 +1064,20 @@ func TestInitDatabaseWrongDriver(t *testing.T) {
 	assert.Error(t, err, "error is expected while calling tested function")
 	assert.Nil(t, connection, "connection should not be established")
 }
+
+// TestInitDatabaseSQLite3Driver driver checks how initDatabaseConnection function
+// behave if configuration with SQLite3 driver is used
+func TestInitDatabaseSQLite3Driver(t *testing.T) {
+	// properly initialized storage configuration for SQLite3
+	configuration := cleaner.StorageConfiguration{
+		Driver:           "sqlite3",
+		SQLiteDataSource: "/tmp/test.db",
+	}
+
+	// call tested function
+	connection, err := cleaner.InitDatabaseConnection(&configuration)
+
+	// check output from tested function
+	assert.NoError(t, err, "error is not expected while calling tested function")
+	assert.NotNil(t, connection, "connection should be established")
+}
