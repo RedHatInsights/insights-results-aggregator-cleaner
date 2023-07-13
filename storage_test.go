@@ -1048,3 +1048,19 @@ func TestInitDatabaseNoConfiguration(t *testing.T) {
 	assert.Error(t, err, "error is expected while calling tested function")
 	assert.Nil(t, connection, "connection should not be established")
 }
+
+// TestInitDatabaseWrongDriver checks how initDatabaseConnection function
+// behave if configuration with wrong driver is used
+func TestInitDatabaseWrongDriver(t *testing.T) {
+	// not initialized storage configuration
+	configuration := cleaner.StorageConfiguration{
+		Driver: "wrong-one",
+	}
+
+	// call tested function
+	connection, err := cleaner.InitDatabaseConnection(&configuration)
+
+	// check output from tested function
+	assert.Error(t, err, "error is expected while calling tested function")
+	assert.Nil(t, connection, "connection should not be established")
+}
