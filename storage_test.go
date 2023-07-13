@@ -1081,3 +1081,26 @@ func TestInitDatabaseSQLite3Driver(t *testing.T) {
 	assert.NoError(t, err, "error is not expected while calling tested function")
 	assert.NotNil(t, connection, "connection should be established")
 }
+
+// TestInitDatabasePostgreSQLDriver driver checks how initDatabaseConnection function
+// behave if configuration with PostgreSQL driver is used
+func TestInitDatabasePostgreSQLDriver(t *testing.T) {
+	// properly initialized storage configuration for PostgreSQL
+	configuration := cleaner.StorageConfiguration{
+		Driver:     "postgres",
+		PGUsername: "user",
+		PGPassword: "password",
+		PGHost:     "nowhere",
+		PGPort:     1234,
+		PGDBName:   "test",
+		PGParams:   "",
+	}
+
+	// call tested function
+	// (open may just validate its arguments without creating a connection to the database)
+	connection, err := cleaner.InitDatabaseConnection(&configuration)
+
+	// check output from tested function
+	assert.NoError(t, err, "error is not expected while calling tested function")
+	assert.NotNil(t, connection, "connection should be established")
+}
