@@ -41,6 +41,7 @@ var (
 	PerformCleanupInDB                = performCleanupInDB
 	PerformVacuumDB                   = performVacuumDB
 	FillInDatabaseByTestData          = fillInDatabaseByTestData
+	InitDatabaseConnection            = initDatabaseConnection
 
 	// functions from the cleaner.go source file
 	ShowVersion                    = showVersion

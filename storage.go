@@ -88,6 +88,15 @@ const (
 // initDatabaseConnection initializes driver, checks if it's supported and
 // initializes connection to the storage.
 func initDatabaseConnection(configuration *StorageConfiguration) (*sql.DB, error) {
+	// check if storage configuration structure has been initialized and
+	// passed to this function properly
+	if configuration == nil {
+		const message = "StorageConfiguration structure should be provided"
+		err := errors.New(message)
+		log.Error().Msg(message)
+		return nil, err
+	}
+
 	driverName := configuration.Driver
 	dataSource := ""
 	log.Info().Str("driverName", configuration.Driver).Msg("DB connection configuration")
