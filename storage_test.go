@@ -1034,3 +1034,17 @@ func TestPerformCleanupInDBNoConnection(t *testing.T) {
 
 	assert.Error(t, err, "error is expected while calling tested function")
 }
+
+// TestInitDatabaseNoConfiguration checks how initDatabaseConnection function
+// behave if null configuration is used
+func TestInitDatabaseNoConfiguration(t *testing.T) {
+	// not initialized storage configuration
+	var configurationPtr *cleaner.StorageConfiguration = nil
+
+	// call tested function
+	connection, err := cleaner.InitDatabaseConnection(configurationPtr)
+
+	// check output from tested function
+	assert.Error(t, err, "error is expected while calling tested function")
+	assert.Nil(t, connection, "connection should not be established")
+}
