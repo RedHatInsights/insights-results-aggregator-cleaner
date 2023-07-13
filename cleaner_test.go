@@ -716,3 +716,29 @@ func TestVacuumDBNoConnection(t *testing.T) {
 	// check the status
 	assert.Equal(t, status, main.ExitStatusPerformVacuumError)
 }
+
+// TestCleanupNoConnection check the function cleanup when the
+// connection to DB is not established
+func TestCleanupNoConnection(t *testing.T) {
+	// stub for structures needed to call the tested function
+	configuration := main.ConfigStruct{}
+
+	configuration.Cleaner = main.CleanerConfiguration{
+		ClusterListFile: "tests/cluster_list.txt",
+	}
+
+	cliFlags := main.CliFlags{
+		ShowVersion:       false,
+		ShowAuthors:       false,
+		ShowConfiguration: false,
+	}
+
+	// call the tested function
+	status, err := main.Cleanup(&configuration, nil, cliFlags)
+
+	// error is expected
+	assert.Error(t, err, "error is expected while calling main.cleanup")
+
+	// check the status
+	assert.Equal(t, status, main.ExitStatusPerformCleanupError)
+}

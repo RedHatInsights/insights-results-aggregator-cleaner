@@ -1017,3 +1017,20 @@ func TestPerformCleanupInDB(t *testing.T) {
 	// check all DB expectactions happened correctly
 	checkAllExpectations(t, mock)
 }
+
+// TestPerformCleanupInDBNoConnection checks the basic behaviour of
+// performCleanupInDB function when connection is not established.
+func TestPerformCleanupInDBNoConnection(t *testing.T) {
+	// connection that is not constructed correctly
+	var connection *sql.DB = nil
+
+	clusterNames := cleaner.ClusterList{
+		"00000000-0000-0000-0000-000000000000",
+		"11111111-1111-1111-1111-111111111111",
+		"5d5892d4-1f74-4ccf-91af-548dfc9767aa",
+	}
+
+	_, err := cleaner.PerformCleanupInDB(connection, clusterNames)
+
+	assert.Error(t, err, "error is expected while calling tested function")
+}
