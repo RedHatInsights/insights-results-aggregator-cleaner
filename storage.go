@@ -34,6 +34,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"math"
 	"os"
@@ -597,8 +598,17 @@ func performVacuumDB(connection *sql.DB) error {
 func performCleanupInDB(connection *sql.DB,
 	clusterList ClusterList) (map[string]int, error) {
 
-	// initialize counters
+	// return value
 	deletionsForTable := make(map[string]int)
+
+	// check if connection has been initialized
+	if connection == nil {
+		const message = "Connection to database was not established"
+		log.Error().Msg(message)
+		return deletionsForTable, errors.New(message)
+	}
+
+	// initialize counters
 	for _, tableAndKey := range tablesAndKeys {
 		deletionsForTable[tableAndKey.TableName] = 0
 	}
