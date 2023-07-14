@@ -742,3 +742,19 @@ func TestCleanupNoConnection(t *testing.T) {
 	// check the status
 	assert.Equal(t, status, main.ExitStatusPerformCleanupError)
 }
+
+// TestDetectMultipleRuleDisable check the function detectMultipleRuleDisable when the
+// connection to DB is not established
+func TestDetectMultipleRuleDisable(t *testing.T) {
+	// stub for CLI flags needed to call the tested function
+	cliFlags := main.CliFlags{}
+
+	// call the tested function with null connection
+	status, err := main.DetectMultipleRuleDisable(nil, cliFlags)
+
+	// error is expected
+	assert.Error(t, err, "error is expected while calling main.cleanup")
+
+	// check the status
+	assert.Equal(t, status, main.ExitStatusStorageError)
+}
