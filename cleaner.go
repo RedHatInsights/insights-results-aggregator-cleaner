@@ -68,6 +68,7 @@ const (
 	clusterListFinished          = "Cluster list finished"
 	inputWithClusterID           = "input"
 	selectingRecordsFromDatabase = "Selecting records from database"
+	connectionToDBNotEstablished = "Connection to database was not established"
 )
 
 // Exit codes
@@ -262,9 +263,8 @@ func PrintSummaryTable(summary Summary) {
 func vacuumDB(connection *sql.DB) (int, error) {
 	// connection might be nil when DB init does not finish correctly
 	if connection == nil {
-		const message = "Connection to database was not established"
-		log.Error().Msg(message)
-		return ExitStatusPerformVacuumError, errors.New(message)
+		log.Error().Msg(connectionToDBNotEstablished)
+		return ExitStatusPerformVacuumError, errors.New(connectionToDBNotEstablished)
 	}
 
 	err := performVacuumDB(connection)
@@ -303,6 +303,12 @@ func cleanup(configuration *ConfigStruct, connection *sql.DB, cliFlags CliFlags)
 // detectMultipleRuleDisable function detects clusters that have the same
 // rule(s) disabled by different users
 func detectMultipleRuleDisable(connection *sql.DB, cliFlags CliFlags) (int, error) {
+	// connection might be nil when DB init does not finish correctly
+	if connection == nil {
+		log.Error().Msg(connectionToDBNotEstablished)
+		return ExitStatusStorageError, errors.New(connectionToDBNotEstablished)
+	}
+
 	err := displayMultipleRuleDisable(connection, cliFlags.Output)
 	if err != nil {
 		log.Err(err).Msg(selectingRecordsFromDatabase)
