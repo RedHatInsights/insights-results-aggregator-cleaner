@@ -42,6 +42,7 @@ var (
 	PerformVacuumDB                   = performVacuumDB
 	FillInDatabaseByTestData          = fillInDatabaseByTestData
 	InitDatabaseConnection            = initDatabaseConnection
+	DetectMultipleRuleDisable         = detectMultipleRuleDisable
 
 	// functions from the cleaner.go source file
 	ShowVersion                    = showVersion
