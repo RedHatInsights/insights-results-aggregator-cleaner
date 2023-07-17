@@ -681,9 +681,9 @@ func TestPerformListOfOldReportsResults(t *testing.T) {
 	checkAllExpectations(t, mock)
 }
 
-// TestPerformListOfOldScanError checks the basic behaviour of
+// TestPerformListOfOldReportsScanError checks the basic behaviour of
 // performListOfOldReports function.
-func TestPerformListOfOldScanError(t *testing.T) {
+func TestPerformListOfOldReportsScanError(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
 	assert.NoError(t, err, "error creating SQL mock")
@@ -710,9 +710,9 @@ func TestPerformListOfOldScanError(t *testing.T) {
 	checkAllExpectations(t, mock)
 }
 
-// TestPerformListOfOldDBError checks the basic behaviour of
+// TestPerformListOfOldReportsDBError checks the basic behaviour of
 // performListOfOldReports function.
-func TestPerformListOfOldDBError(t *testing.T) {
+func TestPerformListOfOldReportsDBError(t *testing.T) {
 	// error to be thrown
 	mockedError := errors.New("mocked error")
 
@@ -885,6 +885,14 @@ func TestDisplayAllOldRecordsWithFileError(t *testing.T) {
 
 	// check all DB expectactions happened correctly
 	checkAllExpectations(t, mock)
+}
+
+// TestDisplayAllOldRecordsNoConnection checks the basic behaviour of
+// displayAllOldRecords function when connection is not established
+func TestDisplayAllOldRecordsNoConnection(t *testing.T) {
+	// call the tested function with invalid filename ("/")
+	err := cleaner.DisplayAllOldRecords(nil, "10", "/")
+	assert.Error(t, err, "error is expected while calling tested function")
 }
 
 // TestPerformListOfOldReportsOnError checks the error handling
