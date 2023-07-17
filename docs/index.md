@@ -299,3 +299,11 @@ Actually cleaning the data for given cluster:
 * [config.go](./packages/config.html)
 * [storage.go](./packages/storage.html)
 * [types.go](./packages/types.html)
+
+## Documentation for unit tests from this repository
+
+* [cleaner_test.go](./packages/cleaner_test.html)
+* [config_test.go](./packages/config_test.html)
+* [export_test.go](./packages/export_test.html)
+* [storage_test.go](./packages/storage_test.html)
+* [types_test.go](./packages/types_test.html)
