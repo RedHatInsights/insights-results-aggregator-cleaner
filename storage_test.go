@@ -174,6 +174,35 @@ func TestReadOrgIDOnError(t *testing.T) {
 	checkAllExpectations(t, mock)
 }
 
+// TestReadOrgIDScanError checks error handling in function readOrgID.
+func TestReadOrgIDScanError(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	// prepare mocked result for SQL query
+	rows := sqlmock.NewRows([]string{"org_id"})
+	rows.AddRow(nil)
+
+	// expected query performed by tested function
+	expectedQuery := "select org_id from report where cluster = \\$1"
+	mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
+	mock.ExpectClose()
+
+	// call the tested function
+	org_id, err := cleaner.ReadOrgID(connection, "123e4567-e89b-12d3-a456-426614173999")
+	assert.Error(t, err, "scan error is expected")
+
+	// check the org ID returned from tested function
+	assert.Equal(t, -1, org_id, "wrong org_id returned: %d", org_id)
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
 // TestPerformDisplayMultipleRuleDisableNoResults checks the basic behaviour of
 // performDisplayMultipleRuleDisable function.
 func TestPerformDisplayMultipleRuleDisableNoResults(t *testing.T) {
