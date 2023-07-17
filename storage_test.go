@@ -71,6 +71,17 @@ func expectOrgIDQuery(mock sqlmock.Sqlmock) {
 	mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
 }
 
+// expectOrgIDQueryError mocks an expect of a repetetive query to check whether cluster
+// belongs to given org
+func expectOrgIDQueryError(mock sqlmock.Sqlmock) {
+	// error to be thrown
+	mockedError := errors.New("read org ID error")
+
+	// expected query performed by tested function
+	expectedQuery := "select org_id from report where cluster = \\$1"
+	mock.ExpectQuery(expectedQuery).WillReturnError(mockedError)
+}
+
 // TestReadOrgIDNoResults checks the function readOrgID.
 func TestReadOrgIDNoResults(t *testing.T) {
 	// prepare new mocked connection to database
