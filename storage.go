@@ -52,6 +52,7 @@ import (
 const (
 	canNotConnectToDataStorageMessage = "Can not connect to data storage"
 	unableToCloseDBRowsHandle         = "Unable to close the DB rows handle"
+	connectionNotEstablished          = "Connection to database was not established"
 )
 
 // Other messages
@@ -612,9 +613,8 @@ func performCleanupInDB(connection *sql.DB,
 
 	// check if connection has been initialized
 	if connection == nil {
-		const message = "Connection to database was not established"
-		log.Error().Msg(message)
-		return deletionsForTable, errors.New(message)
+		log.Error().Msg(connectionNotEstablished)
+		return deletionsForTable, errors.New(connectionNotEstablished)
 	}
 
 	// initialize counters
