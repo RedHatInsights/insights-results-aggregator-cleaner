@@ -1,20 +1,4 @@
 <!DOCTYPE html>
-<!--
- Copyright 2022 Red Hat, Inc
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
--->
-
 <html>
 <head>
 <title>export_test.go</title>
@@ -118,7 +102,7 @@
       <tr class="section">
 	<td class="doc"></td>
 	<td class="code"><pre><code><div class="comment">/*
-Copyright © 2021 Red Hat, Inc.
+Copyright © 2021, 2022, 2023 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
 you may not use this file except in compliance with the License.
@@ -158,21 +142,41 @@ https://medium.com/@robiplus/golang-trick-export-for-test-aa16cbd7b8cd
 to see why this trick is needed.</p>
 </td>
 	<td class="code"><pre><code><div class="keyword">var</div> <div class="operator">(</div>
-	<div class="ident">ReadOrgID</div>                         <div class="operator">=</div> <div class="ident">readOrgID</div><div class="operator"></div>
-	<div class="ident">PerformDisplayMultipleRuleDisable</div> <div class="operator">=</div> <div class="ident">performDisplayMultipleRuleDisable</div><div class="operator"></div>
-	<div class="ident">PerformListOfOldReports</div>           <div class="operator">=</div> <div class="ident">performListOfOldReports</div><div class="operator"></div>
-	<div class="ident">DeleteRecordFromTable</div>             <div class="operator">=</div> <div class="ident">deleteRecordFromTable</div><div class="operator"></div>
+	<div class="ident">TablesAndKeys</div> <div class="operator">=</div> <div class="ident">tablesAndKeys</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
       
       <tr class="section">
-	<td class="doc"><p>functions from the ccx<em>notification</em>writer.go source file</p>
+	<td class="doc"><p>functions from the storage.go source file</p>
 </td>
-	<td class="code"><pre><code>	<div class="ident">ShowVersion</div>         <div class="operator">=</div> <div class="ident">showVersion</div><div class="operator"></div>
-	<div class="ident">ShowAuthors</div>         <div class="operator">=</div> <div class="ident">showAuthors</div><div class="operator"></div>
-	<div class="ident">ShowConfiguration</div>   <div class="operator">=</div> <div class="ident">showConfiguration</div><div class="operator"></div>
-	<div class="ident">DoSelectedOperation</div> <div class="operator">=</div> <div class="ident">doSelectedOperation</div><div class="operator"></div>
+	<td class="code"><pre><code>	<div class="ident">ReadOrgID</div>                         <div class="operator">=</div> <div class="ident">readOrgID</div><div class="operator"></div>
+	<div class="ident">DisplayMultipleRuleDisable</div>        <div class="operator">=</div> <div class="ident">displayMultipleRuleDisable</div><div class="operator"></div>
+	<div class="ident">DisplayAllOldRecords</div>              <div class="operator">=</div> <div class="ident">displayAllOldRecords</div><div class="operator"></div>
+	<div class="ident">PerformDisplayMultipleRuleDisable</div> <div class="operator">=</div> <div class="ident">performDisplayMultipleRuleDisable</div><div class="operator"></div>
+	<div class="ident">PerformListOfOldReports</div>           <div class="operator">=</div> <div class="ident">performListOfOldReports</div><div class="operator"></div>
+	<div class="ident">DeleteRecordFromTable</div>             <div class="operator">=</div> <div class="ident">deleteRecordFromTable</div><div class="operator"></div>
+	<div class="ident">PerformCleanupInDB</div>                <div class="operator">=</div> <div class="ident">performCleanupInDB</div><div class="operator"></div>
+	<div class="ident">PerformVacuumDB</div>                   <div class="operator">=</div> <div class="ident">performVacuumDB</div><div class="operator"></div>
+	<div class="ident">FillInDatabaseByTestData</div>          <div class="operator">=</div> <div class="ident">fillInDatabaseByTestData</div><div class="operator"></div>
+	<div class="ident">InitDatabaseConnection</div>            <div class="operator">=</div> <div class="ident">initDatabaseConnection</div><div class="operator"></div>
+	<div class="ident">DetectMultipleRuleDisable</div>         <div class="operator">=</div> <div class="ident">detectMultipleRuleDisable</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>functions from the cleaner.go source file</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">ShowVersion</div>                    <div class="operator">=</div> <div class="ident">showVersion</div><div class="operator"></div>
+	<div class="ident">ShowAuthors</div>                    <div class="operator">=</div> <div class="ident">showAuthors</div><div class="operator"></div>
+	<div class="ident">ShowConfiguration</div>              <div class="operator">=</div> <div class="ident">showConfiguration</div><div class="operator"></div>
+	<div class="ident">DoSelectedOperation</div>            <div class="operator">=</div> <div class="ident">doSelectedOperation</div><div class="operator"></div>
+	<div class="ident">ReadClusterList</div>                <div class="operator">=</div> <div class="ident">readClusterList</div><div class="operator"></div>
+	<div class="ident">ReadClusterListFromFile</div>        <div class="operator">=</div> <div class="ident">readClusterListFromFile</div><div class="operator"></div>
+	<div class="ident">ReadClusterListFromCLIArgument</div> <div class="operator">=</div> <div class="ident">readClusterListFromCLIArgument</div><div class="operator"></div>
+	<div class="ident">VacuumDB</div>                       <div class="operator">=</div> <div class="ident">vacuumDB</div><div class="operator"></div>
+	<div class="ident">Cleanup</div>                        <div class="operator">=</div> <div class="ident">cleanup</div><div class="operator"></div>
 <div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>

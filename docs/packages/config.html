@@ -1,20 +1,4 @@
 <!DOCTYPE html>
-<!--
- Copyright 2022 Red Hat, Inc
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
--->
-
 <html>
 <head>
 <title>config.go</title>
@@ -118,7 +102,7 @@
       <tr class="section">
 	<td class="doc"></td>
 	<td class="code"><pre><code><div class="comment">/*
-Copyright © 2021, 2022 Red Hat, Inc.
+Copyright © 2021, 2022, 2023 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
 you may not use this file except in compliance with the License.
@@ -331,8 +315,8 @@ INSIGHTS</em>RESULTS_CLEANER<strong>CLEANER</strong>MAX_AGE</p>
       </tr>
       
       <tr class="section">
-	<td class="doc"><p>LoadConfiguration loads configuration from defaultConfigFile, file set in
-configFileEnvVariableName or from env</p>
+	<td class="doc"><p>LoadConfiguration function loads configuration from defaultConfigFile, file
+set in configFileEnvVariableName or from environment variables</p>
 </td>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">LoadConfiguration</div><div class="operator">(</div><div class="ident">configFileEnvVariableName</div><div class="operator">,</div> <div class="ident">defaultConfigFile</div> <div class="ident">string</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">ConfigStruct</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
 	<div class="keyword">var</div> <div class="ident">config</div> <div class="ident">ConfigStruct</div><div class="operator"></div>
@@ -387,8 +371,8 @@ extension</p>
       </tr>
       
       <tr class="section">
-	<td class="doc"><p>If config file is not present (which might be correct in
-some environment) we need to read configuration from
+	<td class="doc"><p>If configuration file is not present (which might be correct
+in some environment) we need to read configuration from
 environment variables. The problem is that Viper is not
 smart enough to understand the structure of config by
 itself, so we need to read fake config file</p>
@@ -405,7 +389,14 @@ itself, so we need to read fake config file</p>
 		<div class="ident">viper</div><div class="operator">.</div><div class="ident">SetConfigType</div><div class="operator">(</div><div class="literal">&#34;toml&#34;</div><div class="operator">)</div><div class="operator"></div>
 
 		<div class="ident">err</div> <div class="operator">=</div> <div class="ident">viper</div><div class="operator">.</div><div class="ident">ReadConfig</div><div class="operator">(</div><div class="ident">strings</div><div class="operator">.</div><div class="ident">NewReader</div><div class="operator">(</div><div class="ident">fakeTomlConfig</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
-		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check for error during parsing</p>
+</td>
+	<td class="code"><pre><code>		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 			<div class="keyword">return</div> <div class="ident">config</div><div class="operator">,</div> <div class="ident">err</div><div class="operator"></div>
 		<div class="operator">}</div><div class="operator"></div>
 	<div class="operator">}</div> <div class="keyword">else</div> <div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
@@ -431,12 +422,24 @@ itself, so we need to read fake config file</p>
 	<div class="ident">viper</div><div class="operator">.</div><div class="ident">SetEnvPrefix</div><div class="operator">(</div><div class="ident">envPrefix</div><div class="operator">)</div><div class="operator"></div>
 	<div class="ident">viper</div><div class="operator">.</div><div class="ident">SetEnvKeyReplacer</div><div class="operator">(</div><div class="ident">strings</div><div class="operator">.</div><div class="ident">NewReplacer</div><div class="operator">(</div><div class="literal">&#34;-&#34;</div><div class="operator">,</div> <div class="literal">&#34;_&#34;</div><div class="operator">,</div> <div class="literal">&#34;.&#34;</div><div class="operator">,</div> <div class="literal">&#34;__&#34;</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
 
-	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">viper</div><div class="operator">.</div><div class="ident">Unmarshal</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">config</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to unmarshall configuration and check for (any) error</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">viper</div><div class="operator">.</div><div class="ident">Unmarshal</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">config</div><div class="operator">)</div><div class="operator"></div>
 	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 		<div class="keyword">return</div> <div class="ident">config</div><div class="operator">,</div> <div class="ident">fmt</div><div class="operator">.</div><div class="ident">Errorf</div><div class="operator">(</div><div class="literal">&#34;fatal - can not unmarshal configuration: %s&#34;</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 
-	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">updateConfigFromClowder</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">config</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>updated configuration by introducing Clowder-related things</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">updateConfigFromClowder</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">config</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 		<div class="ident">fmt</div><div class="operator">.</div><div class="ident">Println</div><div class="operator">(</div><div class="literal">&#34;Error loading clowder configuration&#34;</div><div class="operator">)</div><div class="operator"></div>
 		<div class="keyword">return</div> <div class="ident">config</div><div class="operator">,</div> <div class="ident">err</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
@@ -448,9 +451,9 @@ itself, so we need to read fake config file</p>
       </tr>
       
       <tr class="section">
-	<td class="doc"><p>GetStorageConfiguration returns storage configuration</p>
+	<td class="doc"><p>GetStorageConfiguration function returns storage configuration</p>
 </td>
-	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">GetStorageConfiguration</div><div class="operator">(</div><div class="ident">config</div> <div class="ident">ConfigStruct</div><div class="operator">)</div> <div class="ident">StorageConfiguration</div> <div class="operator">{</div>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">GetStorageConfiguration</div><div class="operator">(</div><div class="ident">config</div> <div class="operator">*</div><div class="ident">ConfigStruct</div><div class="operator">)</div> <div class="ident">StorageConfiguration</div> <div class="operator">{</div>
 	<div class="keyword">return</div> <div class="ident">config</div><div class="operator">.</div><div class="ident">Storage</div><div class="operator"></div>
 <div class="operator">}</div><div class="operator"></div>
 
@@ -458,9 +461,9 @@ itself, so we need to read fake config file</p>
       </tr>
       
       <tr class="section">
-	<td class="doc"><p>GetLoggingConfiguration returns logging configuration</p>
+	<td class="doc"><p>GetLoggingConfiguration function returns logging configuration</p>
 </td>
-	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">GetLoggingConfiguration</div><div class="operator">(</div><div class="ident">config</div> <div class="ident">ConfigStruct</div><div class="operator">)</div> <div class="ident">LoggingConfiguration</div> <div class="operator">{</div>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">GetLoggingConfiguration</div><div class="operator">(</div><div class="ident">config</div> <div class="operator">*</div><div class="ident">ConfigStruct</div><div class="operator">)</div> <div class="ident">LoggingConfiguration</div> <div class="operator">{</div>
 	<div class="keyword">return</div> <div class="ident">config</div><div class="operator">.</div><div class="ident">Logging</div><div class="operator"></div>
 <div class="operator">}</div><div class="operator"></div>
 
@@ -470,7 +473,7 @@ itself, so we need to read fake config file</p>
       <tr class="section">
 	<td class="doc"><p>GetCleanerConfiguration returns cleaner configuration</p>
 </td>
-	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">GetCleanerConfiguration</div><div class="operator">(</div><div class="ident">config</div> <div class="ident">ConfigStruct</div><div class="operator">)</div> <div class="ident">CleanerConfiguration</div> <div class="operator">{</div>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">GetCleanerConfiguration</div><div class="operator">(</div><div class="ident">config</div> <div class="operator">*</div><div class="ident">ConfigStruct</div><div class="operator">)</div> <div class="ident">CleanerConfiguration</div> <div class="operator">{</div>
 	<div class="keyword">return</div> <div class="ident">config</div><div class="operator">.</div><div class="ident">Cleaner</div><div class="operator"></div>
 <div class="operator">}</div><div class="operator"></div>
 
@@ -478,7 +481,8 @@ itself, so we need to read fake config file</p>
       </tr>
       
       <tr class="section">
-	<td class="doc"><p>updateConfigFromClowder updates the current config with the values defined in clowder</p>
+	<td class="doc"><p>updateConfigFromClowder function updates the current config with the values
+defined in clowder</p>
 </td>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">updateConfigFromClowder</div><div class="operator">(</div><div class="ident">c</div> <div class="operator">*</div><div class="ident">ConfigStruct</div><div class="operator">)</div> <div class="ident">error</div> <div class="operator">{</div>
 	<div class="keyword">if</div> <div class="operator">!</div><div class="ident">clowder</div><div class="operator">.</div><div class="ident">IsClowderEnabled</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">||</div> <div class="ident">clowder</div><div class="operator">.</div><div class="ident">LoadedConfig</div> <div class="operator">==</div> <div class="ident">nil</div> <div class="operator">{</div>
