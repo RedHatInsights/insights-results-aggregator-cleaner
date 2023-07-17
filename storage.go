@@ -292,14 +292,7 @@ func readOrgID(connection *sql.DB, clusterName string) (int, error) {
 	return -1, nil
 }
 
-// displayAllOldRecords function read all old records, ie. records that are
-// older than the specified time duration. Those records are simply displayed.
-func displayAllOldRecords(connection *sql.DB, maxAge, output string) error {
-	// check if connection has been initialized
-	if connection == nil {
-		log.Error().Msg(connectionNotEstablished)
-		return errors.New(connectionNotEstablished)
-	}
+func createOutputFile(output string) (*os.File, *bufio.Writer) {
 	var fout *os.File = nil
 	var writer *bufio.Writer = nil
 
@@ -312,8 +305,20 @@ func displayAllOldRecords(connection *sql.DB, maxAge, output string) error {
 		}
 		// an object used to write to file
 		writer = bufio.NewWriter(fout)
-
 	}
+	return fout, writer
+}
+
+// displayAllOldRecords function read all old records, ie. records that are
+// older than the specified time duration. Those records are simply displayed.
+func displayAllOldRecords(connection *sql.DB, maxAge, output string) error {
+	// check if connection has been initialized
+	if connection == nil {
+		log.Error().Msg(connectionNotEstablished)
+		return errors.New(connectionNotEstablished)
+	}
+
+	fout, writer := createOutputFile(output)
 
 	defer func() {
 		// output needs to be flushed at the end
