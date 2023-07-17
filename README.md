@@ -37,6 +37,8 @@
     * [Table `recommendation`](#table-recommendation)
     * [Database tables affected by this service](#database-tables-affected-by-this-service)
 * [Documentation](#documentation-1)
+    * [Documentation for source files from this repository](#documentation-for-source-files-from-this-repository)
+    * [Documentation for unit tests from this repository](#documentation-for-unit-tests-from-this-repository)
 * [Contribution](#contribution-1)
 * [Package manifest](#package-manifest)
 
@@ -429,6 +431,21 @@ Actually cleaning the data for given cluster:
 
 Documentation is hosted on Github Pages <https://redhatinsights.github.io/insights-results-aggregator-cleaner-proxy/>.
 Sources are located in [docs](https://github.com/RedHatInsights/insights-results-aggregator-cleaner-proxy/tree/master/docs).
+
+### Documentation for source files from this repository
+
+* [cleaner.go](https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/cleaner.html)
+* [config.go](https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/config.html)
+* [storage.go](https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/storage.html)
+* [types.go](https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/types.html)
+
+### Documentation for unit tests from this repository
+
+* [cleaner_test.go](https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/cleaner_test.html)
+* [config_test.go](https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/config_test.html)
+* [export_test.go](https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/export_test.html)
+* [storage_test.go](https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/storage_test.html)
+* [types_test.go](https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/types_test.html)
 
 
 ## Contribution
