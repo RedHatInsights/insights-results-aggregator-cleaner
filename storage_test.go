@@ -71,6 +71,17 @@ func expectOrgIDQuery(mock sqlmock.Sqlmock) {
 	mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
 }
 
+// expectOrgIDQueryError mocks an expect of a repetetive query to check whether cluster
+// belongs to given org
+func expectOrgIDQueryError(mock sqlmock.Sqlmock) {
+	// error to be thrown
+	mockedError := errors.New("read org ID error")
+
+	// expected query performed by tested function
+	expectedQuery := "select org_id from report where cluster = \\$1"
+	mock.ExpectQuery(expectedQuery).WillReturnError(mockedError)
+}
+
 // TestReadOrgIDNoResults checks the function readOrgID.
 func TestReadOrgIDNoResults(t *testing.T) {
 	// prepare new mocked connection to database
@@ -155,6 +166,35 @@ func TestReadOrgIDOnError(t *testing.T) {
 	if err != mockedError {
 		t.Errorf("different error was returned: %v", err)
 	}
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
+// TestReadOrgIDScanError checks error handling in function readOrgID.
+func TestReadOrgIDScanError(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	// prepare mocked result for SQL query
+	rows := sqlmock.NewRows([]string{"org_id"})
+	rows.AddRow(nil)
+
+	// expected query performed by tested function
+	expectedQuery := "select org_id from report where cluster = \\$1"
+	mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
+	mock.ExpectClose()
+
+	// call the tested function
+	org_id, err := cleaner.ReadOrgID(connection, "123e4567-e89b-12d3-a456-426614173999")
+	assert.Error(t, err, "scan error is expected")
+
+	// check the org ID returned from tested function
+	assert.Equal(t, -1, org_id, "wrong org_id returned: %d", org_id)
 
 	// check if DB can be closed successfully
 	checkConnectionClose(t, connection)
@@ -373,6 +413,45 @@ func TestDisplayMultipleRuleDisableOnError(t *testing.T) {
 	if err != mockedError {
 		t.Errorf("different error was returned: %v", err)
 	}
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
+// TestPerformDisplayMultipleRuleDisableScanError2 checks the basic behaviour of
+// performDisplayMultipleRuleDisable function with wrong records returned from database.
+func TestPerformDisplayMultipleRuleDisableScanError2(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	// prepare mocked result for SQL query
+	rows1 := sqlmock.NewRows([]string{"cluster_id", "rule_id", "cnt"})
+	rows1.AddRow(cluster1ID, rule1ID, 1)
+
+	// expected query performed by tested function
+	expectedQuery1 := "select cluster_id, rule_id, count\\(\\*\\) as cnt from cluster_rule_toggle group by cluster_id, rule_id having count\\(\\*\\)>1 order by cnt desc;"
+	mock.ExpectQuery(expectedQuery1).WillReturnRows(rows1)
+
+	// prepare mocked result for SQL query
+	expectOrgIDQueryError(mock)
+
+	mock.ExpectClose()
+
+	// first query to be performed
+	query1 := `
+                select cluster_id, rule_id, count(*) as cnt
+                  from cluster_rule_toggle
+                 group by cluster_id, rule_id
+                having count(*)>1
+                 order by cnt desc;
+`
+	// call the tested function
+	err = cleaner.PerformDisplayMultipleRuleDisable(connection, nil, query1, "cluster_rule_toggle")
+	assert.Error(t, err, "error is expected while calling tested function")
 
 	// check if DB can be closed successfully
 	checkConnectionClose(t, connection)
@@ -602,9 +681,9 @@ func TestPerformListOfOldReportsResults(t *testing.T) {
 	checkAllExpectations(t, mock)
 }
 
-// TestPerformListOfOldScanError checks the basic behaviour of
+// TestPerformListOfOldReportsScanError checks the basic behaviour of
 // performListOfOldReports function.
-func TestPerformListOfOldScanError(t *testing.T) {
+func TestPerformListOfOldReportsScanError(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
 	assert.NoError(t, err, "error creating SQL mock")
@@ -631,9 +710,9 @@ func TestPerformListOfOldScanError(t *testing.T) {
 	checkAllExpectations(t, mock)
 }
 
-// TestPerformListOfOldDBError checks the basic behaviour of
+// TestPerformListOfOldReportsDBError checks the basic behaviour of
 // performListOfOldReports function.
-func TestPerformListOfOldDBError(t *testing.T) {
+func TestPerformListOfOldReportsDBError(t *testing.T) {
 	// error to be thrown
 	mockedError := errors.New("mocked error")
 
@@ -806,6 +885,14 @@ func TestDisplayAllOldRecordsWithFileError(t *testing.T) {
 
 	// check all DB expectactions happened correctly
 	checkAllExpectations(t, mock)
+}
+
+// TestDisplayAllOldRecordsNoConnection checks the basic behaviour of
+// displayAllOldRecords function when connection is not established
+func TestDisplayAllOldRecordsNoConnection(t *testing.T) {
+	// call the tested function with invalid filename ("/")
+	err := cleaner.DisplayAllOldRecords(nil, "10", "/")
+	assert.Error(t, err, "error is expected while calling tested function")
 }
 
 // TestPerformListOfOldReportsOnError checks the error handling
