@@ -1,20 +1,4 @@
 <!DOCTYPE html>
-<!--
- Copyright 2022 Red Hat, Inc
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
--->
-
 <html>
 <head>
 <title>cleaner_test.go</title>
@@ -118,7 +102,7 @@
       <tr class="section">
 	<td class="doc"></td>
 	<td class="code"><pre><code><div class="comment">/*
-Copyright © 2021, 2022 Red Hat, Inc.
+Copyright © 2021, 2022, 2023 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
 you may not use this file except in compliance with the License.
@@ -144,6 +128,8 @@ https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/cl
 </td>
 	<td class="code"><pre><code>
 <div class="keyword">import</div> <div class="operator">(</div>
+	<div class="literal">&#34;errors&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;github.com/DATA-DOG/go-sqlmock&#34;</div><div class="operator"></div>
 	<div class="literal">&#34;github.com/rs/zerolog&#34;</div><div class="operator"></div>
 	<div class="literal">&#34;github.com/rs/zerolog/log&#34;</div><div class="operator"></div>
 	<div class="literal">&#34;github.com/stretchr/testify/assert&#34;</div><div class="operator"></div>
@@ -260,7 +246,7 @@ https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/cl
 		<div class="ident">zerolog</div><div class="operator">.</div><div class="ident">SetGlobalLevel</div><div class="operator">(</div><div class="ident">zerolog</div><div class="operator">.</div><div class="ident">InfoLevel</div><div class="operator">)</div><div class="operator"></div>
 		<div class="ident">log</div><div class="operator">.</div><div class="ident">Logger</div> <div class="operator">=</div> <div class="ident">log</div><div class="operator">.</div><div class="ident">Output</div><div class="operator">(</div><div class="ident">zerolog</div><div class="operator">.</div><div class="ident">New</div><div class="operator">(</div><div class="ident">os</div><div class="operator">.</div><div class="ident">Stderr</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
 
-		<div class="ident">main</div><div class="operator">.</div><div class="ident">ShowConfiguration</div><div class="operator">(</div><div class="ident">configuration</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">main</div><div class="operator">.</div><div class="ident">ShowConfiguration</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">configuration</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
@@ -343,7 +329,7 @@ via doSelectedOperation function</p>
 	<td class="doc"><p>try to call the tested function and capture its output</p>
 </td>
 	<td class="code"><pre><code>	<div class="ident">output</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">capture</div><div class="operator">.</div><div class="ident">StandardOutput</div><div class="operator">(</div><div class="keyword">func</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
-		<div class="ident">code</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">DoSelectedOperation</div><div class="operator">(</div><div class="ident">configuration</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator">,</div> <div class="ident">cliFlags</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">code</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">DoSelectedOperation</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">configuration</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator">,</div> <div class="ident">cliFlags</div><div class="operator">)</div><div class="operator"></div>
 		<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">code</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ExitStatusOK</div><div class="operator">)</div><div class="operator"></div>
 		<div class="ident">assert</div><div class="operator">.</div><div class="ident">Nil</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
@@ -387,7 +373,7 @@ via doSelectedOperation function</p>
 	<td class="doc"><p>try to call the tested function and capture its output</p>
 </td>
 	<td class="code"><pre><code>	<div class="ident">output</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">capture</div><div class="operator">.</div><div class="ident">StandardOutput</div><div class="operator">(</div><div class="keyword">func</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
-		<div class="ident">code</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">DoSelectedOperation</div><div class="operator">(</div><div class="ident">configuration</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator">,</div> <div class="ident">cliFlags</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">code</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">DoSelectedOperation</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">configuration</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator">,</div> <div class="ident">cliFlags</div><div class="operator">)</div><div class="operator"></div>
 		<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">code</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ExitStatusOK</div><div class="operator">)</div><div class="operator"></div>
 		<div class="ident">assert</div><div class="operator">.</div><div class="ident">Nil</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
@@ -435,7 +421,7 @@ showConfiguration called via doSelectedOperation function</p>
 		<div class="ident">zerolog</div><div class="operator">.</div><div class="ident">SetGlobalLevel</div><div class="operator">(</div><div class="ident">zerolog</div><div class="operator">.</div><div class="ident">InfoLevel</div><div class="operator">)</div><div class="operator"></div>
 		<div class="ident">log</div><div class="operator">.</div><div class="ident">Logger</div> <div class="operator">=</div> <div class="ident">log</div><div class="operator">.</div><div class="ident">Output</div><div class="operator">(</div><div class="ident">zerolog</div><div class="operator">.</div><div class="ident">New</div><div class="operator">(</div><div class="ident">os</div><div class="operator">.</div><div class="ident">Stderr</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
 
-		<div class="ident">code</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">DoSelectedOperation</div><div class="operator">(</div><div class="ident">configuration</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator">,</div> <div class="ident">cliFlags</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">code</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">DoSelectedOperation</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">configuration</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator">,</div> <div class="ident">cliFlags</div><div class="operator">)</div><div class="operator"></div>
 		<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">code</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ExitStatusOK</div><div class="operator">)</div><div class="operator"></div>
 		<div class="ident">assert</div><div class="operator">.</div><div class="ident">Nil</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
@@ -451,6 +437,1084 @@ showConfiguration called via doSelectedOperation function</p>
 	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">output</div><div class="operator">,</div> <div class="literal">&#34;Driver&#34;</div><div class="operator">)</div><div class="operator"></div>
 	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">output</div><div class="operator">,</div> <div class="literal">&#34;Level&#34;</div><div class="operator">)</div><div class="operator"></div>
 	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">output</div><div class="operator">,</div> <div class="literal">&#34;Records max age&#34;</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestReadClusterList checks the function readClusterList from
+cleaner.go using correct cluster list file</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestReadClusterList</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>cluster list file with 8 clusters in total:
+5 correct cluster names
+3 incorrect cluster names</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ReadClusterList</div><div class="operator">(</div><div class="literal">&#34;tests/cluster_list.txt&#34;</div><div class="operator">,</div> <div class="literal">&#34;&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>file is correct - no errors should be thrown</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">NoError</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check returned content</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="literal">3</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Len</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="literal">5</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>finally check actual cluster names</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ClusterName</div><div class="operator">(</div><div class="literal">&#34;5d5892d4-1f74-4ccf-91af-548dfc9767aa&#34;</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ClusterName</div><div class="operator">(</div><div class="literal">&#34;55d892d4-1f74-4ccf-91af-548dfc9767aa&#34;</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ClusterName</div><div class="operator">(</div><div class="literal">&#34;5d5892d3-1f74-4ccf-91af-548dfc9767bb&#34;</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ClusterName</div><div class="operator">(</div><div class="literal">&#34;00000000-0000-0000-0000-000000000000&#34;</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ClusterName</div><div class="operator">(</div><div class="literal">&#34;11111111-1111-1111-1111-111111111111&#34;</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestReadClusterListNoFile checks the function readClusterList from
+cleaner.go in case the cluster list file does not exists</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestReadClusterListNoFile</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">_</div><div class="operator">,</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ReadClusterListFromFile</div><div class="operator">(</div><div class="literal">&#34;tests/this_does_not_exists.txt&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>in this case we expect error to be thrown</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestReadClusterListCLICase1 checks the function readClusterList from
+cleaner.go using provided CLI arguments</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestReadClusterListCLICase1</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>just one cluster name is specified on CLI</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">input</div> <div class="operator">:=</div> <div class="literal">&#34;5d5892d4-1f74-4ccf-91af-548dfc9767aa&#34;</div><div class="operator"></div>
+	<div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ReadClusterList</div><div class="operator">(</div><div class="literal">&#34;tests/cluster_list.txt&#34;</div><div class="operator">,</div> <div class="ident">input</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>input is correct - no errors should be thrown</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">NoError</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check returned content</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="literal">0</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Len</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="literal">1</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>finally check actual cluster names (only one name expected)</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ClusterName</div><div class="operator">(</div><div class="ident">input</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestReadClusterList checks the function readClusterList from
+cleaner.go using provided CLI arguments</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestReadClusterListCLICase2</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>two cluster names are specified on CLI</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">input</div> <div class="operator">:=</div> <div class="literal">&#34;5d5892d4-1f74-4ccf-91af-548dfc9767aa,ffffffff-1f74-4ccf-91af-548dfc9767aa&#34;</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>input is correct - no errors should be thrown</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ReadClusterList</div><div class="operator">(</div><div class="literal">&#34;tests/cluster_list.txt&#34;</div><div class="operator">,</div> <div class="ident">input</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>both cluster names are correct</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">NoError</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check returned content</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="literal">0</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Len</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="literal">2</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>finally check actual cluster names</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ClusterName</div><div class="operator">(</div><div class="literal">&#34;5d5892d4-1f74-4ccf-91af-548dfc9767aa&#34;</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ClusterName</div><div class="operator">(</div><div class="literal">&#34;ffffffff-1f74-4ccf-91af-548dfc9767aa&#34;</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestReadClusterList checks the function readClusterList from
+cleaner.go using provided CLI arguments</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestReadClusterListCLICase3</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">input</div> <div class="operator">:=</div> <div class="literal">&#34;5d5892d4-1f74-4ccf-91af-548dfc9767aa,this-is-not-correct&#34;</div><div class="operator"></div>
+	<div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ReadClusterList</div><div class="operator">(</div><div class="literal">&#34;tests/cluster_list.txt&#34;</div><div class="operator">,</div> <div class="ident">input</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>just the first cluster name is correct</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">NoError</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check returned content</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="literal">1</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Len</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="literal">1</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>finally check actual cluster names (just one correct cluster name is expected)</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ClusterName</div><div class="operator">(</div><div class="literal">&#34;5d5892d4-1f74-4ccf-91af-548dfc9767aa&#34;</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestReadClusterList checks the function readClusterList from
+cleaner.go using provided CLI arguments</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestReadClusterListCLICase4</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">input</div> <div class="operator">:=</div> <div class="literal">&#34;this-is-not-correct,this-also-is-not-correct&#34;</div><div class="operator"></div>
+	<div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ReadClusterList</div><div class="operator">(</div><div class="literal">&#34;tests/cluster_list.txt&#34;</div><div class="operator">,</div> <div class="ident">input</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>both cluster names are incorrect, but the whole algorithm does not throw an error</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">NoError</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check returned content</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="literal">2</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Len</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="literal">0</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestReadClusterListFromFile checks the function readClusterListFromFile from
+cleaner.go using correct cluster list file with 5 correct clusters and 3
+incorrect clusters.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestReadClusterListFromFile</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>cluster list file with 8 clusters in total:
+5 correct cluster names
+3 incorrect cluster names</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ReadClusterListFromFile</div><div class="operator">(</div><div class="literal">&#34;tests/cluster_list.txt&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>file is correct - no errors should be thrown</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">NoError</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check returned content</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="literal">3</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Len</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="literal">5</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>finally check actual cluster names</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ClusterName</div><div class="operator">(</div><div class="literal">&#34;5d5892d4-1f74-4ccf-91af-548dfc9767aa&#34;</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ClusterName</div><div class="operator">(</div><div class="literal">&#34;55d892d4-1f74-4ccf-91af-548dfc9767aa&#34;</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ClusterName</div><div class="operator">(</div><div class="literal">&#34;5d5892d3-1f74-4ccf-91af-548dfc9767bb&#34;</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ClusterName</div><div class="operator">(</div><div class="literal">&#34;00000000-0000-0000-0000-000000000000&#34;</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ClusterName</div><div class="operator">(</div><div class="literal">&#34;11111111-1111-1111-1111-111111111111&#34;</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestReadClusterListFromFileNoFile checks the function
+readClusterListFromFile from cleaner.go in case the cluster list file does
+not exists</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestReadClusterListFromFileNoFile</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">_</div><div class="operator">,</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ReadClusterListFromFile</div><div class="operator">(</div><div class="literal">&#34;tests/this_does_not_exists.txt&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>file does not exist -&gt; error should be thrown</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestReadClusterListFromFileEmptyFile checks the function
+readClusterListFromFile from cleaner.go in case the special /dev/null file is to be read</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestReadClusterListFromFileEmptyFile</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ReadClusterListFromFile</div><div class="operator">(</div><div class="literal">&#34;tests/empty_cluster_list.txt&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>it's empty so no error should be reported</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">NoError</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>and the content should be empty</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="literal">0</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Len</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="literal">0</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestReadClusterListFromFileNullFile checks the function
+readClusterListFromFile from cleaner.go in case the special /dev/null file is to be read</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestReadClusterListFromFileNullFile</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ReadClusterListFromFile</div><div class="operator">(</div><div class="literal">&#34;/dev/null&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>it's empty so no error should be reported</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">NoError</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>and the content should be empty</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="literal">0</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Len</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="literal">0</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestReadClusterListFromCLIArgumentEmptyInput check the function
+readClusterListFromCLIArgument from cleaner.go</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestReadClusterListFromCLIArgumentEmptyInput</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ReadClusterListFromCLIArgument</div><div class="operator">(</div><div class="literal">&#34;&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>it's empty so no error should be reported</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">NoError</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check returned content</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="literal">1</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Len</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="literal">0</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestReadClusterListFromCLIArgumentOneCluster check the function
+readClusterListFromCLIArgument from cleaner.go</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestReadClusterListFromCLIArgumentOneCluster</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>only one (correct) cluster</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">input</div> <div class="operator">:=</div> <div class="literal">&#34;5d5892d4-1f74-4ccf-91af-548dfc9767aa&#34;</div><div class="operator"></div>
+	<div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ReadClusterListFromCLIArgument</div><div class="operator">(</div><div class="ident">input</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>input is correct -&gt; no error should be thrown</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">NoError</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check returned content</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="literal">0</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Len</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="literal">1</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>finally check actual cluster names (just one cluster name is expected)</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ClusterName</div><div class="operator">(</div><div class="literal">&#34;5d5892d4-1f74-4ccf-91af-548dfc9767aa&#34;</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestReadClusterListFromCLIArgumentOneIncorrectCluster check the function
+readClusterListFromCLIArgument from cleaner.go</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestReadClusterListFromCLIArgumentOneIncorrectCluster</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>only one (incorrect) cluster</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">input</div> <div class="operator">:=</div> <div class="literal">&#34;foo-bar-baz&#34;</div><div class="operator"></div>
+	<div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ReadClusterListFromCLIArgument</div><div class="operator">(</div><div class="ident">input</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">NoError</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check returned content</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="literal">1</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Len</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="literal">0</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestReadClusterListFromCLIArgumentTwoClusters check the function
+readClusterListFromCLIArgument from cleaner.go</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestReadClusterListFromCLIArgumentTwoClusters</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>both clusters are correct</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">input</div> <div class="operator">:=</div> <div class="literal">&#34;5d5892d4-1f74-4ccf-91af-548dfc9767aa,5d5892d4-1f74-4ccf-91af-548dfc9767bb&#34;</div><div class="operator"></div>
+	<div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ReadClusterListFromCLIArgument</div><div class="operator">(</div><div class="ident">input</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>input is correct -&gt; no error should be thrown</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">NoError</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check returned content</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="literal">0</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Len</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="literal">2</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>finally check actual cluster names (just one correct cluster name is expected)</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ClusterName</div><div class="operator">(</div><div class="literal">&#34;5d5892d4-1f74-4ccf-91af-548dfc9767aa&#34;</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ClusterName</div><div class="operator">(</div><div class="literal">&#34;5d5892d4-1f74-4ccf-91af-548dfc9767bb&#34;</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestReadClusterListFromCLIArgumentImproperCluster check the function
+readClusterListFromCLIArgument from cleaner.go</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestReadClusterListFromCLIArgumentImproperCluster</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>first cluster is correct, second one incorrect</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">input</div> <div class="operator">:=</div> <div class="literal">&#34;5d5892d4-1f74-4ccf-91af-548dfc9767aa,foo-bar-baz&#34;</div><div class="operator"></div>
+	<div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ReadClusterListFromCLIArgument</div><div class="operator">(</div><div class="ident">input</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>no error should be thrown</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">NoError</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check returned content</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">improperClusterCount</div><div class="operator">,</div> <div class="literal">1</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Len</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="literal">1</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>finally check actual cluster names (just one correct cluster name is expected)</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">clusterList</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ClusterName</div><div class="operator">(</div><div class="literal">&#34;5d5892d4-1f74-4ccf-91af-548dfc9767aa&#34;</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestPrintSummaryTableBasicCase check the behaviour of function
+PrintSummaryTable for summary with zero changes made in database.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestPrintSummaryTableBasicCase</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="keyword">const</div> <div class="ident">expected</div> <div class="operator">=</div> <div class="literal">`&#43;--------------------------&#43;-------&#43;
+|         SUMMARY          | COUNT |
+&#43;--------------------------&#43;-------&#43;
+| Proper cluster entries   |     0 |
+| Improper cluster entries |     0 |
+|                          |       |
+&#43;--------------------------&#43;-------&#43;
+|     TOTAL DELETIONS      |   0   |
+&#43;--------------------------&#43;-------&#43;
+`</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to call the tested function and capture its output</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">output</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">capture</div><div class="operator">.</div><div class="ident">StandardOutput</div><div class="operator">(</div><div class="keyword">func</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+		<div class="ident">summary</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">Summary</div><div class="operator">{</div>
+			<div class="ident">ProperClusterEntries</div><div class="operator">:</div>   <div class="literal">0</div><div class="operator">,</div>
+			<div class="ident">ImproperClusterEntries</div><div class="operator">:</div> <div class="literal">0</div><div class="operator">,</div>
+			<div class="ident">DeletionsForTable</div><div class="operator">:</div>      <div class="ident">make</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="ident">int</div><div class="operator">)</div><div class="operator">,</div>
+		<div class="operator">}</div><div class="operator"></div>
+		<div class="ident">main</div><div class="operator">.</div><div class="ident">PrintSummaryTable</div><div class="operator">(</div><div class="ident">summary</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check the captured text</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">checkCapture</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if captured text contains expected summary table</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">output</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestPrintSummaryTableProperClusterEntries check the behaviour of function
+PrintSummaryTable for summary with non zero changes made in database.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestPrintSummaryTableProperClusterEntries</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="keyword">const</div> <div class="ident">expected</div> <div class="operator">=</div> <div class="literal">`&#43;--------------------------&#43;-------&#43;
+|         SUMMARY          | COUNT |
+&#43;--------------------------&#43;-------&#43;
+| Proper cluster entries   |    42 |
+| Improper cluster entries |     0 |
+|                          |       |
+&#43;--------------------------&#43;-------&#43;
+|     TOTAL DELETIONS      |   0   |
+&#43;--------------------------&#43;-------&#43;
+`</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to call the tested function and capture its output</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">output</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">capture</div><div class="operator">.</div><div class="ident">StandardOutput</div><div class="operator">(</div><div class="keyword">func</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+		<div class="ident">summary</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">Summary</div><div class="operator">{</div>
+			<div class="ident">ProperClusterEntries</div><div class="operator">:</div>   <div class="literal">42</div><div class="operator">,</div>
+			<div class="ident">ImproperClusterEntries</div><div class="operator">:</div> <div class="literal">0</div><div class="operator">,</div>
+			<div class="ident">DeletionsForTable</div><div class="operator">:</div>      <div class="ident">make</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="ident">int</div><div class="operator">)</div><div class="operator">,</div>
+		<div class="operator">}</div><div class="operator"></div>
+		<div class="ident">main</div><div class="operator">.</div><div class="ident">PrintSummaryTable</div><div class="operator">(</div><div class="ident">summary</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check the captured text</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">checkCapture</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if captured text contains expected summary table</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">output</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestPrintSummaryTableImproperClusterEntries check the behaviour of function
+PrintSummaryTable for summary with non zero changes made in database.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestPrintSummaryTableImproperClusterEntries</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="keyword">const</div> <div class="ident">expected</div> <div class="operator">=</div> <div class="literal">`&#43;--------------------------&#43;-------&#43;
+|         SUMMARY          | COUNT |
+&#43;--------------------------&#43;-------&#43;
+| Proper cluster entries   |     0 |
+| Improper cluster entries |    42 |
+|                          |       |
+&#43;--------------------------&#43;-------&#43;
+|     TOTAL DELETIONS      |   0   |
+&#43;--------------------------&#43;-------&#43;
+`</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to call the tested function and capture its output</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">output</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">capture</div><div class="operator">.</div><div class="ident">StandardOutput</div><div class="operator">(</div><div class="keyword">func</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+		<div class="ident">summary</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">Summary</div><div class="operator">{</div>
+			<div class="ident">ProperClusterEntries</div><div class="operator">:</div>   <div class="literal">0</div><div class="operator">,</div>
+			<div class="ident">ImproperClusterEntries</div><div class="operator">:</div> <div class="literal">42</div><div class="operator">,</div>
+			<div class="ident">DeletionsForTable</div><div class="operator">:</div>      <div class="ident">make</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="ident">int</div><div class="operator">)</div><div class="operator">,</div>
+		<div class="operator">}</div><div class="operator"></div>
+		<div class="ident">main</div><div class="operator">.</div><div class="ident">PrintSummaryTable</div><div class="operator">(</div><div class="ident">summary</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check the captured text</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">checkCapture</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if captured text contains expected summary table</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">output</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestPrintSummaryTableOneTableDeletion check the behaviour of function
+PrintSummaryTable for summary with one deletion in one table.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestPrintSummaryTableOneTableDeletion</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+	<div class="keyword">const</div> <div class="ident">expected</div> <div class="operator">=</div> <div class="literal">`&#43;--------------------------------&#43;-------&#43;
+|            SUMMARY             | COUNT |
+&#43;--------------------------------&#43;-------&#43;
+| Proper cluster entries         |     0 |
+| Improper cluster entries       |     0 |
+|                                |       |
+| Deletions from table &#39;TABLE_X&#39; |     1 |
+&#43;--------------------------------&#43;-------&#43;
+|        TOTAL DELETIONS         |   1   |
+&#43;--------------------------------&#43;-------&#43;
+`</div><div class="operator"></div>
+
+	<div class="ident">deletions</div> <div class="operator">:=</div> <div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="ident">int</div><div class="operator">{</div>
+		<div class="literal">&#34;TABLE_X&#34;</div><div class="operator">:</div> <div class="literal">1</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to call the tested function and capture its output</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">output</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">capture</div><div class="operator">.</div><div class="ident">StandardOutput</div><div class="operator">(</div><div class="keyword">func</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+		<div class="ident">summary</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">Summary</div><div class="operator">{</div>
+			<div class="ident">ProperClusterEntries</div><div class="operator">:</div>   <div class="literal">0</div><div class="operator">,</div>
+			<div class="ident">ImproperClusterEntries</div><div class="operator">:</div> <div class="literal">0</div><div class="operator">,</div>
+			<div class="ident">DeletionsForTable</div><div class="operator">:</div>      <div class="ident">deletions</div><div class="operator">,</div>
+		<div class="operator">}</div><div class="operator"></div>
+		<div class="ident">main</div><div class="operator">.</div><div class="ident">PrintSummaryTable</div><div class="operator">(</div><div class="ident">summary</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check the captured text</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">checkCapture</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if captured text contains expected summary table</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Contains</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">output</div><div class="operator">,</div> <div class="ident">expected</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestPrintSummaryTableTwoTablesDeletions check the behaviour of function
+PrintSummaryTable for summary with multiple deletions in two tables.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestPrintSummaryTableTwoTablesDeletions</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>we work with map and there is no guarantees which order will be choosen in runtime</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">const</div> <div class="ident">expected1</div> <div class="operator">=</div> <div class="literal">`&#43;--------------------------------&#43;-------&#43;
+|            SUMMARY             | COUNT |
+&#43;--------------------------------&#43;-------&#43;
+| Proper cluster entries         |     0 |
+| Improper cluster entries       |     0 |
+|                                |       |
+| Deletions from table &#39;TABLE_X&#39; |     1 |
+| Deletions from table &#39;TABLE_Y&#39; |     2 |
+&#43;--------------------------------&#43;-------&#43;
+|        TOTAL DELETIONS         |   3   |
+&#43;--------------------------------&#43;-------&#43;
+`</div><div class="operator"></div>
+	<div class="keyword">const</div> <div class="ident">expected2</div> <div class="operator">=</div> <div class="literal">`&#43;--------------------------------&#43;-------&#43;
+|            SUMMARY             | COUNT |
+&#43;--------------------------------&#43;-------&#43;
+| Proper cluster entries         |     0 |
+| Improper cluster entries       |     0 |
+|                                |       |
+| Deletions from table &#39;TABLE_Y&#39; |     2 |
+| Deletions from table &#39;TABLE_X&#39; |     1 |
+&#43;--------------------------------&#43;-------&#43;
+|        TOTAL DELETIONS         |   3   |
+&#43;--------------------------------&#43;-------&#43;
+`</div><div class="operator"></div>
+
+	<div class="ident">deletions</div> <div class="operator">:=</div> <div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="ident">int</div><div class="operator">{</div>
+		<div class="literal">&#34;TABLE_X&#34;</div><div class="operator">:</div> <div class="literal">1</div><div class="operator">,</div>
+		<div class="literal">&#34;TABLE_Y&#34;</div><div class="operator">:</div> <div class="literal">2</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>try to call the tested function and capture its output</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">output</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">capture</div><div class="operator">.</div><div class="ident">StandardOutput</div><div class="operator">(</div><div class="keyword">func</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+		<div class="ident">summary</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">Summary</div><div class="operator">{</div>
+			<div class="ident">ProperClusterEntries</div><div class="operator">:</div>   <div class="literal">0</div><div class="operator">,</div>
+			<div class="ident">ImproperClusterEntries</div><div class="operator">:</div> <div class="literal">0</div><div class="operator">,</div>
+			<div class="ident">DeletionsForTable</div><div class="operator">:</div>      <div class="ident">deletions</div><div class="operator">,</div>
+		<div class="operator">}</div><div class="operator"></div>
+		<div class="ident">main</div><div class="operator">.</div><div class="ident">PrintSummaryTable</div><div class="operator">(</div><div class="ident">summary</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check the captured text</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">checkCapture</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if captured text contains expected summary table
+again: we work with map and there is no guarantees which order will
+be choosen in runtime</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">output</div> <div class="operator">!=</div> <div class="ident">expected1</div> <div class="operator">&amp;&amp;</div> <div class="ident">output</div> <div class="operator">!=</div> <div class="ident">expected2</div> <div class="operator">{</div>
+		<div class="ident">t</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="literal">&#34;Unexpected output&#34;</div><div class="operator">,</div> <div class="ident">output</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestVacuumDBPositiveCase check the function vacuumDB when the DB
+operation pass without any error</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestVacuumDBPositiveCase</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>prepare new mocked connection to database</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">connection</div><div class="operator">,</div> <div class="ident">mock</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">sqlmock</div><div class="operator">.</div><div class="ident">New</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">NoError</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">,</div> <div class="literal">&#34;error creating SQL mock&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">expectedVacuum</div> <div class="operator">:=</div> <div class="literal">&#34;VACUUM VERBOSE;&#34;</div><div class="operator"></div>
+	<div class="ident">mock</div><div class="operator">.</div><div class="ident">ExpectExec</div><div class="operator">(</div><div class="ident">expectedVacuum</div><div class="operator">)</div><div class="operator">.</div><div class="ident">WillReturnResult</div><div class="operator">(</div><div class="ident">sqlmock</div><div class="operator">.</div><div class="ident">NewResult</div><div class="operator">(</div><div class="literal">1</div><div class="operator">,</div> <div class="literal">1</div><div class="operator">)</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">mock</div><div class="operator">.</div><div class="ident">ExpectClose</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>call the tested function</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">status</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">VacuumDB</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">NoError</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">,</div> <div class="literal">&#34;error not expected while calling tested function&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check the status</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">status</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ExitStatusOK</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if DB can be closed successfully</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">checkConnectionClose</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">connection</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check all DB expectactions happened correctly</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">checkAllExpectations</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">mock</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestVacuumDBNegativeCase check the function vacuumDB when the DB
+operation pass with an error</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestVacuumDBNegativeCase</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>error to be thrown</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">mockedError</div> <div class="operator">:=</div> <div class="ident">errors</div><div class="operator">.</div><div class="ident">New</div><div class="operator">(</div><div class="literal">&#34;mocked error&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>prepare new mocked connection to database</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">connection</div><div class="operator">,</div> <div class="ident">mock</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">sqlmock</div><div class="operator">.</div><div class="ident">New</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">assert</div><div class="operator">.</div><div class="ident">NoError</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">,</div> <div class="literal">&#34;error creating SQL mock&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">expectedVacuum</div> <div class="operator">:=</div> <div class="literal">&#34;VACUUM VERBOSE;&#34;</div><div class="operator"></div>
+	<div class="ident">mock</div><div class="operator">.</div><div class="ident">ExpectExec</div><div class="operator">(</div><div class="ident">expectedVacuum</div><div class="operator">)</div><div class="operator">.</div><div class="ident">WillReturnError</div><div class="operator">(</div><div class="ident">mockedError</div><div class="operator">)</div><div class="operator"></div>
+
+	<div class="ident">mock</div><div class="operator">.</div><div class="ident">ExpectClose</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>call the tested function</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">status</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">VacuumDB</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>error is expected</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">,</div> <div class="literal">&#34;error is expected while calling main.vacuumDB&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check the status</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">status</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ExitStatusPerformVacuumError</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if DB can be closed successfully</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">checkConnectionClose</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">connection</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check all DB expectactions happened correctly</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">checkAllExpectations</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">mock</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestVacuumDBNoConnection check the function vacuumDB when the
+connection to DB is not established</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestVacuumDBNoConnection</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>call the tested function</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">status</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">VacuumDB</div><div class="operator">(</div><div class="ident">nil</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>error is expected</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">,</div> <div class="literal">&#34;error is expected while calling main.vacuumDB&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check the status</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">status</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ExitStatusPerformVacuumError</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestCleanupNoConnection check the function cleanup when the
+connection to DB is not established</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestCleanupNoConnection</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>stub for structures needed to call the tested function</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">configuration</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ConfigStruct</div><div class="operator">{</div><div class="operator">}</div><div class="operator"></div>
+
+	<div class="ident">configuration</div><div class="operator">.</div><div class="ident">Cleaner</div> <div class="operator">=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">CleanerConfiguration</div><div class="operator">{</div>
+		<div class="ident">ClusterListFile</div><div class="operator">:</div> <div class="literal">&#34;tests/cluster_list.txt&#34;</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="ident">cliFlags</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">CliFlags</div><div class="operator">{</div>
+		<div class="ident">ShowVersion</div><div class="operator">:</div>       <div class="ident">false</div><div class="operator">,</div>
+		<div class="ident">ShowAuthors</div><div class="operator">:</div>       <div class="ident">false</div><div class="operator">,</div>
+		<div class="ident">ShowConfiguration</div><div class="operator">:</div> <div class="ident">false</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>call the tested function</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">status</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">Cleanup</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">configuration</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator">,</div> <div class="ident">cliFlags</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>error is expected</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">,</div> <div class="literal">&#34;error is expected while calling main.cleanup&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check the status</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">status</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ExitStatusPerformCleanupError</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>TestDetectMultipleRuleDisable check the function detectMultipleRuleDisable when the
+connection to DB is not established</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestDetectMultipleRuleDisable</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>stub for CLI flags needed to call the tested function</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">cliFlags</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">CliFlags</div><div class="operator">{</div><div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>call the tested function with null connection</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">status</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">DetectMultipleRuleDisable</div><div class="operator">(</div><div class="ident">nil</div><div class="operator">,</div> <div class="ident">cliFlags</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>error is expected</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">,</div> <div class="literal">&#34;error is expected while calling main.cleanup&#34;</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check the status</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">assert</div><div class="operator">.</div><div class="ident">Equal</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">status</div><div class="operator">,</div> <div class="ident">main</div><div class="operator">.</div><div class="ident">ExitStatusStorageError</div><div class="operator">)</div><div class="operator"></div>
 <div class="operator">}</div><div class="operator"></div>
 
 </code></pre></td>
