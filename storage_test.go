@@ -392,6 +392,45 @@ func TestDisplayMultipleRuleDisableOnError(t *testing.T) {
 	checkAllExpectations(t, mock)
 }
 
+// TestPerformDisplayMultipleRuleDisableScanError2 checks the basic behaviour of
+// performDisplayMultipleRuleDisable function with wrong records returned from database.
+func TestPerformDisplayMultipleRuleDisableScanError2(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	// prepare mocked result for SQL query
+	rows1 := sqlmock.NewRows([]string{"cluster_id", "rule_id", "cnt"})
+	rows1.AddRow(cluster1ID, rule1ID, 1)
+
+	// expected query performed by tested function
+	expectedQuery1 := "select cluster_id, rule_id, count\\(\\*\\) as cnt from cluster_rule_toggle group by cluster_id, rule_id having count\\(\\*\\)>1 order by cnt desc;"
+	mock.ExpectQuery(expectedQuery1).WillReturnRows(rows1)
+
+	// prepare mocked result for SQL query
+	expectOrgIDQueryError(mock)
+
+	mock.ExpectClose()
+
+	// first query to be performed
+	query1 := `
+                select cluster_id, rule_id, count(*) as cnt
+                  from cluster_rule_toggle
+                 group by cluster_id, rule_id
+                having count(*)>1
+                 order by cnt desc;
+`
+	// call the tested function
+	err = cleaner.PerformDisplayMultipleRuleDisable(connection, nil, query1, "cluster_rule_toggle")
+	assert.Error(t, err, "error is expected while calling tested function")
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
 // TestDisplayMultipleRuleDisableResultsNoOutput checks the basic behaviour of
 // displayMultipleRuleDisable function with results returned without defining the filenames.
 func TestDisplayMultipleRuleDisableResultsNoOutput(t *testing.T) {
