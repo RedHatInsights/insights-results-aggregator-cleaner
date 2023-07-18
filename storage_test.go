@@ -954,6 +954,34 @@ func TestPerformListOfOldRatingsNoResults(t *testing.T) {
 	checkAllExpectations(t, mock)
 }
 
+// TestPerformListOfOldRatingsResults checks the basic behaviour of
+// performListOfOldRatings function.
+func TestPerformListOfOldRatingsResults(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	// prepare mocked result for SQL query
+	rows := sqlmock.NewRows([]string{"org_id", "rule_fqdn", "error_key", "rule_id", "rating", "last_updated_at"})
+	updatedAt := time.Now()
+	rows.AddRow("1", "fqdn", "key", rule1ID, "1", updatedAt)
+
+	// expected query performed by tested function
+	expectedQuery := "SELECT org_id, rule_fqdn, error_key, rule_id, rating, last_updated_at FROM advisor_ratings WHERE last_updated_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY last_updated_at"
+	mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
+	mock.ExpectClose()
+
+	// call the tested function
+	err = cleaner.PerformListOfOldRatings(connection, "10")
+	assert.NoError(t, err, "error not expected while calling tested function")
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
 // TestDeleteRecordFromTable checks the basic behaviour of
 // deleteRecordFromTable function.
 func TestDeleteRecordFromTable(t *testing.T) {
