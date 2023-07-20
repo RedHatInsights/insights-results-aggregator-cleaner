@@ -830,3 +830,11 @@ func TestFillInDatabaseOnError(t *testing.T) {
 	// check all DB expectactions happened correctly
 	checkAllExpectations(t, mock)
 }
+
+// TestFillInDatabaseNoConnection checks the basic behaviour of
+// fillInDatabase function when connection is not established.
+func TestFillInDatabaseNoConnection(t *testing.T) {
+	exitCode, err := main.FillInDatabase(nil)
+	assert.Error(t, err, "error is expected while calling tested function")
+	assert.Equal(t, exitCode, main.ExitStatusFillInStorageError)
+}
