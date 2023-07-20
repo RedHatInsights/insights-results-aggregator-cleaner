@@ -320,6 +320,12 @@ func detectMultipleRuleDisable(connection *sql.DB, cliFlags CliFlags) (int, erro
 
 // fillInDatabase function fills-in database by test data
 func fillInDatabase(connection *sql.DB) (int, error) {
+	// connection might be nil when DB init does not finish correctly
+	if connection == nil {
+		log.Error().Msg(connectionToDBNotEstablished)
+		return ExitStatusFillInStorageError, errors.New(connectionToDBNotEstablished)
+	}
+
 	err := fillInDatabaseByTestData(connection)
 	if err != nil {
 		log.Err(err).Msg("Fill-in database by test data")
