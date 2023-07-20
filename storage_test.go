@@ -710,6 +710,36 @@ func TestPerformListOfOldConsumerErrorsScanError(t *testing.T) {
 	checkAllExpectations(t, mock)
 }
 
+// TestPerformListOfOldConsumerErrorsDBError checks the basic behaviour of
+// PerformListOfOldConsumerErrors function.
+func TestPerformListOfOldConsumerErrorsDBError(t *testing.T) {
+	// error to be thrown
+	mockedError := errors.New("mocked error")
+
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	// expected query performed by tested function
+	expectedQuery := "SELECT topic, partition, topic_offset, key, consumed_at, message FROM consumer_error WHERE consumed_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY consumed_at"
+	mock.ExpectQuery(expectedQuery).WillReturnError(mockedError)
+	mock.ExpectClose()
+
+	// call the tested function
+	err = cleaner.PerformListOfOldConsumerErrors(connection, "10")
+	assert.Error(t, err)
+
+	if err != mockedError {
+		t.Errorf("different error was returned: %v", err)
+	}
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
 // TestPerformListOfOldReportsNoResults checks the basic behaviour of
 // performListOfOldReports function.
 func TestPerformListOfOldReportsNoResults(t *testing.T) {
