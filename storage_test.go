@@ -1011,6 +1011,120 @@ func TestDisplayAllOldRecordsNoConnection(t *testing.T) {
 	assert.Error(t, err, "error is expected while calling tested function")
 }
 
+// TestDisplayAllOldRecordErrorInFirstList checks the basic behaviour of
+// displayAllOldRecords function when error occurs.
+func TestDisplayAllOldRecordsErrorFirstList(t *testing.T) {
+	// error to be thrown
+	mockedError := errors.New("mocked error")
+
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	// prepare mocked result for SQL query
+	rows := sqlmock.NewRows([]string{"cluster", "reported_at", "last_checked"})
+	reportedAt := time.Now()
+	updatedAt := time.Now()
+	rows.AddRow(cluster1ID, reportedAt, updatedAt)
+
+	// expected queries performed by tested function
+	expectedQuery1 := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
+	mock.ExpectQuery(expectedQuery1).WillReturnError(mockedError)
+
+	mock.ExpectClose()
+
+	// call the tested function without filename (stdout)
+	err = cleaner.DisplayAllOldRecords(connection, "10", "")
+	assert.Error(t, err, "error not expected while calling tested function")
+
+	assert.Equal(t, err, mockedError)
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
+// TestDisplayAllOldRecordErrorInMiddleList checks the basic behaviour of
+// displayAllOldRecords function when error occurs.
+func TestDisplayAllOldRecordsErrorInMiddleList(t *testing.T) {
+	// error to be thrown
+	mockedError := errors.New("mocked error")
+
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	// prepare mocked result for SQL query
+	rows := sqlmock.NewRows([]string{"cluster", "reported_at", "last_checked"})
+	reportedAt := time.Now()
+	updatedAt := time.Now()
+	rows.AddRow(cluster1ID, reportedAt, updatedAt)
+
+	// expected queries performed by tested function
+	expectedQuery1 := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
+	mock.ExpectQuery(expectedQuery1).WillReturnRows(rows)
+
+	expectedQuery2 := "SELECT org_id, rule_fqdn, error_key, rule_id, rating, last_updated_at FROM advisor_ratings WHERE last_updated_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY last_updated_at"
+	mock.ExpectQuery(expectedQuery2).WillReturnError(mockedError)
+
+	mock.ExpectClose()
+
+	// call the tested function without filename (stdout)
+	err = cleaner.DisplayAllOldRecords(connection, "10", "")
+	assert.Error(t, err, "error not expected while calling tested function")
+
+	assert.Equal(t, err, mockedError)
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
+// TestDisplayAllOldRecordErrorInLastList checks the basic behaviour of
+// displayAllOldRecords function when error occurs.
+func TestDisplayAllOldRecordsErrorInLastList(t *testing.T) {
+	// error to be thrown
+	mockedError := errors.New("mocked error")
+
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	// prepare mocked result for SQL query
+	rows := sqlmock.NewRows([]string{"cluster", "reported_at", "last_checked"})
+	reportedAt := time.Now()
+	updatedAt := time.Now()
+	rows.AddRow(cluster1ID, reportedAt, updatedAt)
+
+	// expected queries performed by tested function
+	expectedQuery1 := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
+	mock.ExpectQuery(expectedQuery1).WillReturnRows(rows)
+
+	expectedQuery2 := "SELECT org_id, rule_fqdn, error_key, rule_id, rating, last_updated_at FROM advisor_ratings WHERE last_updated_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY last_updated_at"
+	mock.ExpectQuery(expectedQuery2).WillReturnRows(rows)
+
+	expectedQuery3 := "SELECT topic, partition, topic_offset, key, consumed_at, message FROM consumer_error WHERE consumed_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY consumed_at"
+	mock.ExpectQuery(expectedQuery3).WillReturnError(mockedError)
+
+	mock.ExpectClose()
+
+	// call the tested function without filename (stdout)
+	err = cleaner.DisplayAllOldRecords(connection, "10", "")
+	assert.Error(t, err, "error not expected while calling tested function")
+
+	assert.Equal(t, err, mockedError)
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
 // TestPerformListOfOldReportsOnError checks the error handling
 // ability in performListOfOldReports function.
 func TestPerformListOfOldReportsOnError(t *testing.T) {
@@ -1254,6 +1368,83 @@ func TestFillInDatabaseByTestData(t *testing.T) {
 
 	err = cleaner.FillInDatabaseByTestData(connection)
 	assert.NoError(t, err, "error not expected while calling tested function")
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
+// TestFillInDatabaseByTestDataOnError1 checks the basic behaviour of
+// fillInDatabaseByTestDataOnError function. The last INSERT statement throws
+// error.
+func TestFillInDatabaseByTestDataOnError1(t *testing.T) {
+	// error to be thrown
+	mockedError := errors.New("insert into rule hit error")
+
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	clusterNames := [...]string{
+		"00000000-0000-0000-0000-000000000000",
+		"11111111-1111-1111-1111-111111111111",
+		"5d5892d4-1f74-4ccf-91af-548dfc9767aa",
+	}
+
+	for _, clusterName := range clusterNames {
+		mock.ExpectExec("INSERT INTO report").WithArgs(clusterName).WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectExec("INSERT INTO cluster_rule_toggle").WithArgs(clusterName).WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectExec("INSERT INTO cluster_rule_user_feedback").WithArgs(clusterName).WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectExec("INSERT INTO cluster_user_rule_disable_feedback").WithArgs(clusterName).WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectExec("INSERT INTO rule_hit").WithArgs(clusterName).WillReturnError(mockedError)
+	}
+
+	mock.ExpectClose()
+
+	err = cleaner.FillInDatabaseByTestData(connection)
+	assert.Error(t, err, "error is expected while calling tested function")
+
+	assert.Equal(t, err, mockedError)
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
+// TestFillInDatabaseByTestDataOnError2 checks the basic behaviour of
+// fillInDatabaseByTestDataOnError function. Now the first INSERT statement return error.
+func TestFillInDatabaseByTestDataOnError2(t *testing.T) {
+	// error to be thrown
+	mockedError := errors.New("insert into report")
+
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	clusterNames := [...]string{
+		"00000000-0000-0000-0000-000000000000",
+		"11111111-1111-1111-1111-111111111111",
+		"5d5892d4-1f74-4ccf-91af-548dfc9767aa",
+	}
+
+	for _, clusterName := range clusterNames {
+		mock.ExpectExec("INSERT INTO report").WithArgs(clusterName).WillReturnError(mockedError)
+		mock.ExpectExec("INSERT INTO cluster_rule_toggle").WithArgs(clusterName).WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectExec("INSERT INTO cluster_rule_user_feedback").WithArgs(clusterName).WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectExec("INSERT INTO cluster_user_rule_disable_feedback").WithArgs(clusterName).WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectExec("INSERT INTO rule_hit").WithArgs(clusterName).WillReturnResult(sqlmock.NewResult(1, 1))
+	}
+
+	mock.ExpectClose()
+
+	err = cleaner.FillInDatabaseByTestData(connection)
+	assert.Error(t, err, "error is expected while calling tested function")
+
+	assert.Equal(t, err, mockedError)
 
 	// check if DB can be closed successfully
 	checkConnectionClose(t, connection)
