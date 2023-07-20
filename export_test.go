@@ -56,4 +56,5 @@ var (
 	ReadClusterListFromCLIArgument = readClusterListFromCLIArgument
 	VacuumDB                       = vacuumDB
 	Cleanup                        = cleanup
+	FillInDatabase                 = fillInDatabase
 )
