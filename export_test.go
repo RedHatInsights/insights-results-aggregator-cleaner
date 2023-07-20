@@ -38,6 +38,7 @@ var (
 	PerformDisplayMultipleRuleDisable = performDisplayMultipleRuleDisable
 	PerformListOfOldReports           = performListOfOldReports
 	PerformListOfOldRatings           = performListOfOldRatings
+	PerformListOfOldConsumerErrors    = performListOfOldConsumerErrors
 	DeleteRecordFromTable             = deleteRecordFromTable
 	PerformCleanupInDB                = performCleanupInDB
 	PerformVacuumDB                   = performVacuumDB
