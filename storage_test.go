@@ -1301,6 +1301,44 @@ func TestFillInDatabaseByTestDataOnError1(t *testing.T) {
 	checkAllExpectations(t, mock)
 }
 
+// TestFillInDatabaseByTestDataOnError2 checks the basic behaviour of
+// fillInDatabaseByTestDataOnError function. Now the first INSERT statement return error.
+func TestFillInDatabaseByTestDataOnError2(t *testing.T) {
+	// error to be thrown
+	mockedError := errors.New("insert into report")
+
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	clusterNames := [...]string{
+		"00000000-0000-0000-0000-000000000000",
+		"11111111-1111-1111-1111-111111111111",
+		"5d5892d4-1f74-4ccf-91af-548dfc9767aa",
+	}
+
+	for _, clusterName := range clusterNames {
+		mock.ExpectExec("INSERT INTO report").WithArgs(clusterName).WillReturnError(mockedError)
+		mock.ExpectExec("INSERT INTO cluster_rule_toggle").WithArgs(clusterName).WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectExec("INSERT INTO cluster_rule_user_feedback").WithArgs(clusterName).WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectExec("INSERT INTO cluster_user_rule_disable_feedback").WithArgs(clusterName).WillReturnResult(sqlmock.NewResult(1, 1))
+		mock.ExpectExec("INSERT INTO rule_hit").WithArgs(clusterName).WillReturnResult(sqlmock.NewResult(1, 1))
+	}
+
+	mock.ExpectClose()
+
+	err = cleaner.FillInDatabaseByTestData(connection)
+	assert.Error(t, err, "error is expected while calling tested function")
+
+	assert.Equal(t, err, mockedError)
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
 // TestPerformCleanupInDB checks the basic behaviour of
 // performCleanupInDB function.
 func TestPerformCleanupInDB(t *testing.T) {
