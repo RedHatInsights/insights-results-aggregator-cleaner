@@ -1011,6 +1011,41 @@ func TestDisplayAllOldRecordsNoConnection(t *testing.T) {
 	assert.Error(t, err, "error is expected while calling tested function")
 }
 
+// TestDisplayAllOldRecordErrorInFirstList checks the basic behaviour of
+// displayAllOldRecords function when error occurs.
+func TestDisplayAllOldRecordsErrorFirstList(t *testing.T) {
+	// error to be thrown
+	mockedError := errors.New("mocked error")
+
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	// prepare mocked result for SQL query
+	rows := sqlmock.NewRows([]string{"cluster", "reported_at", "last_checked"})
+	reportedAt := time.Now()
+	updatedAt := time.Now()
+	rows.AddRow(cluster1ID, reportedAt, updatedAt)
+
+	// expected queries performed by tested function
+	expectedQuery1 := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
+	mock.ExpectQuery(expectedQuery1).WillReturnError(mockedError)
+
+	mock.ExpectClose()
+
+	// call the tested function without filename (stdout)
+	err = cleaner.DisplayAllOldRecords(connection, "10", "")
+	assert.Error(t, err, "error not expected while calling tested function")
+
+	assert.Equal(t, err, mockedError)
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
 // TestDisplayAllOldRecordErrorInLastList checks the basic behaviour of
 // displayAllOldRecords function when error occurs.
 func TestDisplayAllOldRecordsErrorInLastList(t *testing.T) {
