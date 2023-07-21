@@ -1190,3 +1190,19 @@ func TestDisplayOldRecordsProperConnection(t *testing.T) {
 	assert.NoError(t, err, "error is not expected while calling tested function")
 	assert.Equal(t, main.ExitStatusOK, exitCode)
 }
+
+// TestDetectMultipleRuleDisablesNoConnection check the function
+// detectMultipleRuleDisable when the connection to DB is not established
+func TestDetectMultipleRuleDisablesNoConnection(t *testing.T) {
+	// command line flags
+	cliFlags := main.CliFlags{}
+
+	// call the tested function
+	status, err := main.DetectMultipleRuleDisable(nil, cliFlags)
+
+	// error is expected
+	assert.Error(t, err, "error is expected while calling main.vacuumDB")
+
+	// check the status
+	assert.Equal(t, status, main.ExitStatusStorageError)
+}
