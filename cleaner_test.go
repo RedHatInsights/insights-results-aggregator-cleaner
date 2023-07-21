@@ -1135,3 +1135,45 @@ func TestDisplayOldRecordsNoConnection(t *testing.T) {
 	assert.Error(t, err, "error is expected while calling tested function")
 	assert.Equal(t, exitCode, main.ExitStatusStorageError)
 }
+
+// TestDisplayOldRecordsProperConnection checks the basic behaviour of
+// displayOldRecords function when connection is established.
+func TestDisplayOldRecordsProperConnection(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	// fill in configuration structure
+	configuration := main.ConfigStruct{}
+	configuration.Cleaner = main.CleanerConfiguration{
+		MaxAge: "3 days",
+	}
+
+	// command line flags
+	cliFlags := main.CliFlags{}
+
+	// prepare mocked result for SQL query
+	rows := sqlmock.NewRows([]string{"cluster", "reported_at", "last_checked"})
+	reportedAt := time.Now()
+	updatedAt := time.Now()
+	rows.AddRow(cluster1ID, reportedAt, updatedAt)
+
+	// expected queries performed by tested function
+	expectedQuery1 := "SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
+	mock.ExpectQuery(expectedQuery1).WillReturnRows(rows)
+
+	expectedQuery2 := "SELECT org_id, rule_fqdn, error_key, rule_id, rating, last_updated_at FROM advisor_ratings WHERE last_updated_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY last_updated_at"
+	mock.ExpectQuery(expectedQuery2).WillReturnRows(rows)
+
+	expectedQuery3 := "SELECT topic, partition, topic_offset, key, consumed_at, message FROM consumer_error WHERE consumed_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY consumed_at"
+	mock.ExpectQuery(expectedQuery3).WillReturnRows(rows)
+
+	mock.ExpectClose()
+
+	// call the tested function
+	exitCode, err := main.DisplayOldRecords(&configuration, connection, cliFlags)
+
+	// and check its output
+	assert.NoError(t, err, "error is not expected while calling tested function")
+	assert.Equal(t, main.ExitStatusOK, exitCode)
+}
