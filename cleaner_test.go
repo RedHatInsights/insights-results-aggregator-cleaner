@@ -834,6 +834,66 @@ func TestCleanupPrintSummaryTable(t *testing.T) {
 	assert.Equal(t, status, main.ExitStatusOK)
 }
 
+// TestCleanupCheckSummaryTableContent check the function cleanup when
+// summary table should be printed
+func TestCleanupCheckSummaryTableContent(t *testing.T) {
+	var expectedOutputLines []string = []string{
+		"+-----------------------------------------------------------+-------+",
+		"|                          SUMMARY                          | COUNT |",
+		"+-----------------------------------------------------------+-------+",
+		"| Proper cluster entries                                    |     5 |",
+		"| Improper cluster entries                                  |     2 |",
+		"|                                                           |       |",
+		"| Deletions from table 'cluster_rule_user_feedback'         |     0 |",
+		"| Deletions from table 'cluster_user_rule_disable_feedback' |     0 |",
+		"| Deletions from table 'rule_hit'                           |     0 |",
+		"| Deletions from table 'recommendation'                     |     0 |",
+		"| Deletions from table 'report_info'                        |     0 |",
+		"| Deletions from table 'report'                             |     0 |",
+		"| Deletions from table 'cluster_rule_toggle'                |     0 |",
+		"+-----------------------------------------------------------+-------+",
+		"|                      TOTAL DELETIONS                      |   0   |",
+		"+-----------------------------------------------------------+-------+",
+	}
+
+	// prepare new mocked connection to database
+	connection, _, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	// stub for structures needed to call the tested function
+	configuration := main.ConfigStruct{}
+
+	configuration.Cleaner = main.CleanerConfiguration{
+		MaxAge:          "3 days",
+		ClusterListFile: "cluster_list.txt",
+	}
+
+	cliFlags := main.CliFlags{
+		ShowVersion:       false,
+		ShowAuthors:       false,
+		ShowConfiguration: false,
+		PrintSummaryTable: true,
+	}
+
+	var status int
+
+	// call the tested function
+	output, err := capture.StandardOutput(func() {
+		status, _ = main.Cleanup(&configuration, connection, cliFlags)
+	})
+
+	// check the captured text
+	checkCapture(t, err)
+
+	// check if captured text contains expected summary table
+	for _, expectedLine := range expectedOutputLines {
+		assert.Contains(t, output, expectedLine)
+	}
+
+	// check the status
+	assert.Equal(t, status, main.ExitStatusOK)
+}
+
 // TestDetectMultipleRuleDisable check the function detectMultipleRuleDisable when the
 // connection to DB is not established
 func TestDetectMultipleRuleDisable(t *testing.T) {
