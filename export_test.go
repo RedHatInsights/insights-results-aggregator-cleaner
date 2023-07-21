@@ -57,4 +57,5 @@ var (
 	VacuumDB                       = vacuumDB
 	Cleanup                        = cleanup
 	FillInDatabase                 = fillInDatabase
+	DisplayOldRecords              = displayOldRecords
 )
