@@ -770,6 +770,38 @@ func TestCleanupOnReadClusterListError(t *testing.T) {
 	assert.Equal(t, status, main.ExitStatusPerformCleanupError)
 }
 
+// TestCleanup check the function cleanup when
+// summary table should not be printed
+func TestCleanup(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, _, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	// stub for structures needed to call the tested function
+	configuration := main.ConfigStruct{}
+
+	configuration.Cleaner = main.CleanerConfiguration{
+		MaxAge:          "3 days",
+		ClusterListFile: "cluster_list.txt",
+	}
+
+	cliFlags := main.CliFlags{
+		ShowVersion:       false,
+		ShowAuthors:       false,
+		ShowConfiguration: false,
+		PrintSummaryTable: false,
+	}
+
+	// call the tested function
+	status, err := main.Cleanup(&configuration, connection, cliFlags)
+
+	// error is not expected
+	assert.NoError(t, err, "error is not expected while calling main.cleanup")
+
+	// check the status
+	assert.Equal(t, status, main.ExitStatusOK)
+}
+
 // TestCleanupPrintSummaryTable check the function cleanup when
 // summary table should be printed
 func TestCleanupPrintSummaryTable(t *testing.T) {
