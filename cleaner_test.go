@@ -1119,3 +1119,19 @@ func TestFillInDatabaseNoConnection(t *testing.T) {
 	assert.Error(t, err, "error is expected while calling tested function")
 	assert.Equal(t, exitCode, main.ExitStatusFillInStorageError)
 }
+
+// TestDisplayOldRecordsNoConnection checks the basic behaviour of
+// displayOldRecords function when connection is not established.
+func TestDisplayOldRecordsNoConnection(t *testing.T) {
+	// fill in configuration structure
+	configuration := main.ConfigStruct{}
+	configuration.Cleaner = main.CleanerConfiguration{
+		MaxAge: "3 days",
+	}
+
+	cliFlags := main.CliFlags{}
+
+	exitCode, err := main.DisplayOldRecords(&configuration, nil, cliFlags)
+	assert.Error(t, err, "error is expected while calling tested function")
+	assert.Equal(t, exitCode, main.ExitStatusStorageError)
+}
