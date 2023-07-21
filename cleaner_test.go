@@ -1236,3 +1236,37 @@ func TestDetectMultipleRuleDisablesProperConnection(t *testing.T) {
 	// check the status
 	assert.Equal(t, status, main.ExitStatusOK)
 }
+
+// TestDetectMultipleRuleDisablesOnError1 check the function
+// detectMultipleRuleDisable when DB error is thrown
+func TestDetectMultipleRuleDisablesOnError1(t *testing.T) {
+	// error to be thrown
+	mockedError := errors.New("mocked error")
+
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	// command line flags
+	cliFlags := main.CliFlags{}
+
+	// prepare mocked result for SQL query
+	rows := sqlmock.NewRows([]string{})
+
+	// expected queries performed by tested function
+	expectedQuery1 := "select cluster_id, rule_id, count\\(\\*\\) as cnt from cluster_rule_toggle group by cluster_id, rule_id having count\\(\\*\\)>1 order by cnt desc;"
+	expectedQuery2 := "select cluster_id, rule_id, count\\(\\*\\) as cnt from cluster_user_rule_disable_feedback group by cluster_id, rule_id having count\\(\\*\\)>1 order by cnt desc;"
+	mock.ExpectQuery(expectedQuery1).WillReturnRows(rows)
+	mock.ExpectQuery(expectedQuery2).WillReturnError(mockedError)
+	mock.ExpectClose()
+
+	// call the tested function
+	status, err := main.DetectMultipleRuleDisable(connection, cliFlags)
+
+	// error is expected
+	assert.Error(t, err, "error is expected while calling main.detectMultipleRuleDisable")
+	assert.Equal(t, err, mockedError)
+
+	// check the status
+	assert.Equal(t, status, main.ExitStatusStorageError)
+}
