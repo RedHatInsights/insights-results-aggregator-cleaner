@@ -299,6 +299,32 @@ func TestDoSelectedOperationDetectMultipleRuleDisable(t *testing.T) {
 	assert.Equal(t, code, main.ExitStatusStorageError)
 }
 
+// TestDoSelectedOperationFillInDatabase checks the function
+// fillInDatabase called via doSelectedOperation function
+func TestDoSelectedOperationFillInDatabase(t *testing.T) {
+	// fill in configuration structure
+	configuration := main.ConfigStruct{}
+
+	cliFlags := main.CliFlags{
+		ShowVersion:               false,
+		ShowAuthors:               false,
+		ShowConfiguration:         false,
+		VacuumDatabase:            false,
+		PerformCleanup:            false,
+		DetectMultipleRuleDisable: false,
+		FillInDatabase:            true,
+	}
+
+	// call tested function
+	code, err := main.DoSelectedOperation(&configuration, nil, cliFlags)
+
+	// error is expected
+	assert.Error(t, err, "error is expected while calling main.vacuumDB")
+
+	// check the status
+	assert.Equal(t, code, main.ExitStatusFillInStorageError)
+}
+
 // TestReadClusterList checks the function readClusterList from
 // cleaner.go using correct cluster list file
 func TestReadClusterList(t *testing.T) {
