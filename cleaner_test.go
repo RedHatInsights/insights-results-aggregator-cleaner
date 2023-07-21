@@ -325,6 +325,32 @@ func TestDoSelectedOperationFillInDatabase(t *testing.T) {
 	assert.Equal(t, code, main.ExitStatusFillInStorageError)
 }
 
+// TestDoSelectedOperationDefaultOperation checks the function
+// displayOldRecords called via doSelectedOperation function
+func TestDoSelectedOperationDefaultOperation(t *testing.T) {
+	// fill in configuration structure
+	configuration := main.ConfigStruct{}
+
+	cliFlags := main.CliFlags{
+		ShowVersion:               false,
+		ShowAuthors:               false,
+		ShowConfiguration:         false,
+		VacuumDatabase:            false,
+		PerformCleanup:            false,
+		DetectMultipleRuleDisable: false,
+		FillInDatabase:            false,
+	}
+
+	// call tested function
+	code, err := main.DoSelectedOperation(&configuration, nil, cliFlags)
+
+	// error is expected
+	assert.Error(t, err, "error is expected while calling main.vacuumDB")
+
+	// check the status
+	assert.Equal(t, code, main.ExitStatusStorageError)
+}
+
 // TestReadClusterList checks the function readClusterList from
 // cleaner.go using correct cluster list file
 func TestReadClusterList(t *testing.T) {
