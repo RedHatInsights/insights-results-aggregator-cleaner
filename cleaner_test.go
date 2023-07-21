@@ -28,6 +28,7 @@ import (
 	"github.com/tisnik/go-capture"
 	"os"
 	"testing"
+	"time"
 
 	main "github.com/RedHatInsights/insights-results-aggregator-cleaner"
 )
@@ -149,9 +150,13 @@ func TestDoSelectedOperationShowVersion(t *testing.T) {
 	// stub for structures needed to call the tested function
 	configuration := main.ConfigStruct{}
 	cliFlags := main.CliFlags{
-		ShowVersion:       true,
-		ShowAuthors:       false,
-		ShowConfiguration: false,
+		ShowVersion:               true,
+		ShowAuthors:               false,
+		ShowConfiguration:         false,
+		VacuumDatabase:            false,
+		PerformCleanup:            false,
+		DetectMultipleRuleDisable: false,
+		FillInDatabase:            false,
 	}
 
 	// try to call the tested function and capture its output
@@ -173,9 +178,13 @@ func TestDoSelectedOperationShowAuthors(t *testing.T) {
 	// stub for structures needed to call the tested function
 	configuration := main.ConfigStruct{}
 	cliFlags := main.CliFlags{
-		ShowVersion:       false,
-		ShowAuthors:       true,
-		ShowConfiguration: false,
+		ShowVersion:               false,
+		ShowAuthors:               true,
+		ShowConfiguration:         false,
+		VacuumDatabase:            false,
+		PerformCleanup:            false,
+		DetectMultipleRuleDisable: false,
+		FillInDatabase:            false,
 	}
 
 	// try to call the tested function and capture its output
@@ -198,9 +207,13 @@ func TestDoSelectedOperationShowConfiguration(t *testing.T) {
 	configuration := main.ConfigStruct{}
 
 	cliFlags := main.CliFlags{
-		ShowVersion:       false,
-		ShowAuthors:       false,
-		ShowConfiguration: true,
+		ShowVersion:               false,
+		ShowAuthors:               false,
+		ShowConfiguration:         true,
+		VacuumDatabase:            false,
+		PerformCleanup:            false,
+		DetectMultipleRuleDisable: false,
+		FillInDatabase:            false,
 	}
 
 	// try to call the tested function and capture its output
