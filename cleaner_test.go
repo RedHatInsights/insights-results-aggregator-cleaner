@@ -743,6 +743,33 @@ func TestCleanupNoConnection(t *testing.T) {
 	assert.Equal(t, status, main.ExitStatusPerformCleanupError)
 }
 
+// TestCleanupOnReadClusterListError check the function cleanup when
+// cluster list can not be retrieved
+func TestCleanupOnReadClusterListError(t *testing.T) {
+	// stub for structures needed to call the tested function
+	configuration := main.ConfigStruct{}
+
+	configuration.Cleaner = main.CleanerConfiguration{
+		// non-existent file
+		ClusterListFile: "tests/this_dos_not_exists.txt",
+	}
+
+	cliFlags := main.CliFlags{
+		ShowVersion:       false,
+		ShowAuthors:       false,
+		ShowConfiguration: false,
+	}
+
+	// call the tested function
+	status, err := main.Cleanup(&configuration, nil, cliFlags)
+
+	// error is expected
+	assert.Error(t, err, "error is expected while calling main.cleanup")
+
+	// check the status
+	assert.Equal(t, status, main.ExitStatusPerformCleanupError)
+}
+
 // TestDetectMultipleRuleDisable check the function detectMultipleRuleDisable when the
 // connection to DB is not established
 func TestDetectMultipleRuleDisable(t *testing.T) {
