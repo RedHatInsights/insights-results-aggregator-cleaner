@@ -221,6 +221,32 @@ func TestDoSelectedOperationShowConfiguration(t *testing.T) {
 	assert.Contains(t, output, "Records max age")
 }
 
+// TestDoSelectedOperationVacuumDatabase checks the function
+// vacuumDB called via doSelectedOperation function
+func TestDoSelectedOperationVacuumDatabase(t *testing.T) {
+	// fill in configuration structure
+	configuration := main.ConfigStruct{}
+
+	cliFlags := main.CliFlags{
+		ShowVersion:               false,
+		ShowAuthors:               false,
+		ShowConfiguration:         false,
+		VacuumDatabase:            true,
+		PerformCleanup:            false,
+		DetectMultipleRuleDisable: false,
+		FillInDatabase:            false,
+	}
+
+	// call tested function
+	code, err := main.DoSelectedOperation(&configuration, nil, cliFlags)
+
+	// error is expected
+	assert.Error(t, err, "error is expected while calling main.vacuumDB")
+
+	// check the status
+	assert.Equal(t, code, main.ExitStatusPerformVacuumError)
+}
+
 // TestReadClusterList checks the function readClusterList from
 // cleaner.go using correct cluster list file
 func TestReadClusterList(t *testing.T) {
