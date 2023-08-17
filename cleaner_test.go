@@ -21,14 +21,15 @@ package main_test
 
 import (
 	"errors"
+	"os"
+	"testing"
+	"time"
+
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/tisnik/go-capture"
-	"os"
-	"testing"
-	"time"
 
 	main "github.com/RedHatInsights/insights-results-aggregator-cleaner"
 )
@@ -137,9 +138,7 @@ func TestIsValidUUID(t *testing.T) {
 	for _, uuid := range uuids {
 		v := main.IsValidUUID(uuid.id)
 		assert.Equal(t, v, uuid.valid)
-
 	}
-
 }
 
 // TestDoSelectedOperationShowVersion checks the function showVersion called
