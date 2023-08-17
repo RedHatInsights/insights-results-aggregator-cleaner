@@ -55,7 +55,7 @@ func mustSetEnv(t *testing.T, key, val string) {
 
 // TestLoadDefaultConfiguration test loads a configuration file for testing
 // with check that load was correct
-func TestLoadDefaultConfiguration(t *testing.T) {
+func TestLoadDefaultConfiguration(_ *testing.T) {
 	os.Clearenv()
 	mustLoadConfiguration("nonExistingEnvVar")
 }
