@@ -137,8 +137,8 @@ func initDatabaseConnection(configuration *StorageConfiguration) (*sql.DB, error
 // displayMultipleRuleDisable function read and displays clusters where
 // multiple users have disabled some rules.
 func displayMultipleRuleDisable(connection *sql.DB, output string) error {
-	var fout *os.File = nil
-	var writer *bufio.Writer = nil
+	var fout *os.File
+	var writer *bufio.Writer
 
 	if output != "" {
 		// create output file
@@ -661,7 +661,7 @@ func performCleanupInDB(connection *sql.DB,
 // used against production database)
 func fillInDatabaseByTestData(connection *sql.DB) error {
 	log.Info().Msg("Fill-in database started")
-	var lastError error = nil
+	var lastError error
 
 	clusterNames := [...]string{
 		"00000000-0000-0000-0000-000000000000",
@@ -695,7 +695,6 @@ func fillInDatabaseByTestData(connection *sql.DB) error {
 				lastError = err
 			}
 		}
-
 	}
 	log.Info().Msg("Fill-in database finished")
 	return lastError
