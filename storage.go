@@ -367,7 +367,6 @@ func listOldDatabaseRecords(connection *sql.DB, maxAge string,
 	writer *bufio.Writer, query string,
 	logEntry string, countLogEntry string,
 	callback func(rows *sql.Rows, writer *bufio.Writer) (int, error)) error {
-
 	log.Info().Msg(logEntry + " begin")
 	rows, err := connection.Query(query, maxAge)
 	if err != nil {
@@ -616,7 +615,6 @@ func performVacuumDB(connection *sql.DB) error {
 // performCleanupInDB function cleans up all data for selected cluster names
 func performCleanupInDB(connection *sql.DB,
 	clusterList ClusterList) (map[string]int, error) {
-
 	// return value
 	deletionsForTable := make(map[string]int)
 
