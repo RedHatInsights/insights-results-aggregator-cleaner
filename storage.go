@@ -137,8 +137,8 @@ func initDatabaseConnection(configuration *StorageConfiguration) (*sql.DB, error
 // displayMultipleRuleDisable function read and displays clusters where
 // multiple users have disabled some rules.
 func displayMultipleRuleDisable(connection *sql.DB, output string) error {
-	var fout *os.File = nil
-	var writer *bufio.Writer = nil
+	var fout *os.File
+	var writer *bufio.Writer
 
 	if output != "" {
 		// create output file
@@ -207,7 +207,6 @@ func displayMultipleRuleDisable(connection *sql.DB, output string) error {
 // ids where multiple users disabled any rule
 func performDisplayMultipleRuleDisable(connection *sql.DB,
 	writer *bufio.Writer, query string, tableName string) error {
-
 	// perform given query to database
 	rows, err := connection.Query(query)
 	if err != nil {
@@ -293,8 +292,8 @@ func readOrgID(connection *sql.DB, clusterName string) (int, error) {
 }
 
 func createOutputFile(output string) (*os.File, *bufio.Writer) {
-	var fout *os.File = nil
-	var writer *bufio.Writer = nil
+	var fout *os.File
+	var writer *bufio.Writer
 
 	if output != "" {
 		// create output file
@@ -368,7 +367,6 @@ func listOldDatabaseRecords(connection *sql.DB, maxAge string,
 	writer *bufio.Writer, query string,
 	logEntry string, countLogEntry string,
 	callback func(rows *sql.Rows, writer *bufio.Writer) (int, error)) error {
-
 	log.Info().Msg(logEntry + " begin")
 	rows, err := connection.Query(query, maxAge)
 	if err != nil {
@@ -553,6 +551,7 @@ func deleteRecordFromTable(connection *sql.DB, table, key string, clusterName Cl
 	sqlStatement := "DELETE FROM " + table + " WHERE " + key + " = $1;"
 
 	// perform the SQL statement
+	// #nosec G202
 	result, err := connection.Exec(sqlStatement, clusterName)
 	if err != nil {
 		return 0, err
@@ -617,7 +616,6 @@ func performVacuumDB(connection *sql.DB) error {
 // performCleanupInDB function cleans up all data for selected cluster names
 func performCleanupInDB(connection *sql.DB,
 	clusterList ClusterList) (map[string]int, error) {
-
 	// return value
 	deletionsForTable := make(map[string]int)
 
@@ -664,7 +662,7 @@ func performCleanupInDB(connection *sql.DB,
 // used against production database)
 func fillInDatabaseByTestData(connection *sql.DB) error {
 	log.Info().Msg("Fill-in database started")
-	var lastError error = nil
+	var lastError error
 
 	clusterNames := [...]string{
 		"00000000-0000-0000-0000-000000000000",
@@ -698,7 +696,6 @@ func fillInDatabaseByTestData(connection *sql.DB) error {
 				lastError = err
 			}
 		}
-
 	}
 	log.Info().Msg("Fill-in database finished")
 	return lastError
