@@ -548,9 +548,10 @@ func deleteRecordFromTable(connection *sql.DB, table, key string, clusterName Cl
 	// it is not possible to use parameter for table name or a key
 	// disable "G202 (CWE-89): SQL string concatenation (Confidence: HIGH, Severity: MEDIUM)"
 	// #nosec G202
-	sqlStatement := "DELETE FROM " + table + " WHERE " + key + " = $1;" // #nosec G202
+	sqlStatement := "DELETE FROM " + table + " WHERE " + key + " = $1;"
 
 	// perform the SQL statement
+	// #nosec G202
 	result, err := connection.Exec(sqlStatement, clusterName)
 	if err != nil {
 		return 0, err
