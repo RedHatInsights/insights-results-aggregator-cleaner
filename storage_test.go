@@ -97,12 +97,12 @@ func TestReadOrgIDNoResults(t *testing.T) {
 	mock.ExpectClose()
 
 	// call the tested function
-	orgId, err := cleaner.ReadOrgID(connection, "123e4567-e89b-12d3-a456-426614174000")
+	orgID, err := cleaner.ReadOrgID(connection, "123e4567-e89b-12d3-a456-426614174000")
 	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check the org ID returned from tested function
-	if orgId != -1 {
-		t.Errorf("wrong org_id returned: %d", orgId)
+	if orgID != -1 {
+		t.Errorf("wrong org_id returned: %d", orgID)
 	}
 
 	// check if DB can be closed successfully
@@ -122,12 +122,12 @@ func TestReadOrgIDResult(t *testing.T) {
 	expectOrgIDQuery(mock)
 
 	// call the tested function
-	orgId, err := cleaner.ReadOrgID(connection, "123e4567-e89b-12d3-a456-426614174000")
+	orgID, err := cleaner.ReadOrgID(connection, "123e4567-e89b-12d3-a456-426614174000")
 	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check the org ID returned from tested function
-	if orgId != defaultOrgID {
-		t.Errorf("wrong org_id returned: %d", orgId)
+	if orgID != defaultOrgID {
+		t.Errorf("wrong org_id returned: %d", orgID)
 	}
 
 	// check if DB can be closed successfully
@@ -152,14 +152,14 @@ func TestReadOrgIDOnError(t *testing.T) {
 	mock.ExpectClose()
 
 	// call the tested function
-	orgId, err := cleaner.ReadOrgID(connection, "123e4567-e89b-12d3-a456-426614173999")
+	orgID, err := cleaner.ReadOrgID(connection, "123e4567-e89b-12d3-a456-426614173999")
 	if err == nil {
 		t.Fatalf("error was expected while updating stats")
 	}
 
 	// check the org ID returned from tested function
-	if orgId != -1 {
-		t.Errorf("wrong org_id returned: %d", orgId)
+	if orgID != -1 {
+		t.Errorf("wrong org_id returned: %d", orgID)
 	}
 
 	// check if the error is correct
@@ -190,11 +190,11 @@ func TestReadOrgIDScanError(t *testing.T) {
 	mock.ExpectClose()
 
 	// call the tested function
-	org_id, err := cleaner.ReadOrgID(connection, "123e4567-e89b-12d3-a456-426614173999")
+	orgID, err := cleaner.ReadOrgID(connection, "123e4567-e89b-12d3-a456-426614173999")
 	assert.Error(t, err, "scan error is expected")
 
 	// check the org ID returned from tested function
-	assert.Equal(t, -1, org_id, "wrong org_id returned: %d", org_id)
+	assert.Equal(t, -1, orgID, "wrong org_id returned: %d", orgID)
 
 	// check if DB can be closed successfully
 	checkConnectionClose(t, connection)
