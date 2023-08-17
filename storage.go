@@ -207,7 +207,6 @@ func displayMultipleRuleDisable(connection *sql.DB, output string) error {
 // ids where multiple users disabled any rule
 func performDisplayMultipleRuleDisable(connection *sql.DB,
 	writer *bufio.Writer, query string, tableName string) error {
-
 	// perform given query to database
 	rows, err := connection.Query(query)
 	if err != nil {
@@ -293,8 +292,8 @@ func readOrgID(connection *sql.DB, clusterName string) (int, error) {
 }
 
 func createOutputFile(output string) (*os.File, *bufio.Writer) {
-	var fout *os.File = nil
-	var writer *bufio.Writer = nil
+	var fout *os.File
+	var writer *bufio.Writer
 
 	if output != "" {
 		// create output file
