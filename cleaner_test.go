@@ -979,7 +979,7 @@ func TestCleanupPrintSummaryTable(t *testing.T) {
 // TestCleanupCheckSummaryTableContent check the function cleanup when
 // summary table should be printed
 func TestCleanupCheckSummaryTableContent(t *testing.T) {
-	var expectedOutputLines []string = []string{
+	var expectedOutputLines = []string{
 		"+-----------------------------------------------------------+-------+",
 		"|                          SUMMARY                          | COUNT |",
 		"+-----------------------------------------------------------+-------+",
