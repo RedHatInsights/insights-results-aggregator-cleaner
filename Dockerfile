@@ -23,7 +23,7 @@ RUN umask 0022 && \
     make build && \
     chmod a+x insights-results-aggregator-cleaner
 
-FROM registry.access.redhat.com/ubi8/ubi-minimal:8.8-1037
+FROM registry.access.redhat.com/ubi8/ubi-micro:8.8-5
 
 COPY --from=builder /opt/app-root/src/insights-results-aggregator-cleaner .
 
