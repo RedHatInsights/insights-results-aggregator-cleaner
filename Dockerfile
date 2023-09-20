@@ -27,12 +27,12 @@ FROM registry.access.redhat.com/ubi8/ubi-micro:latest
 
 COPY --from=builder /opt/app-root/src/insights-results-aggregator-cleaner .
 
-
-# RUN curl -L -o /usr/bin/haberdasher \
-#     https://github.com/RedHatInsights/haberdasher/releases/download/v0.1.3/haberdasher_linux_amd64 && \
-#     chmod 755 /usr/bin/haberdasher
-
 USER 1001
+
+# copy the certificates from builder image
+COPY --from=builder /etc/ssl /etc/ssl
+COPY --from=builder /etc/pki /etc/pki
+
 
 # ENTRYPOINT ["/usr/bin/haberdasher"]
 CMD ["/insights-results-aggregator-cleaner"]
