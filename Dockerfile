@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM registry.redhat.io/rhel8/go-toolset:1.17 AS builder
+FROM registry.redhat.io/rhel8/go-toolset:1.18.9-8.1675807488 AS builder
 
 COPY . .
 
@@ -23,16 +23,16 @@ RUN umask 0022 && \
     make build && \
     chmod a+x insights-results-aggregator-cleaner
 
-FROM registry.access.redhat.com/ubi8/ubi-minimal:8.8-1014
+FROM registry.access.redhat.com/ubi8/ubi-micro:latest
 
 COPY --from=builder /opt/app-root/src/insights-results-aggregator-cleaner .
 
-
-# RUN curl -L -o /usr/bin/haberdasher \
-#     https://github.com/RedHatInsights/haberdasher/releases/download/v0.1.3/haberdasher_linux_amd64 && \
-#     chmod 755 /usr/bin/haberdasher
-
 USER 1001
+
+# copy the certificates from builder image
+COPY --from=builder /etc/ssl /etc/ssl
+COPY --from=builder /etc/pki /etc/pki
+
 
 # ENTRYPOINT ["/usr/bin/haberdasher"]
 CMD ["/insights-results-aggregator-cleaner"]

@@ -35,7 +35,7 @@ Before you submit your pull request consider the following guidelines:
 * Include documentation that either describe a change to a behavior or the changed capability to an end user
 * Commit your changes using **a descriptive commit message**. If you are fixing an issue please include something like 'this closes issue #xyz'
   * Please make sure your tests pass!
-  * Currently we use Travis CI for our automated testing.
+  * Currently we use Github workflows for our automated testing.
 
 * Push your branch to GitHub:
 

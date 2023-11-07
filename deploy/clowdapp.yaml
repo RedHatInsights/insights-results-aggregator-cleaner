@@ -32,7 +32,7 @@ objects:
               memory: ${MEMORY_REQUEST}
           env:
             - name: INSIGHTS_RESULTS_CLEANER__STORAGE__PG_PARAMS
-              value: sslmode=disable
+              value: ${PG_PARAMS}
             - name: INSIGHTS_RESULTS_CLEANER__STORAGE__DB_DRIVER
               value: postgres
             - name: INSIGHTS_RESULTS_CLEANER__LOGGING__DEBUG
@@ -94,3 +94,5 @@ parameters:
 - name: DEADLINE_TIMEOUT
   description: Deadline for the job execution
   value: "600"
+- name: PG_PARAMS
+  value: sslmode=require

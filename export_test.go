@@ -37,10 +37,13 @@ var (
 	DisplayAllOldRecords              = displayAllOldRecords
 	PerformDisplayMultipleRuleDisable = performDisplayMultipleRuleDisable
 	PerformListOfOldReports           = performListOfOldReports
+	PerformListOfOldRatings           = performListOfOldRatings
+	PerformListOfOldConsumerErrors    = performListOfOldConsumerErrors
 	DeleteRecordFromTable             = deleteRecordFromTable
 	PerformCleanupInDB                = performCleanupInDB
 	PerformVacuumDB                   = performVacuumDB
 	FillInDatabaseByTestData          = fillInDatabaseByTestData
+	InitDatabaseConnection            = initDatabaseConnection
 
 	// functions from the cleaner.go source file
 	ShowVersion                    = showVersion
@@ -51,4 +54,8 @@ var (
 	ReadClusterListFromFile        = readClusterListFromFile
 	ReadClusterListFromCLIArgument = readClusterListFromCLIArgument
 	VacuumDB                       = vacuumDB
+	Cleanup                        = cleanup
+	FillInDatabase                 = fillInDatabase
+	DisplayOldRecords              = displayOldRecords
+	DetectMultipleRuleDisable      = detectMultipleRuleDisable
 )

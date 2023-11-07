@@ -5,8 +5,9 @@ nav_order: 7
 
 # Continuous integration
 
-[Travis CI](https://travis-ci.com/) is configured for this repository. Several
-tests and checks are started for all pull requests:
+[Github workflows](https://docs.github.com/en/actions/using-workflows) are
+configured for this repository. Several tests and checks are started for
+all pull requests:
 
 * Unit tests that use the standard tool `go test` (see [Testing](testing.html)
   section).
@@ -37,6 +38,5 @@ https://www.shellcheck.net/.
 All the above test and checks should be executed without a single error in order
 to merge new changes into `master` branch.
 
-History of checks performed by CI is available at
-[RedHatInsights /
-insights-results-smart-proxy](https://travis-ci.org/RedHatInsights/insights-results-smart-proxy).
+History of checks performed by CI is available in [the repository's
+Actions](https://github.com/RedHatInsights/insights-results-aggregator-cleaner/actions).

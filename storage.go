@@ -34,6 +34,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"math"
 	"os"
@@ -51,6 +52,7 @@ import (
 const (
 	canNotConnectToDataStorageMessage = "Can not connect to data storage"
 	unableToCloseDBRowsHandle         = "Unable to close the DB rows handle"
+	connectionNotEstablished          = "Connection to database was not established"
 )
 
 // Other messages
@@ -87,6 +89,15 @@ const (
 // initDatabaseConnection initializes driver, checks if it's supported and
 // initializes connection to the storage.
 func initDatabaseConnection(configuration *StorageConfiguration) (*sql.DB, error) {
+	// check if storage configuration structure has been initialized and
+	// passed to this function properly
+	if configuration == nil {
+		const message = "StorageConfiguration structure should be provided"
+		err := errors.New(message)
+		log.Error().Msg(message)
+		return nil, err
+	}
+
 	driverName := configuration.Driver
 	dataSource := ""
 	log.Info().Str("driverName", configuration.Driver).Msg("DB connection configuration")
@@ -126,8 +137,8 @@ func initDatabaseConnection(configuration *StorageConfiguration) (*sql.DB, error
 // displayMultipleRuleDisable function read and displays clusters where
 // multiple users have disabled some rules.
 func displayMultipleRuleDisable(connection *sql.DB, output string) error {
-	var fout *os.File = nil
-	var writer *bufio.Writer = nil
+	var fout *os.File
+	var writer *bufio.Writer
 
 	if output != "" {
 		// create output file
@@ -196,7 +207,6 @@ func displayMultipleRuleDisable(connection *sql.DB, output string) error {
 // ids where multiple users disabled any rule
 func performDisplayMultipleRuleDisable(connection *sql.DB,
 	writer *bufio.Writer, query string, tableName string) error {
-
 	// perform given query to database
 	rows, err := connection.Query(query)
 	if err != nil {
@@ -281,11 +291,9 @@ func readOrgID(connection *sql.DB, clusterName string) (int, error) {
 	return -1, nil
 }
 
-// displayAllOldRecords function read all old records, ie. records that are
-// older than the specified time duration. Those records are simply displayed.
-func displayAllOldRecords(connection *sql.DB, maxAge, output string) error {
-	var fout *os.File = nil
-	var writer *bufio.Writer = nil
+func createOutputFile(output string) (*os.File, *bufio.Writer) {
+	var fout *os.File
+	var writer *bufio.Writer
 
 	if output != "" {
 		// create output file
@@ -296,8 +304,20 @@ func displayAllOldRecords(connection *sql.DB, maxAge, output string) error {
 		}
 		// an object used to write to file
 		writer = bufio.NewWriter(fout)
-
 	}
+	return fout, writer
+}
+
+// displayAllOldRecords function read all old records, ie. records that are
+// older than the specified time duration. Those records are simply displayed.
+func displayAllOldRecords(connection *sql.DB, maxAge, output string) error {
+	// check if connection has been initialized
+	if connection == nil {
+		log.Error().Msg(connectionNotEstablished)
+		return errors.New(connectionNotEstablished)
+	}
+
+	fout, writer := createOutputFile(output)
 
 	defer func() {
 		// output needs to be flushed at the end
@@ -347,7 +367,6 @@ func listOldDatabaseRecords(connection *sql.DB, maxAge string,
 	writer *bufio.Writer, query string,
 	logEntry string, countLogEntry string,
 	callback func(rows *sql.Rows, writer *bufio.Writer) (int, error)) error {
-
 	log.Info().Msg(logEntry + " begin")
 	rows, err := connection.Query(query, maxAge)
 	if err != nil {
@@ -532,6 +551,7 @@ func deleteRecordFromTable(connection *sql.DB, table, key string, clusterName Cl
 	sqlStatement := "DELETE FROM " + table + " WHERE " + key + " = $1;"
 
 	// perform the SQL statement
+	// #nosec G202
 	result, err := connection.Exec(sqlStatement, clusterName)
 	if err != nil {
 		return 0, err
@@ -596,9 +616,16 @@ func performVacuumDB(connection *sql.DB) error {
 // performCleanupInDB function cleans up all data for selected cluster names
 func performCleanupInDB(connection *sql.DB,
 	clusterList ClusterList) (map[string]int, error) {
+	// return value
+	deletionsForTable := make(map[string]int)
+
+	// check if connection has been initialized
+	if connection == nil {
+		log.Error().Msg(connectionNotEstablished)
+		return deletionsForTable, errors.New(connectionNotEstablished)
+	}
 
 	// initialize counters
-	deletionsForTable := make(map[string]int)
 	for _, tableAndKey := range tablesAndKeys {
 		deletionsForTable[tableAndKey.TableName] = 0
 	}
@@ -635,7 +662,7 @@ func performCleanupInDB(connection *sql.DB,
 // used against production database)
 func fillInDatabaseByTestData(connection *sql.DB) error {
 	log.Info().Msg("Fill-in database started")
-	var lastError error = nil
+	var lastError error
 
 	clusterNames := [...]string{
 		"00000000-0000-0000-0000-000000000000",
@@ -669,7 +696,6 @@ func fillInDatabaseByTestData(connection *sql.DB) error {
 				lastError = err
 			}
 		}
-
 	}
 	log.Info().Msg("Fill-in database finished")
 	return lastError

@@ -40,6 +40,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -67,6 +68,7 @@ const (
 	clusterListFinished          = "Cluster list finished"
 	inputWithClusterID           = "input"
 	selectingRecordsFromDatabase = "Selecting records from database"
+	connectionToDBNotEstablished = "Connection to database was not established"
 )
 
 // Exit codes
@@ -259,6 +261,12 @@ func PrintSummaryTable(summary Summary) {
 
 // vacuumDB function starts the database vacuuming operation
 func vacuumDB(connection *sql.DB) (int, error) {
+	// connection might be nil when DB init does not finish correctly
+	if connection == nil {
+		log.Error().Msg(connectionToDBNotEstablished)
+		return ExitStatusPerformVacuumError, errors.New(connectionToDBNotEstablished)
+	}
+
 	err := performVacuumDB(connection)
 	if err != nil {
 		log.Err(err).Msg("Performing vacuuming database")
@@ -295,6 +303,12 @@ func cleanup(configuration *ConfigStruct, connection *sql.DB, cliFlags CliFlags)
 // detectMultipleRuleDisable function detects clusters that have the same
 // rule(s) disabled by different users
 func detectMultipleRuleDisable(connection *sql.DB, cliFlags CliFlags) (int, error) {
+	// connection might be nil when DB init does not finish correctly
+	if connection == nil {
+		log.Error().Msg(connectionToDBNotEstablished)
+		return ExitStatusStorageError, errors.New(connectionToDBNotEstablished)
+	}
+
 	err := displayMultipleRuleDisable(connection, cliFlags.Output)
 	if err != nil {
 		log.Err(err).Msg(selectingRecordsFromDatabase)
@@ -306,6 +320,12 @@ func detectMultipleRuleDisable(connection *sql.DB, cliFlags CliFlags) (int, erro
 
 // fillInDatabase function fills-in database by test data
 func fillInDatabase(connection *sql.DB) (int, error) {
+	// connection might be nil when DB init does not finish correctly
+	if connection == nil {
+		log.Error().Msg(connectionToDBNotEstablished)
+		return ExitStatusFillInStorageError, errors.New(connectionToDBNotEstablished)
+	}
+
 	err := fillInDatabaseByTestData(connection)
 	if err != nil {
 		log.Err(err).Msg("Fill-in database by test data")

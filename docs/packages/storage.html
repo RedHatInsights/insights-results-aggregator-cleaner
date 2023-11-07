@@ -1,20 +1,4 @@
 <!DOCTYPE html>
-<!--
- Copyright 2022 Red Hat, Inc
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
--->
-
 <html>
 <head>
 <title>storage.go</title>
@@ -118,7 +102,7 @@
       <tr class="section">
 	<td class="doc"></td>
 	<td class="code"><pre><code><div class="comment">/*
-Copyright © 2021, 2022 Red Hat, Inc.
+Copyright © 2021, 2022, 2023 Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the &#34;License&#34;);
 you may not use this file except in compliance with the License.
@@ -168,6 +152,7 @@ https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner
 	<td class="code"><pre><code>
 <div class="keyword">import</div> <div class="operator">(</div>
 	<div class="literal">&#34;bufio&#34;</div><div class="operator"></div>
+	<div class="literal">&#34;errors&#34;</div><div class="operator"></div>
 	<div class="literal">&#34;fmt&#34;</div><div class="operator"></div>
 	<div class="literal">&#34;math&#34;</div><div class="operator"></div>
 	<div class="literal">&#34;os&#34;</div><div class="operator"></div>
@@ -175,8 +160,8 @@ https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner
 
 	<div class="literal">&#34;database/sql&#34;</div><div class="operator"></div>
 
-	<div class="ident">_</div> <div class="literal">&#34;github.com/lib/pq&#34;</div>           <div class="operator"></div><div class="comment">// PostgreSQL database driver</div>
-	<div class="ident">_</div> <div class="literal">&#34;github.com/mattn/go-sqlite3&#34;</div> <div class="operator"></div><div class="comment">// SQLite database driver</div>
+	<div class="ident">_</div> <div class="literal">&#34;github.com/lib/pq&#34;</div>           <div class="comment">// PostgreSQL database driver</div><div class="operator"></div>
+	<div class="ident">_</div> <div class="literal">&#34;github.com/mattn/go-sqlite3&#34;</div> <div class="comment">// SQLite database driver</div><div class="operator"></div>
 
 	<div class="literal">&#34;github.com/rs/zerolog/log&#34;</div><div class="operator"></div>
 <div class="operator">)</div><div class="operator"></div>
@@ -190,6 +175,7 @@ https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner
 	<td class="code"><pre><code><div class="keyword">const</div> <div class="operator">(</div>
 	<div class="ident">canNotConnectToDataStorageMessage</div> <div class="operator">=</div> <div class="literal">&#34;Can not connect to data storage&#34;</div><div class="operator"></div>
 	<div class="ident">unableToCloseDBRowsHandle</div>         <div class="operator">=</div> <div class="literal">&#34;Unable to close the DB rows handle&#34;</div><div class="operator"></div>
+	<div class="ident">connectionNotEstablished</div>          <div class="operator">=</div> <div class="literal">&#34;Connection to database was not established&#34;</div><div class="operator"></div>
 <div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
@@ -211,10 +197,50 @@ https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner
       </tr>
       
       <tr class="section">
+	<td class="doc"><p>SQL commands</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">const</div> <div class="operator">(</div>
+	<div class="ident">selectOldReports</div> <div class="operator">=</div> <div class="literal">`
+	    SELECT cluster, reported_at, last_checked_at
+	      FROM report
+	     WHERE reported_at &lt; NOW() - $1::INTERVAL
+	     ORDER BY reported_at`</div><div class="operator"></div>
+
+	<div class="ident">selectOldAdvisorRatings</div> <div class="operator">=</div> <div class="literal">`
+	    SELECT org_id, rule_fqdn, error_key, rule_id, rating, last_updated_at
+	      FROM advisor_ratings
+	     WHERE last_updated_at &lt; NOW() - $1::INTERVAL
+	     ORDER BY last_updated_at`</div><div class="operator"></div>
+
+	<div class="ident">selectOldConsumerErrors</div> <div class="operator">=</div> <div class="literal">`
+	    SELECT topic, partition, topic_offset, key, consumed_at, message
+	      FROM consumer_error
+	     WHERE consumed_at &lt; NOW() - $1::INTERVAL
+	     ORDER BY consumed_at`</div><div class="operator"></div>
+<div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
 	<td class="doc"><p>initDatabaseConnection initializes driver, checks if it's supported and
 initializes connection to the storage.</p>
 </td>
-	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">initDatabaseConnection</div><div class="operator">(</div><div class="ident">configuration</div> <div class="ident">StorageConfiguration</div><div class="operator">)</div> <div class="operator">(</div><div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">initDatabaseConnection</div><div class="operator">(</div><div class="ident">configuration</div> <div class="operator">*</div><div class="ident">StorageConfiguration</div><div class="operator">)</div> <div class="operator">(</div><div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if storage configuration structure has been initialized and
+passed to this function properly</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">configuration</div> <div class="operator">==</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="keyword">const</div> <div class="ident">message</div> <div class="operator">=</div> <div class="literal">&#34;StorageConfiguration structure should be provided&#34;</div><div class="operator"></div>
+		<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">errors</div><div class="operator">.</div><div class="ident">New</div><div class="operator">(</div><div class="ident">message</div><div class="operator">)</div><div class="operator"></div>
+		<div class="ident">log</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">message</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div> <div class="ident">nil</div><div class="operator">,</div> <div class="ident">err</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
 	<div class="ident">driverName</div> <div class="operator">:=</div> <div class="ident">configuration</div><div class="operator">.</div><div class="ident">Driver</div><div class="operator"></div>
 	<div class="ident">dataSource</div> <div class="operator">:=</div> <div class="literal">&#34;&#34;</div><div class="operator"></div>
 	<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Str</div><div class="operator">(</div><div class="literal">&#34;driverName&#34;</div><div class="operator">,</div> <div class="ident">configuration</div><div class="operator">.</div><div class="ident">Driver</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;DB connection configuration&#34;</div><div class="operator">)</div><div class="operator"></div>
@@ -285,7 +311,7 @@ multiple users have disabled some rules.</p>
 	<td class="doc"><p>create output file
 disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, Severity: MEDIUM)</p>
 </td>
-	<td class="code"><pre><code>		<div class="ident">fout</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">os</div><div class="operator">.</div><div class="ident">Create</div><div class="operator">(</div><div class="ident">output</div><div class="operator">)</div> <div class="operator"></div><div class="comment">// #nosec G304</div>
+	<td class="code"><pre><code>		<div class="ident">fout</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">os</div><div class="operator">.</div><div class="ident">Create</div><div class="operator">(</div><div class="ident">output</div><div class="operator">)</div> <div class="comment">// #nosec G304</div><div class="operator"></div>
 		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 			<div class="ident">log</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">fileOpenMsg</div><div class="operator">)</div><div class="operator"></div>
 		<div class="operator">}</div><div class="operator"></div>
@@ -296,7 +322,6 @@ disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, 
 	<td class="doc"><p>an object used to write to file</p>
 </td>
 	<td class="code"><pre><code>		<div class="ident">writer</div> <div class="operator">=</div> <div class="ident">bufio</div><div class="operator">.</div><div class="ident">NewWriter</div><div class="operator">(</div><div class="ident">fout</div><div class="operator">)</div><div class="operator"></div>
-
 	<div class="operator">}</div><div class="operator"></div>
 
 	<div class="keyword">defer</div> <div class="keyword">func</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
@@ -555,14 +580,7 @@ ids where multiple users disabled any rule</p>
 	<div class="keyword">return</div> <div class="operator">-</div><div class="literal">1</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
 <div class="operator">}</div><div class="operator"></div>
 
-</code></pre></td>
-      </tr>
-      
-      <tr class="section">
-	<td class="doc"><p>displayAllOldRecords function read all old records, ie. records that are
-older than the specified time duration. Those records are simply displayed.</p>
-</td>
-	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">displayAllOldRecords</div><div class="operator">(</div><div class="ident">connection</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">,</div> <div class="ident">maxAge</div><div class="operator">,</div> <div class="ident">output</div> <div class="ident">string</div><div class="operator">)</div> <div class="ident">error</div> <div class="operator">{</div>
+<div class="keyword">func</div> <div class="ident">createOutputFile</div><div class="operator">(</div><div class="ident">output</div> <div class="ident">string</div><div class="operator">)</div> <div class="operator">(</div><div class="operator">*</div><div class="ident">os</div><div class="operator">.</div><div class="ident">File</div><div class="operator">,</div> <div class="operator">*</div><div class="ident">bufio</div><div class="operator">.</div><div class="ident">Writer</div><div class="operator">)</div> <div class="operator">{</div>
 	<div class="keyword">var</div> <div class="ident">fout</div> <div class="operator">*</div><div class="ident">os</div><div class="operator">.</div><div class="ident">File</div> <div class="operator">=</div> <div class="ident">nil</div><div class="operator"></div>
 	<div class="keyword">var</div> <div class="ident">writer</div> <div class="operator">*</div><div class="ident">bufio</div><div class="operator">.</div><div class="ident">Writer</div> <div class="operator">=</div> <div class="ident">nil</div><div class="operator"></div>
 
@@ -574,7 +592,7 @@ older than the specified time duration. Those records are simply displayed.</p>
 	<td class="doc"><p>create output file
 disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, Severity: MEDIUM)</p>
 </td>
-	<td class="code"><pre><code>		<div class="ident">fout</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">os</div><div class="operator">.</div><div class="ident">Create</div><div class="operator">(</div><div class="ident">output</div><div class="operator">)</div> <div class="operator"></div><div class="comment">// #nosec G304</div>
+	<td class="code"><pre><code>		<div class="ident">fout</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">os</div><div class="operator">.</div><div class="ident">Create</div><div class="operator">(</div><div class="ident">output</div><div class="operator">)</div> <div class="comment">// #nosec G304</div><div class="operator"></div>
 		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 			<div class="ident">log</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">fileOpenMsg</div><div class="operator">)</div><div class="operator"></div>
 		<div class="operator">}</div><div class="operator"></div>
@@ -585,8 +603,30 @@ disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, 
 	<td class="doc"><p>an object used to write to file</p>
 </td>
 	<td class="code"><pre><code>		<div class="ident">writer</div> <div class="operator">=</div> <div class="ident">bufio</div><div class="operator">.</div><div class="ident">NewWriter</div><div class="operator">(</div><div class="ident">fout</div><div class="operator">)</div><div class="operator"></div>
-
 	<div class="operator">}</div><div class="operator"></div>
+	<div class="keyword">return</div> <div class="ident">fout</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>displayAllOldRecords function read all old records, ie. records that are
+older than the specified time duration. Those records are simply displayed.</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">displayAllOldRecords</div><div class="operator">(</div><div class="ident">connection</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">,</div> <div class="ident">maxAge</div><div class="operator">,</div> <div class="ident">output</div> <div class="ident">string</div><div class="operator">)</div> <div class="ident">error</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if connection has been initialized</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">connection</div> <div class="operator">==</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">log</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">connectionNotEstablished</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div> <div class="ident">errors</div><div class="operator">.</div><div class="ident">New</div><div class="operator">(</div><div class="ident">connectionNotEstablished</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="ident">fout</div><div class="operator">,</div> <div class="ident">writer</div> <div class="operator">:=</div> <div class="ident">createOutputFile</div><div class="operator">(</div><div class="ident">output</div><div class="operator">)</div><div class="operator"></div>
 
 	<div class="keyword">defer</div> <div class="keyword">func</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
@@ -618,13 +658,20 @@ disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, 
 		<div class="operator">}</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
 
-	<div class="keyword">return</div> <div class="ident">performListOfOldReports</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">,</div> <div class="ident">maxAge</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">)</div><div class="operator"></div>
-<div class="operator">}</div><div class="operator"></div>
-
-<div class="keyword">func</div> <div class="ident">performListOfOldReports</div><div class="operator">(</div><div class="ident">connection</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">,</div> <div class="ident">maxAge</div> <div class="ident">string</div><div class="operator">,</div> <div class="ident">writer</div> <div class="operator">*</div><div class="ident">bufio</div><div class="operator">.</div><div class="ident">Writer</div><div class="operator">)</div> <div class="ident">error</div> <div class="operator">{</div>
-	<div class="ident">query</div> <div class="operator">:=</div> <div class="literal">&#34;SELECT cluster, reported_at, last_checked_at FROM report WHERE reported_at &lt; NOW() - $1::INTERVAL ORDER BY reported_at&#34;</div><div class="operator"></div>
-	<div class="ident">rows</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">connection</div><div class="operator">.</div><div class="ident">Query</div><div class="operator">(</div><div class="ident">query</div><div class="operator">,</div> <div class="ident">maxAge</div><div class="operator">)</div><div class="operator"></div>
-	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>main function of this tool is ability to delete old reports</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">performListOfOldReports</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">,</div> <div class="ident">maxAge</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>skip next operation on first error</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 		<div class="keyword">return</div> <div class="ident">err</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 
@@ -632,9 +679,85 @@ disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, 
       </tr>
       
       <tr class="section">
+	<td class="doc"><p>but we might be interested in other tables as well, especially advisor ratings</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">performListOfOldRatings</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">,</div> <div class="ident">maxAge</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>skip next operation on first error</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="keyword">return</div> <div class="ident">err</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>also but we might be interested in other consumer errors</p>
+</td>
+	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">performListOfOldConsumerErrors</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">,</div> <div class="ident">maxAge</div><div class="operator">)</div><div class="operator"></div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>skip next operation on first error</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="keyword">return</div> <div class="ident">err</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="keyword">return</div> <div class="ident">nil</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+<div class="keyword">func</div> <div class="ident">listOldDatabaseRecords</div><div class="operator">(</div><div class="ident">connection</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">,</div> <div class="ident">maxAge</div> <div class="ident">string</div><div class="operator">,</div>
+	<div class="ident">writer</div> <div class="operator">*</div><div class="ident">bufio</div><div class="operator">.</div><div class="ident">Writer</div><div class="operator">,</div> <div class="ident">query</div> <div class="ident">string</div><div class="operator">,</div>
+	<div class="ident">logEntry</div> <div class="ident">string</div><div class="operator">,</div> <div class="ident">countLogEntry</div> <div class="ident">string</div><div class="operator">,</div>
+	<div class="ident">callback</div> <div class="keyword">func</div><div class="operator">(</div><div class="ident">rows</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">Rows</div><div class="operator">,</div> <div class="ident">writer</div> <div class="operator">*</div><div class="ident">bufio</div><div class="operator">.</div><div class="ident">Writer</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">int</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div><div class="operator">)</div> <div class="ident">error</div> <div class="operator">{</div>
+
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">logEntry</div> <div class="operator">&#43;</div> <div class="literal">&#34; begin&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="ident">rows</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">connection</div><div class="operator">.</div><div class="ident">Query</div><div class="operator">(</div><div class="ident">query</div><div class="operator">,</div> <div class="ident">maxAge</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="keyword">return</div> <div class="ident">err</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="ident">count</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">callback</div><div class="operator">(</div><div class="ident">rows</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">log</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Query error&#34;</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div> <div class="ident">err</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+	<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Int</div><div class="operator">(</div><div class="ident">countLogEntry</div><div class="operator">,</div> <div class="ident">count</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">logEntry</div> <div class="operator">&#43;</div> <div class="literal">&#34; end&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<div class="keyword">return</div> <div class="ident">nil</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>performListOfOldReports read and displays old records read from reported_at
+table</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">performListOfOldReports</div><div class="operator">(</div><div class="ident">connection</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">,</div> <div class="ident">maxAge</div> <div class="ident">string</div><div class="operator">,</div> <div class="ident">writer</div> <div class="operator">*</div><div class="ident">bufio</div><div class="operator">.</div><div class="ident">Writer</div><div class="operator">)</div> <div class="ident">error</div> <div class="operator">{</div>
+	<div class="keyword">return</div> <div class="ident">listOldDatabaseRecords</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">,</div> <div class="ident">maxAge</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">,</div> <div class="ident">selectOldReports</div><div class="operator">,</div> <div class="literal">&#34;List of old reports&#34;</div><div class="operator">,</div> <div class="literal">&#34;reports count&#34;</div><div class="operator">,</div>
+		<div class="keyword">func</div><div class="operator">(</div><div class="ident">rows</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">Rows</div><div class="operator">,</div> <div class="ident">writer</div> <div class="operator">*</div><div class="ident">bufio</div><div class="operator">.</div><div class="ident">Writer</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">int</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
 	<td class="doc"><p>used to compute a real record age</p>
 </td>
-	<td class="code"><pre><code>	<div class="ident">now</div> <div class="operator">:=</div> <div class="ident">time</div><div class="operator">.</div><div class="ident">Now</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+	<td class="code"><pre><code>			<div class="ident">now</div> <div class="operator">:=</div> <div class="ident">time</div><div class="operator">.</div><div class="ident">Now</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>reports count</p>
+</td>
+	<td class="code"><pre><code>			<div class="ident">count</div> <div class="operator">:=</div> <div class="literal">0</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -642,12 +765,12 @@ disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, 
       <tr class="section">
 	<td class="doc"><p>iterate over all old records</p>
 </td>
-	<td class="code"><pre><code>	<div class="keyword">for</div> <div class="ident">rows</div><div class="operator">.</div><div class="ident">Next</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
-		<div class="keyword">var</div> <div class="operator">(</div>
-			<div class="ident">clusterName</div> <div class="ident">string</div><div class="operator"></div>
-			<div class="ident">reported</div>    <div class="ident">time</div><div class="operator">.</div><div class="ident">Time</div><div class="operator"></div>
-			<div class="ident">lastChecked</div> <div class="ident">time</div><div class="operator">.</div><div class="ident">Time</div><div class="operator"></div>
-		<div class="operator">)</div><div class="operator"></div>
+	<td class="code"><pre><code>			<div class="keyword">for</div> <div class="ident">rows</div><div class="operator">.</div><div class="ident">Next</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+				<div class="keyword">var</div> <div class="operator">(</div>
+					<div class="ident">clusterName</div> <div class="ident">string</div><div class="operator"></div>
+					<div class="ident">reported</div>    <div class="ident">time</div><div class="operator">.</div><div class="ident">Time</div><div class="operator"></div>
+					<div class="ident">lastChecked</div> <div class="ident">time</div><div class="operator">.</div><div class="ident">Time</div><div class="operator"></div>
+				<div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -655,18 +778,18 @@ disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, 
       <tr class="section">
 	<td class="doc"><p>read one old record from the report table</p>
 </td>
-	<td class="code"><pre><code>		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">rows</div><div class="operator">.</div><div class="ident">Scan</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">clusterName</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">reported</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">lastChecked</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+	<td class="code"><pre><code>				<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">rows</div><div class="operator">.</div><div class="ident">Scan</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">clusterName</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">reported</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">lastChecked</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
       
       <tr class="section">
 	<td class="doc"><p>close the result set in case of any error</p>
 </td>
-	<td class="code"><pre><code>			<div class="keyword">if</div> <div class="ident">closeErr</div> <div class="operator">:=</div> <div class="ident">rows</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">closeErr</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
-				<div class="ident">log</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">closeErr</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">unableToCloseDBRowsHandle</div><div class="operator">)</div><div class="operator"></div>
-			<div class="operator">}</div><div class="operator"></div>
-			<div class="keyword">return</div> <div class="ident">err</div><div class="operator"></div>
-		<div class="operator">}</div><div class="operator"></div>
+	<td class="code"><pre><code>					<div class="keyword">if</div> <div class="ident">closeErr</div> <div class="operator">:=</div> <div class="ident">rows</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">closeErr</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+						<div class="ident">log</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">closeErr</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">unableToCloseDBRowsHandle</div><div class="operator">)</div><div class="operator"></div>
+					<div class="operator">}</div><div class="operator"></div>
+					<div class="keyword">return</div> <div class="ident">count</div><div class="operator">,</div> <div class="ident">err</div><div class="operator"></div>
+				<div class="operator">}</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -674,7 +797,7 @@ disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, 
       <tr class="section">
 	<td class="doc"><p>compute the real record age</p>
 </td>
-	<td class="code"><pre><code>		<div class="ident">age</div> <div class="operator">:=</div> <div class="ident">int</div><div class="operator">(</div><div class="ident">math</div><div class="operator">.</div><div class="ident">Ceil</div><div class="operator">(</div><div class="ident">now</div><div class="operator">.</div><div class="ident">Sub</div><div class="operator">(</div><div class="ident">reported</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Hours</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">/</div> <div class="literal">24</div><div class="operator">)</div><div class="operator">)</div> <div class="operator"></div><div class="comment">// in days</div>
+	<td class="code"><pre><code>				<div class="ident">age</div> <div class="operator">:=</div> <div class="ident">int</div><div class="operator">(</div><div class="ident">math</div><div class="operator">.</div><div class="ident">Ceil</div><div class="operator">(</div><div class="ident">now</div><div class="operator">.</div><div class="ident">Sub</div><div class="operator">(</div><div class="ident">reported</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Hours</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">/</div> <div class="literal">24</div><div class="operator">)</div><div class="operator">)</div> <div class="comment">// in days</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -682,8 +805,8 @@ disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, 
       <tr class="section">
 	<td class="doc"><p>prepare for the report</p>
 </td>
-	<td class="code"><pre><code>		<div class="ident">reportedF</div> <div class="operator">:=</div> <div class="ident">reported</div><div class="operator">.</div><div class="ident">Format</div><div class="operator">(</div><div class="ident">time</div><div class="operator">.</div><div class="ident">RFC3339</div><div class="operator">)</div><div class="operator"></div>
-		<div class="ident">lastCheckedF</div> <div class="operator">:=</div> <div class="ident">lastChecked</div><div class="operator">.</div><div class="ident">Format</div><div class="operator">(</div><div class="ident">time</div><div class="operator">.</div><div class="ident">RFC3339</div><div class="operator">)</div><div class="operator"></div>
+	<td class="code"><pre><code>				<div class="ident">reportedF</div> <div class="operator">:=</div> <div class="ident">reported</div><div class="operator">.</div><div class="ident">Format</div><div class="operator">(</div><div class="ident">time</div><div class="operator">.</div><div class="ident">RFC3339</div><div class="operator">)</div><div class="operator"></div>
+				<div class="ident">lastCheckedF</div> <div class="operator">:=</div> <div class="ident">lastChecked</div><div class="operator">.</div><div class="ident">Format</div><div class="operator">(</div><div class="ident">time</div><div class="operator">.</div><div class="ident">RFC3339</div><div class="operator">)</div><div class="operator"></div>
 
 </code></pre></td>
       </tr>
@@ -691,20 +814,217 @@ disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, 
       <tr class="section">
 	<td class="doc"><p>just print the report</p>
 </td>
-	<td class="code"><pre><code>		<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Str</div><div class="operator">(</div><div class="ident">clusterNameMsg</div><div class="operator">,</div> <div class="ident">clusterName</div><div class="operator">)</div><div class="operator">.</div>
-			<div class="ident">Str</div><div class="operator">(</div><div class="literal">&#34;reported&#34;</div><div class="operator">,</div> <div class="ident">reportedF</div><div class="operator">)</div><div class="operator">.</div>
-			<div class="ident">Str</div><div class="operator">(</div><div class="literal">&#34;lastChecked&#34;</div><div class="operator">,</div> <div class="ident">lastCheckedF</div><div class="operator">)</div><div class="operator">.</div>
-			<div class="ident">Int</div><div class="operator">(</div><div class="literal">&#34;age&#34;</div><div class="operator">,</div> <div class="ident">age</div><div class="operator">)</div><div class="operator">.</div>
-			<div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Old report&#34;</div><div class="operator">)</div><div class="operator"></div>
+	<td class="code"><pre><code>				<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Str</div><div class="operator">(</div><div class="ident">clusterNameMsg</div><div class="operator">,</div> <div class="ident">clusterName</div><div class="operator">)</div><div class="operator">.</div>
+					<div class="ident">Str</div><div class="operator">(</div><div class="literal">&#34;reported&#34;</div><div class="operator">,</div> <div class="ident">reportedF</div><div class="operator">)</div><div class="operator">.</div>
+					<div class="ident">Str</div><div class="operator">(</div><div class="literal">&#34;lastChecked&#34;</div><div class="operator">,</div> <div class="ident">lastCheckedF</div><div class="operator">)</div><div class="operator">.</div>
+					<div class="ident">Int</div><div class="operator">(</div><div class="literal">&#34;age&#34;</div><div class="operator">,</div> <div class="ident">age</div><div class="operator">)</div><div class="operator">.</div>
+					<div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Old report&#34;</div><div class="operator">)</div><div class="operator"></div>
 
-		<div class="keyword">if</div> <div class="ident">writer</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
-			<div class="ident">_</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">fmt</div><div class="operator">.</div><div class="ident">Fprintf</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;%s,%s,%s,%d\n&#34;</div><div class="operator">,</div> <div class="ident">clusterName</div><div class="operator">,</div> <div class="ident">reportedF</div><div class="operator">,</div> <div class="ident">lastCheckedF</div><div class="operator">,</div> <div class="ident">age</div><div class="operator">)</div><div class="operator"></div>
-			<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
-				<div class="ident">log</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">writeToFileMsg</div><div class="operator">)</div><div class="operator"></div>
+				<div class="keyword">if</div> <div class="ident">writer</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+					<div class="ident">_</div><div class="operator">,</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">fmt</div><div class="operator">.</div><div class="ident">Fprintf</div><div class="operator">(</div><div class="ident">writer</div><div class="operator">,</div> <div class="literal">&#34;%s,%s,%s,%d\n&#34;</div><div class="operator">,</div> <div class="ident">clusterName</div><div class="operator">,</div> <div class="ident">reportedF</div><div class="operator">,</div> <div class="ident">lastCheckedF</div><div class="operator">,</div> <div class="ident">age</div><div class="operator">)</div><div class="operator"></div>
+					<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+						<div class="ident">log</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">err</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">writeToFileMsg</div><div class="operator">)</div><div class="operator"></div>
+					<div class="operator">}</div><div class="operator"></div>
+				<div class="operator">}</div><div class="operator"></div>
+				<div class="ident">count</div><div class="operator">&#43;&#43;</div><div class="operator"></div>
 			<div class="operator">}</div><div class="operator"></div>
-		<div class="operator">}</div><div class="operator"></div>
-	<div class="operator">}</div><div class="operator"></div>
-	<div class="keyword">return</div> <div class="ident">nil</div><div class="operator"></div>
+			<div class="keyword">return</div> <div class="ident">count</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>performListOfOldRatings read and displays old Advisor ratings read from
+advisor_ratings table</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">performListOfOldRatings</div><div class="operator">(</div><div class="ident">connection</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">,</div> <div class="ident">maxAge</div> <div class="ident">string</div><div class="operator">)</div> <div class="ident">error</div> <div class="operator">{</div>
+	<div class="keyword">return</div> <div class="ident">listOldDatabaseRecords</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">,</div> <div class="ident">maxAge</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator">,</div> <div class="ident">selectOldAdvisorRatings</div><div class="operator">,</div> <div class="literal">&#34;List of old Advisor ratings&#34;</div><div class="operator">,</div> <div class="literal">&#34;ratings count&#34;</div><div class="operator">,</div>
+		<div class="keyword">func</div><div class="operator">(</div><div class="ident">rows</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">Rows</div><div class="operator">,</div> <div class="ident">writer</div> <div class="operator">*</div><div class="ident">bufio</div><div class="operator">.</div><div class="ident">Writer</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">int</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>used to compute a real record age</p>
+</td>
+	<td class="code"><pre><code>			<div class="ident">now</div> <div class="operator">:=</div> <div class="ident">time</div><div class="operator">.</div><div class="ident">Now</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>reports count</p>
+</td>
+	<td class="code"><pre><code>			<div class="ident">count</div> <div class="operator">:=</div> <div class="literal">0</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>iterate over all old records</p>
+</td>
+	<td class="code"><pre><code>			<div class="keyword">for</div> <div class="ident">rows</div><div class="operator">.</div><div class="ident">Next</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+				<div class="keyword">var</div> <div class="operator">(</div>
+					<div class="ident">orgID</div>         <div class="ident">string</div><div class="operator"></div>
+					<div class="ident">ruleFQDN</div>      <div class="ident">string</div><div class="operator"></div>
+					<div class="ident">errorKey</div>      <div class="ident">string</div><div class="operator"></div>
+					<div class="ident">ruleID</div>        <div class="ident">string</div><div class="operator"></div>
+					<div class="ident">rating</div>        <div class="ident">int</div><div class="operator"></div>
+					<div class="ident">lastUpdatedAt</div> <div class="ident">time</div><div class="operator">.</div><div class="ident">Time</div><div class="operator"></div>
+				<div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>read one old record from the report table</p>
+</td>
+	<td class="code"><pre><code>				<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">rows</div><div class="operator">.</div><div class="ident">Scan</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">orgID</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">ruleFQDN</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">errorKey</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">ruleID</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">rating</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">lastUpdatedAt</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>close the result set in case of any error</p>
+</td>
+	<td class="code"><pre><code>					<div class="keyword">if</div> <div class="ident">closeErr</div> <div class="operator">:=</div> <div class="ident">rows</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">closeErr</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+						<div class="ident">log</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">closeErr</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">unableToCloseDBRowsHandle</div><div class="operator">)</div><div class="operator"></div>
+					<div class="operator">}</div><div class="operator"></div>
+					<div class="keyword">return</div> <div class="ident">count</div><div class="operator">,</div> <div class="ident">err</div><div class="operator"></div>
+				<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>compute the real error age</p>
+</td>
+	<td class="code"><pre><code>				<div class="ident">age</div> <div class="operator">:=</div> <div class="ident">int</div><div class="operator">(</div><div class="ident">math</div><div class="operator">.</div><div class="ident">Ceil</div><div class="operator">(</div><div class="ident">now</div><div class="operator">.</div><div class="ident">Sub</div><div class="operator">(</div><div class="ident">lastUpdatedAt</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Hours</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">/</div> <div class="literal">24</div><div class="operator">)</div><div class="operator">)</div> <div class="comment">// in days</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>prepare for the report</p>
+</td>
+	<td class="code"><pre><code>				<div class="ident">lastUpdatedAtF</div> <div class="operator">:=</div> <div class="ident">lastUpdatedAt</div><div class="operator">.</div><div class="ident">Format</div><div class="operator">(</div><div class="ident">time</div><div class="operator">.</div><div class="ident">RFC3339</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>just print the report</p>
+</td>
+	<td class="code"><pre><code>				<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div>
+					<div class="ident">Str</div><div class="operator">(</div><div class="literal">&#34;organization&#34;</div><div class="operator">,</div> <div class="ident">orgID</div><div class="operator">)</div><div class="operator">.</div>
+					<div class="ident">Str</div><div class="operator">(</div><div class="literal">&#34;rule FQDN&#34;</div><div class="operator">,</div> <div class="ident">ruleFQDN</div><div class="operator">)</div><div class="operator">.</div>
+					<div class="ident">Str</div><div class="operator">(</div><div class="literal">&#34;error key&#34;</div><div class="operator">,</div> <div class="ident">errorKey</div><div class="operator">)</div><div class="operator">.</div>
+					<div class="ident">Int</div><div class="operator">(</div><div class="literal">&#34;rating&#34;</div><div class="operator">,</div> <div class="ident">rating</div><div class="operator">)</div><div class="operator">.</div>
+					<div class="ident">Str</div><div class="operator">(</div><div class="literal">&#34;updated at&#34;</div><div class="operator">,</div> <div class="ident">lastUpdatedAtF</div><div class="operator">)</div><div class="operator">.</div>
+					<div class="ident">Int</div><div class="operator">(</div><div class="literal">&#34;rating age&#34;</div><div class="operator">,</div> <div class="ident">age</div><div class="operator">)</div><div class="operator">.</div>
+					<div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Old Advisor rating&#34;</div><div class="operator">)</div><div class="operator"></div>
+				<div class="ident">count</div><div class="operator">&#43;&#43;</div><div class="operator"></div>
+			<div class="operator">}</div><div class="operator"></div>
+			<div class="keyword">return</div> <div class="ident">count</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
+<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>performListOfOldConsumerErrors read and displays consumer errors stored in
+consumer_errors table</p>
+</td>
+	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">performListOfOldConsumerErrors</div><div class="operator">(</div><div class="ident">connection</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">,</div> <div class="ident">maxAge</div> <div class="ident">string</div><div class="operator">)</div> <div class="ident">error</div> <div class="operator">{</div>
+	<div class="keyword">return</div> <div class="ident">listOldDatabaseRecords</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">,</div> <div class="ident">maxAge</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator">,</div> <div class="ident">selectOldConsumerErrors</div><div class="operator">,</div> <div class="literal">&#34;List of old consumer errors&#34;</div><div class="operator">,</div> <div class="literal">&#34;errors count&#34;</div><div class="operator">,</div>
+		<div class="keyword">func</div><div class="operator">(</div><div class="ident">rows</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">Rows</div><div class="operator">,</div> <div class="ident">writer</div> <div class="operator">*</div><div class="ident">bufio</div><div class="operator">.</div><div class="ident">Writer</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">int</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>used to compute a real record age</p>
+</td>
+	<td class="code"><pre><code>			<div class="ident">now</div> <div class="operator">:=</div> <div class="ident">time</div><div class="operator">.</div><div class="ident">Now</div><div class="operator">(</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>reports count</p>
+</td>
+	<td class="code"><pre><code>			<div class="ident">count</div> <div class="operator">:=</div> <div class="literal">0</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>iterate over all old records</p>
+</td>
+	<td class="code"><pre><code>			<div class="keyword">for</div> <div class="ident">rows</div><div class="operator">.</div><div class="ident">Next</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
+				<div class="keyword">var</div> <div class="operator">(</div>
+					<div class="ident">topic</div>      <div class="ident">string</div><div class="operator"></div>
+					<div class="ident">partition</div>  <div class="ident">int</div><div class="operator"></div>
+					<div class="ident">offset</div>     <div class="ident">int</div><div class="operator"></div>
+					<div class="ident">key</div>        <div class="ident">string</div><div class="operator"></div>
+					<div class="ident">consumedAt</div> <div class="ident">time</div><div class="operator">.</div><div class="ident">Time</div><div class="operator"></div>
+					<div class="ident">message</div>    <div class="ident">string</div><div class="operator"></div>
+				<div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>read one old record from the report table</p>
+</td>
+	<td class="code"><pre><code>				<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">rows</div><div class="operator">.</div><div class="ident">Scan</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">topic</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">partition</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">offset</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">key</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">consumedAt</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">message</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>close the result set in case of any error</p>
+</td>
+	<td class="code"><pre><code>					<div class="keyword">if</div> <div class="ident">closeErr</div> <div class="operator">:=</div> <div class="ident">rows</div><div class="operator">.</div><div class="ident">Close</div><div class="operator">(</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">closeErr</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
+						<div class="ident">log</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Err</div><div class="operator">(</div><div class="ident">closeErr</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">unableToCloseDBRowsHandle</div><div class="operator">)</div><div class="operator"></div>
+					<div class="operator">}</div><div class="operator"></div>
+					<div class="keyword">return</div> <div class="ident">count</div><div class="operator">,</div> <div class="ident">err</div><div class="operator"></div>
+				<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>compute the real error age</p>
+</td>
+	<td class="code"><pre><code>				<div class="ident">age</div> <div class="operator">:=</div> <div class="ident">int</div><div class="operator">(</div><div class="ident">math</div><div class="operator">.</div><div class="ident">Ceil</div><div class="operator">(</div><div class="ident">now</div><div class="operator">.</div><div class="ident">Sub</div><div class="operator">(</div><div class="ident">consumedAt</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Hours</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">/</div> <div class="literal">24</div><div class="operator">)</div><div class="operator">)</div> <div class="comment">// in days</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>prepare for the report</p>
+</td>
+	<td class="code"><pre><code>				<div class="ident">consumedF</div> <div class="operator">:=</div> <div class="ident">consumedAt</div><div class="operator">.</div><div class="ident">Format</div><div class="operator">(</div><div class="ident">time</div><div class="operator">.</div><div class="ident">RFC3339</div><div class="operator">)</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>just print the report</p>
+</td>
+	<td class="code"><pre><code>				<div class="ident">log</div><div class="operator">.</div><div class="ident">Info</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div>
+					<div class="ident">Str</div><div class="operator">(</div><div class="literal">&#34;topic&#34;</div><div class="operator">,</div> <div class="ident">topic</div><div class="operator">)</div><div class="operator">.</div>
+					<div class="ident">Int</div><div class="operator">(</div><div class="literal">&#34;partition&#34;</div><div class="operator">,</div> <div class="ident">partition</div><div class="operator">)</div><div class="operator">.</div>
+					<div class="ident">Int</div><div class="operator">(</div><div class="literal">&#34;offset&#34;</div><div class="operator">,</div> <div class="ident">offset</div><div class="operator">)</div><div class="operator">.</div>
+					<div class="ident">Str</div><div class="operator">(</div><div class="literal">&#34;key&#34;</div><div class="operator">,</div> <div class="ident">key</div><div class="operator">)</div><div class="operator">.</div>
+					<div class="ident">Str</div><div class="operator">(</div><div class="literal">&#34;message&#34;</div><div class="operator">,</div> <div class="ident">message</div><div class="operator">)</div><div class="operator">.</div>
+					<div class="ident">Str</div><div class="operator">(</div><div class="literal">&#34;consumed&#34;</div><div class="operator">,</div> <div class="ident">consumedF</div><div class="operator">)</div><div class="operator">.</div>
+					<div class="ident">Int</div><div class="operator">(</div><div class="literal">&#34;error age&#34;</div><div class="operator">,</div> <div class="ident">age</div><div class="operator">)</div><div class="operator">.</div>
+					<div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;Old consumer error&#34;</div><div class="operator">)</div><div class="operator"></div>
+				<div class="ident">count</div><div class="operator">&#43;&#43;</div><div class="operator"></div>
+			<div class="operator">}</div><div class="operator"></div>
+			<div class="keyword">return</div> <div class="ident">count</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator"></div>
+		<div class="operator">}</div><div class="operator">)</div><div class="operator"></div>
 <div class="operator">}</div><div class="operator"></div>
 
 </code></pre></td>
@@ -778,6 +1098,10 @@ records to be deleted</p>
 		<div class="ident">TableName</div><div class="operator">:</div> <div class="literal">&#34;recommendation&#34;</div><div class="operator">,</div>
 		<div class="ident">KeyName</div><div class="operator">:</div>   <div class="literal">&#34;cluster_id&#34;</div><div class="operator">,</div>
 	<div class="operator">}</div><div class="operator">,</div>
+	<div class="operator">{</div>
+		<div class="ident">TableName</div><div class="operator">:</div> <div class="literal">&#34;report_info&#34;</div><div class="operator">,</div>
+		<div class="ident">KeyName</div><div class="operator">:</div>   <div class="literal">&#34;cluster_id&#34;</div><div class="operator">,</div>
+	<div class="operator">}</div><div class="operator">,</div>
 </code></pre></td>
       </tr>
       
@@ -827,10 +1151,28 @@ records to be deleted</p>
       </tr>
       
       <tr class="section">
-	<td class="doc"><p>initialize counters</p>
+	<td class="doc"><p>return value</p>
 </td>
 	<td class="code"><pre><code>	<div class="ident">deletionsForTable</div> <div class="operator">:=</div> <div class="ident">make</div><div class="operator">(</div><div class="keyword">map</div><div class="operator">[</div><div class="ident">string</div><div class="operator">]</div><div class="ident">int</div><div class="operator">)</div><div class="operator"></div>
-	<div class="keyword">for</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">tableAndKey</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">tablesAndKeys</div> <div class="operator">{</div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>check if connection has been initialized</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">if</div> <div class="ident">connection</div> <div class="operator">==</div> <div class="ident">nil</div> <div class="operator">{</div>
+		<div class="ident">log</div><div class="operator">.</div><div class="ident">Error</div><div class="operator">(</div><div class="operator">)</div><div class="operator">.</div><div class="ident">Msg</div><div class="operator">(</div><div class="ident">connectionNotEstablished</div><div class="operator">)</div><div class="operator"></div>
+		<div class="keyword">return</div> <div class="ident">deletionsForTable</div><div class="operator">,</div> <div class="ident">errors</div><div class="operator">.</div><div class="ident">New</div><div class="operator">(</div><div class="ident">connectionNotEstablished</div><div class="operator">)</div><div class="operator"></div>
+	<div class="operator">}</div><div class="operator"></div>
+
+</code></pre></td>
+      </tr>
+      
+      <tr class="section">
+	<td class="doc"><p>initialize counters</p>
+</td>
+	<td class="code"><pre><code>	<div class="keyword">for</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">tableAndKey</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">tablesAndKeys</div> <div class="operator">{</div>
 		<div class="ident">deletionsForTable</div><div class="operator">[</div><div class="ident">tableAndKey</div><div class="operator">.</div><div class="ident">TableName</div><div class="operator">]</div> <div class="operator">=</div> <div class="literal">0</div><div class="operator"></div>
 	<div class="operator">}</div><div class="operator"></div>
 
