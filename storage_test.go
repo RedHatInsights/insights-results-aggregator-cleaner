@@ -1604,7 +1604,7 @@ func TestPerformCleanupInDB(t *testing.T) {
 
 	mock.ExpectClose()
 
-	deletedRows, err := cleaner.PerformCleanupInDB(connection, clusterNames)
+	deletedRows, err := cleaner.PerformCleanupInDB(connection, clusterNames, main.DBSchemaOCPRecommendations)
 	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check tables have correct number of deleted rows for each table
@@ -1651,7 +1651,7 @@ func TestPerformCleanupInDBOnDeleteError(t *testing.T) {
 
 	mock.ExpectClose()
 
-	deletedRows, err := cleaner.PerformCleanupInDB(connection, clusterNames)
+	deletedRows, err := cleaner.PerformCleanupInDB(connection, clusterNames, main.DBSchemaOCPRecommendations)
 	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check tables have correct number of deleted rows for each table
@@ -1678,7 +1678,7 @@ func TestPerformCleanupInDBNoConnection(t *testing.T) {
 		"5d5892d4-1f74-4ccf-91af-548dfc9767aa",
 	}
 
-	_, err := cleaner.PerformCleanupInDB(connection, clusterNames)
+	_, err := cleaner.PerformCleanupInDB(connection, clusterNames, main.DBSchemaOCPRecommendations)
 
 	assert.Error(t, err, "error is expected while calling tested function")
 }

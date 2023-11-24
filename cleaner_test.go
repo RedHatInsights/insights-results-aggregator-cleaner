@@ -876,7 +876,7 @@ func TestCleanupNoConnection(t *testing.T) {
 	}
 
 	// call the tested function
-	status, err := main.Cleanup(&configuration, nil, cliFlags)
+	status, err := main.Cleanup(&configuration, nil, cliFlags, main.DBSchemaOCPRecommendations)
 
 	// error is expected
 	assert.Error(t, err, "error is expected while calling main.cleanup")
@@ -903,7 +903,7 @@ func TestCleanupOnReadClusterListError(t *testing.T) {
 	}
 
 	// call the tested function
-	status, err := main.Cleanup(&configuration, nil, cliFlags)
+	status, err := main.Cleanup(&configuration, nil, cliFlags, main.DBSchemaOCPRecommendations)
 
 	// error is expected
 	assert.Error(t, err, "error is expected while calling main.cleanup")
@@ -935,7 +935,7 @@ func TestCleanup(t *testing.T) {
 	}
 
 	// call the tested function
-	status, err := main.Cleanup(&configuration, connection, cliFlags)
+	status, err := main.Cleanup(&configuration, connection, cliFlags, main.DBSchemaOCPRecommendations)
 
 	// error is not expected
 	assert.NoError(t, err, "error is not expected while calling main.cleanup")
@@ -967,7 +967,7 @@ func TestCleanupPrintSummaryTable(t *testing.T) {
 	}
 
 	// call the tested function
-	status, err := main.Cleanup(&configuration, connection, cliFlags)
+	status, err := main.Cleanup(&configuration, connection, cliFlags, main.DBSchemaOCPRecommendations)
 
 	// error is not expected
 	assert.NoError(t, err, "error is not expected while calling main.cleanup")
@@ -1021,7 +1021,7 @@ func TestCleanupCheckSummaryTableContent(t *testing.T) {
 
 	// call the tested function
 	output, err := capture.StandardOutput(func() {
-		status, _ = main.Cleanup(&configuration, connection, cliFlags)
+		status, _ = main.Cleanup(&configuration, connection, cliFlags, main.DBSchemaOCPRecommendations)
 	})
 
 	// check the captured text

@@ -621,7 +621,7 @@ func performVacuumDB(connection *sql.DB) error {
 
 // performCleanupInDB function cleans up all data for selected cluster names
 func performCleanupInDB(connection *sql.DB,
-	clusterList ClusterList) (map[string]int, error) {
+	clusterList ClusterList, schema string) (map[string]int, error) {
 	// return value
 	deletionsForTable := make(map[string]int)
 
