@@ -86,6 +86,12 @@ const (
 	     ORDER BY consumed_at`
 )
 
+// DB schemas
+const (
+	DBSchemaOCPRecommendations = "ocp_recommendations"
+	DBSchemaDVORecommendations = "dvo_recommendations"
+)
+
 // initDatabaseConnection initializes driver, checks if it's supported and
 // initializes connection to the storage.
 func initDatabaseConnection(configuration *StorageConfiguration) (*sql.DB, error) {
@@ -660,7 +666,7 @@ func performCleanupInDB(connection *sql.DB,
 
 // fillInDatabaseByTestData function fill-in database by test data (not to be
 // used against production database)
-func fillInDatabaseByTestData(connection *sql.DB) error {
+func fillInDatabaseByTestData(connection *sql.DB, schema string) error {
 	log.Info().Msg("Fill-in database started")
 	var lastError error
 
