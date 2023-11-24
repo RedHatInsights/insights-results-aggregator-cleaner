@@ -316,7 +316,7 @@ func createOutputFile(output string) (*os.File, *bufio.Writer) {
 
 // displayAllOldRecords function read all old records, ie. records that are
 // older than the specified time duration. Those records are simply displayed.
-func displayAllOldRecords(connection *sql.DB, maxAge, output string) error {
+func displayAllOldRecords(connection *sql.DB, maxAge, output string, schema string) error {
 	// check if connection has been initialized
 	if connection == nil {
 		log.Error().Msg(connectionNotEstablished)
@@ -345,25 +345,37 @@ func displayAllOldRecords(connection *sql.DB, maxAge, output string) error {
 		}
 	}()
 
-	// main function of this tool is ability to delete old reports
-	err := performListOfOldReports(connection, maxAge, writer)
-	// skip next operation on first error
-	if err != nil {
-		return err
-	}
+	switch schema {
+	case DBSchemaOCPRecommendations:
+		// main function of this tool is ability to delete old reports
+		err := performListOfOldOCPReports(connection, maxAge, writer)
+		// skip next operation on first error
+		if err != nil {
+			return err
+		}
 
-	// but we might be interested in other tables as well, especially advisor ratings
-	err = performListOfOldRatings(connection, maxAge)
-	// skip next operation on first error
-	if err != nil {
-		return err
-	}
+		// but we might be interested in other tables as well, especially advisor ratings
+		err = performListOfOldRatings(connection, maxAge)
+		// skip next operation on first error
+		if err != nil {
+			return err
+		}
 
-	// also but we might be interested in other consumer errors
-	err = performListOfOldConsumerErrors(connection, maxAge)
-	// skip next operation on first error
-	if err != nil {
-		return err
+		// also but we might be interested in other consumer errors
+		err = performListOfOldConsumerErrors(connection, maxAge)
+		// skip next operation on first error
+		if err != nil {
+			return err
+		}
+	case DBSchemaDVORecommendations:
+		// main function of this tool is ability to delete old reports
+		err := performListOfOldDVOReports(connection, maxAge, writer)
+		// skip next operation on first error
+		if err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("Invalid database schema to be investigated: '%s'", schema)
 	}
 
 	return nil
@@ -389,9 +401,9 @@ func listOldDatabaseRecords(connection *sql.DB, maxAge string,
 	return nil
 }
 
-// performListOfOldReports read and displays old records read from reported_at
+// performListOfOldOCPReports read and displays old records read from reported_at
 // table
-func performListOfOldReports(connection *sql.DB, maxAge string, writer *bufio.Writer) error {
+func performListOfOldOCPReports(connection *sql.DB, maxAge string, writer *bufio.Writer) error {
 	return listOldDatabaseRecords(connection, maxAge, writer, selectOldReports, "List of old reports", "reports count",
 		func(rows *sql.Rows, writer *bufio.Writer) (int, error) {
 			// used to compute a real record age
@@ -441,6 +453,12 @@ func performListOfOldReports(connection *sql.DB, maxAge string, writer *bufio.Wr
 			}
 			return count, nil
 		})
+}
+
+// performListOfOldDVOReports read and displays old records read from dvo_report
+// table
+func performListOfOldDVOReports(connection *sql.DB, maxAge string, writer *bufio.Writer) error {
+	return nil
 }
 
 // performListOfOldRatings read and displays old Advisor ratings read from

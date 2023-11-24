@@ -37,7 +37,8 @@ var (
 	DisplayMultipleRuleDisable        = displayMultipleRuleDisable
 	DisplayAllOldRecords              = displayAllOldRecords
 	PerformDisplayMultipleRuleDisable = performDisplayMultipleRuleDisable
-	PerformListOfOldReports           = performListOfOldReports
+	PerformListOfOldOCPReports        = performListOfOldOCPReports
+	PerformListOfOldDVOReports        = performListOfOldDVOReports
 	PerformListOfOldRatings           = performListOfOldRatings
 	PerformListOfOldConsumerErrors    = performListOfOldConsumerErrors
 	DeleteRecordFromTable             = deleteRecordFromTable
