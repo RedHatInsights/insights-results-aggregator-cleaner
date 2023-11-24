@@ -1366,7 +1366,7 @@ func TestFillInDatabaseByTestData(t *testing.T) {
 
 	mock.ExpectClose()
 
-	err = cleaner.FillInDatabaseByTestData(connection)
+	err = cleaner.FillInDatabaseByTestData(connection, DBSchemaOCPRecommendations)
 	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check if DB can be closed successfully
@@ -1403,7 +1403,7 @@ func TestFillInDatabaseByTestDataOnError1(t *testing.T) {
 
 	mock.ExpectClose()
 
-	err = cleaner.FillInDatabaseByTestData(connection)
+	err = cleaner.FillInDatabaseByTestData(connection, DBSchemaDVORecommendations)
 	assert.Error(t, err, "error is expected while calling tested function")
 
 	assert.Equal(t, err, mockedError)
@@ -1441,7 +1441,7 @@ func TestFillInDatabaseByTestDataOnError2(t *testing.T) {
 
 	mock.ExpectClose()
 
-	err = cleaner.FillInDatabaseByTestData(connection)
+	err = cleaner.FillInDatabaseByTestData(connection, DBSchemaDVORecommendations)
 	assert.Error(t, err, "error is expected while calling tested function")
 
 	assert.Equal(t, err, mockedError)
