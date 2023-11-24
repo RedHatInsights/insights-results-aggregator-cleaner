@@ -1151,7 +1151,7 @@ func TestDisplayOldRecordsNoConnection(t *testing.T) {
 
 	cliFlags := main.CliFlags{}
 
-	exitCode, err := main.DisplayOldRecords(&configuration, nil, cliFlags)
+	exitCode, err := main.DisplayOldRecords(&configuration, nil, cliFlags, main.DBSchemaOCPRecommendations)
 	assert.Error(t, err, "error is expected while calling tested function")
 	assert.Equal(t, exitCode, main.ExitStatusStorageError)
 }
@@ -1191,7 +1191,7 @@ func TestDisplayOldRecordsProperConnection(t *testing.T) {
 	mock.ExpectClose()
 
 	// call the tested function
-	exitCode, err := main.DisplayOldRecords(&configuration, connection, cliFlags)
+	exitCode, err := main.DisplayOldRecords(&configuration, connection, cliFlags, main.DBSchemaOCPRecommendations)
 
 	// and check its output
 	assert.NoError(t, err, "error is not expected while calling tested function")
