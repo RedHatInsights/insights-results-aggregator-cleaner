@@ -30,6 +30,7 @@ package main
 // to see why this trick is needed.
 var (
 	TablesAndKeysInOCPDatabase = tablesAndKeysInOCPDatabase
+	TablesAndKeysInDVODatabase = tablesAndKeysInDVODatabase
 
 	// functions from the storage.go source file
 	ReadOrgID                         = readOrgID
