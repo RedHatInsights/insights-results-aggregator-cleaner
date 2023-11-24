@@ -250,6 +250,7 @@ func updateConfigFromClowder(c *ConfigStruct) error {
 	return nil
 }
 
+// StringSet type is a poor man's implementation of set of strings
 type StringSet map[string]struct{}
 
 // allSupportedDrivers constructs set with names of all supported database
