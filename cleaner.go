@@ -277,7 +277,7 @@ func vacuumDB(connection *sql.DB) (int, error) {
 }
 
 // cleanup function starts the cleanup operation
-func cleanup(configuration *ConfigStruct, connection *sql.DB, cliFlags CliFlags) (int, error) {
+func cleanup(configuration *ConfigStruct, connection *sql.DB, cliFlags CliFlags, schema string) (int, error) {
 	// cleanup operation
 	clusterList, improperClusterCounter, err := readClusterList(
 		configuration.Cleaner.ClusterListFile,
@@ -286,7 +286,7 @@ func cleanup(configuration *ConfigStruct, connection *sql.DB, cliFlags CliFlags)
 		log.Err(err).Msg("Read cluster list")
 		return ExitStatusPerformCleanupError, err
 	}
-	deletionsForTable, err := performCleanupInDB(connection, clusterList)
+	deletionsForTable, err := performCleanupInDB(connection, clusterList, schema)
 	if err != nil {
 		log.Err(err).Msg("Performing cleanup")
 		return ExitStatusPerformCleanupError, err
@@ -364,7 +364,7 @@ func doSelectedOperation(configuration *ConfigStruct, connection *sql.DB, cliFla
 	case cliFlags.VacuumDatabase:
 		return vacuumDB(connection)
 	case cliFlags.PerformCleanup:
-		return cleanup(configuration, connection, cliFlags)
+		return cleanup(configuration, connection, cliFlags, configuration.Storage.Schema)
 	case cliFlags.DetectMultipleRuleDisable:
 		return detectMultipleRuleDisable(connection, cliFlags)
 	case cliFlags.FillInDatabase:
