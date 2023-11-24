@@ -44,6 +44,7 @@ package main
 // pg_port = 5432
 // pg_db_name = "aggregator"
 // pg_params = "sslmode=disable"
+// schema = "ocp_recommendations"
 //
 // [logging]
 // debug = true
@@ -62,6 +63,7 @@ package main
 // INSIGHTS_RESULTS_CLEANER__STORAGE__PG_PORT
 // INSIGHTS_RESULTS_CLEANER__STORAGE__PG_DB_NAME
 // INSIGHTS_RESULTS_CLEANER__STORAGE__PG_PARAMS
+// INSIGHTS_RESULTS_CLEANER__STORAGE__SCHEMA
 // INSIGHTS_RESULTS_CLEANER__LOGGING__DEBUG
 // INSIGHTS_RESULTS_CLEANER__LOGGING__LOG_DEVEL
 // INSIGHTS_RESULTS_CLEANER__CLEANER__MAX_AGE
@@ -132,6 +134,7 @@ type StorageConfiguration struct {
 	PGPort           int    `mapstructure:"pg_port" toml:"pg_port"`
 	PGDBName         string `mapstructure:"pg_db_name" toml:"pg_db_name"`
 	PGParams         string `mapstructure:"pg_params" toml:"pg_params"`
+	Schema           string `mapstructure:"schema" toml:"schema"`
 }
 
 // LoadConfiguration function loads configuration from defaultConfigFile, file
@@ -243,6 +246,57 @@ func updateConfigFromClowder(c *ConfigStruct) error {
 	c.Storage.PGPort = clowder.LoadedConfig.Database.Port
 	c.Storage.PGUsername = clowder.LoadedConfig.Database.Username
 	c.Storage.PGPassword = clowder.LoadedConfig.Database.Password
+
+	return nil
+}
+
+type StringSet map[string]struct{}
+
+// allSupportedDrivers constructs set with names of all supported database
+// drivers
+func allSupportedDrivers() StringSet {
+	var drivers = make(StringSet)
+	drivers["sqlite3"] = struct{}{}
+	drivers["postgres"] = struct{}{}
+	return drivers
+}
+
+// allSupportedSchmeas constructs set with names of all supported database
+// schemas
+func allSupportedSchemas() StringSet {
+	var schemas = make(StringSet)
+	schemas["ocm_recommendations"] = struct{}{}
+	schemas["dvo_recommendations"] = struct{}{}
+	return schemas
+}
+
+// CheckConfiguration function checks if loaded configuration contains expected
+// items
+func CheckConfiguration(config *ConfigStruct) error {
+	drivers := allSupportedDrivers()
+	schemas := allSupportedSchemas()
+
+	storageCfg := GetStorageConfiguration(config)
+	driver := storageCfg.Driver
+	schema := storageCfg.Schema
+
+	if driver == "" {
+		return fmt.Errorf("Database driver is not specified in configuration")
+	}
+
+	if schema == "" {
+		return fmt.Errorf("Database schema is not specified in configuration")
+	}
+
+	_, found := drivers[driver]
+	if !found {
+		return fmt.Errorf("Incorrect database driver found in configuration: %s", driver)
+	}
+
+	_, found = schemas[schema]
+	if !found {
+		return fmt.Errorf("Incorrect database schema found in configuration: %s", schema)
+	}
 
 	return nil
 }
