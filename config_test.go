@@ -137,6 +137,7 @@ func TestLoadStorageConfiguration(t *testing.T) {
 	assert.Equal(t, 5432, storageCfg.PGPort)
 	assert.Equal(t, "notifications", storageCfg.PGDBName)
 	assert.Equal(t, "", storageCfg.PGParams)
+	assert.Equal(t, "ocp_recommendations", storageCfg.Schema)
 }
 
 // TestLoadLoggingConfiguration tests loading the logging configuration
@@ -173,4 +174,71 @@ func TestLoadConfigurationFromEnvVariableClowderEnabled(t *testing.T) {
 	// check loaded configuration
 	dbCfg := main.GetStorageConfiguration(&config)
 	assert.Equal(t, testDB, dbCfg.PGDBName)
+}
+
+// TestCheckConfigurationEmptyConfig tests the function to check loaded configuration
+func TestCheckConfigurationEmptyConfig(t *testing.T) {
+	config := main.ConfigStruct{}
+	err := main.CheckConfiguration(&config)
+	assert.Error(t, err, "Error should be thrown for empty configuration")
+}
+
+// TestCheckConfigurationPositiveTestCases tests the function to check loaded configuration
+func TestCheckConfigurationPositiveTestCases(t *testing.T) {
+	config1 := main.ConfigStruct{
+		Storage: main.StorageConfiguration{
+			Driver: "postgres",
+			Schema: "ocm_recommendations",
+		},
+	}
+	err := main.CheckConfiguration(&config1)
+	assert.NoError(t, err, "Error should not be thrown")
+
+	config2 := main.ConfigStruct{
+		Storage: main.StorageConfiguration{
+			Driver: "sqlite3",
+			Schema: "dvo_recommendations",
+		},
+	}
+	err = main.CheckConfiguration(&config2)
+	assert.NoError(t, err, "Error should not be thrown")
+}
+
+// TestCheckConfigurationNegativeTestCases tests the function to check loaded configuration
+func TestCheckConfigurationNegativeTestCases(t *testing.T) {
+	config1 := main.ConfigStruct{
+		Storage: main.StorageConfiguration{
+			Driver: "unknown",
+			Schema: "ocm_recommendations",
+		},
+	}
+	err := main.CheckConfiguration(&config1)
+	assert.Error(t, err, "Error should be thrown for unknown database driver")
+
+	config2 := main.ConfigStruct{
+		Storage: main.StorageConfiguration{
+			Driver: "sqlite3",
+			Schema: "unknown",
+		},
+	}
+	err = main.CheckConfiguration(&config2)
+	assert.Error(t, err, "Error should be thrown for unknown database schema")
+
+	config3 := main.ConfigStruct{
+		Storage: main.StorageConfiguration{
+			Driver: "",
+			Schema: "ocm_recommendations",
+		},
+	}
+	err = main.CheckConfiguration(&config3)
+	assert.Error(t, err, "Error should be thrown for empty/missing database driver")
+
+	config4 := main.ConfigStruct{
+		Storage: main.StorageConfiguration{
+			Driver: "sqlite3",
+			Schema: "",
+		},
+	}
+	err = main.CheckConfiguration(&config4)
+	assert.Error(t, err, "Error should be thrown for empty/missing database schema")
 }

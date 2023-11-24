@@ -400,6 +400,11 @@ func main() {
 		log.Err(err).Msg("Load configuration")
 	}
 
+	err = CheckConfiguration(&config)
+	if err != nil {
+		log.Err(err).Msg("Check configuration")
+	}
+
 	if config.Logging.Debug {
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}

@@ -35,6 +35,8 @@ objects:
               value: ${PG_PARAMS}
             - name: INSIGHTS_RESULTS_CLEANER__STORAGE__DB_DRIVER
               value: postgres
+            - name: INSIGHTS_RESULTS_CLEANER__STORAGE__SCHEMA
+              value: ocp_recommendations
             - name: INSIGHTS_RESULTS_CLEANER__LOGGING__DEBUG
               value: "${DEBUG}"
             - name: INSIGHTS_RESULTS_CLEANER__LOGGING__LOG_DEVEL

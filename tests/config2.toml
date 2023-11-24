@@ -8,6 +8,7 @@ pg_port = 5432
 pg_db_name = "notifications"
 pg_params = ""
 log_sql_queries = true
+schema = "ocp_recommendations"
 
 [logging]
 debug = true
