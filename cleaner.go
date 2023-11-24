@@ -337,9 +337,9 @@ func fillInDatabase(connection *sql.DB, schema string) (int, error) {
 }
 
 // displayOldRecords function displays old records in database
-func displayOldRecords(configuration *ConfigStruct, connection *sql.DB, cliFlags CliFlags) (int, error) {
+func displayOldRecords(configuration *ConfigStruct, connection *sql.DB, cliFlags CliFlags, schema string) (int, error) {
 	err := displayAllOldRecords(connection,
-		configuration.Cleaner.MaxAge, cliFlags.Output)
+		configuration.Cleaner.MaxAge, cliFlags.Output, schema)
 	if err != nil {
 		log.Err(err).Msg(selectingRecordsFromDatabase)
 		return ExitStatusStorageError, err
@@ -370,7 +370,7 @@ func doSelectedOperation(configuration *ConfigStruct, connection *sql.DB, cliFla
 	case cliFlags.FillInDatabase:
 		return fillInDatabase(connection, configuration.Storage.Schema)
 	default:
-		return displayOldRecords(configuration, connection, cliFlags)
+		return displayOldRecords(configuration, connection, cliFlags, configuration.Storage.Schema)
 	}
 	// we should not end there
 }

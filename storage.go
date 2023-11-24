@@ -53,6 +53,10 @@ const (
 	canNotConnectToDataStorageMessage = "Can not connect to data storage"
 	unableToCloseDBRowsHandle         = "Unable to close the DB rows handle"
 	connectionNotEstablished          = "Connection to database was not established"
+	reportedMsg                       = "reported"
+	lastCheckedMsg                    = "lastChecked"
+	ageMsg                            = "age"
+	reportsCountMsg                   = "reports count"
 )
 
 // Other messages
@@ -67,7 +71,7 @@ const (
 
 // SQL commands
 const (
-	selectOldReports = `
+	selectOldOCPReports = `
 	    SELECT cluster, reported_at, last_checked_at
 	      FROM report
 	     WHERE reported_at < NOW() - $1::INTERVAL
@@ -84,6 +88,12 @@ const (
 	      FROM consumer_error
 	     WHERE consumed_at < NOW() - $1::INTERVAL
 	     ORDER BY consumed_at`
+
+	selectOldDVOReports = `
+	    SELECT org_id, cluster_id, reported_at, last_checked_at
+	      FROM dvo_report
+	     WHERE reported_at < NOW() - $1::INTERVAL
+	     ORDER BY reported_at`
 )
 
 // DB schemas
@@ -316,7 +326,7 @@ func createOutputFile(output string) (*os.File, *bufio.Writer) {
 
 // displayAllOldRecords function read all old records, ie. records that are
 // older than the specified time duration. Those records are simply displayed.
-func displayAllOldRecords(connection *sql.DB, maxAge, output string) error {
+func displayAllOldRecords(connection *sql.DB, maxAge, output string, schema string) error {
 	// check if connection has been initialized
 	if connection == nil {
 		log.Error().Msg(connectionNotEstablished)
@@ -345,25 +355,37 @@ func displayAllOldRecords(connection *sql.DB, maxAge, output string) error {
 		}
 	}()
 
-	// main function of this tool is ability to delete old reports
-	err := performListOfOldReports(connection, maxAge, writer)
-	// skip next operation on first error
-	if err != nil {
-		return err
-	}
+	switch schema {
+	case DBSchemaOCPRecommendations:
+		// main function of this tool is ability to delete old reports
+		err := performListOfOldOCPReports(connection, maxAge, writer)
+		// skip next operation on first error
+		if err != nil {
+			return err
+		}
 
-	// but we might be interested in other tables as well, especially advisor ratings
-	err = performListOfOldRatings(connection, maxAge)
-	// skip next operation on first error
-	if err != nil {
-		return err
-	}
+		// but we might be interested in other tables as well, especially advisor ratings
+		err = performListOfOldRatings(connection, maxAge)
+		// skip next operation on first error
+		if err != nil {
+			return err
+		}
 
-	// also but we might be interested in other consumer errors
-	err = performListOfOldConsumerErrors(connection, maxAge)
-	// skip next operation on first error
-	if err != nil {
-		return err
+		// also but we might be interested in other consumer errors
+		err = performListOfOldConsumerErrors(connection, maxAge)
+		// skip next operation on first error
+		if err != nil {
+			return err
+		}
+	case DBSchemaDVORecommendations:
+		// main function of this tool is ability to delete old reports
+		err := performListOfOldDVOReports(connection, maxAge, writer)
+		// skip next operation on first error
+		if err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("Invalid database schema to be investigated: '%s'", schema)
 	}
 
 	return nil
@@ -389,10 +411,10 @@ func listOldDatabaseRecords(connection *sql.DB, maxAge string,
 	return nil
 }
 
-// performListOfOldReports read and displays old records read from reported_at
+// performListOfOldOCPReports read and displays old records read from reported_at
 // table
-func performListOfOldReports(connection *sql.DB, maxAge string, writer *bufio.Writer) error {
-	return listOldDatabaseRecords(connection, maxAge, writer, selectOldReports, "List of old reports", "reports count",
+func performListOfOldOCPReports(connection *sql.DB, maxAge string, writer *bufio.Writer) error {
+	return listOldDatabaseRecords(connection, maxAge, writer, selectOldOCPReports, "List of old OCP reports", reportsCountMsg,
 		func(rows *sql.Rows, writer *bufio.Writer) (int, error) {
 			// used to compute a real record age
 			now := time.Now()
@@ -426,13 +448,68 @@ func performListOfOldReports(connection *sql.DB, maxAge string, writer *bufio.Wr
 
 				// just print the report
 				log.Info().Str(clusterNameMsg, clusterName).
-					Str("reported", reportedF).
-					Str("lastChecked", lastCheckedF).
-					Int("age", age).
-					Msg("Old report")
+					Str(reportedMsg, reportedF).
+					Str(lastCheckedMsg, lastCheckedF).
+					Int(ageMsg, age).
+					Msg("Old OCP report")
 
 				if writer != nil {
 					_, err := fmt.Fprintf(writer, "%s,%s,%s,%d\n", clusterName, reportedF, lastCheckedF, age)
+					if err != nil {
+						log.Error().Err(err).Msg(writeToFileMsg)
+					}
+				}
+				count++
+			}
+			return count, nil
+		})
+}
+
+// performListOfOldDVOReports read and displays old records read from dvo_report
+// table
+func performListOfOldDVOReports(connection *sql.DB, maxAge string, writer *bufio.Writer) error {
+	return listOldDatabaseRecords(connection, maxAge, writer, selectOldDVOReports, "List of old DVO reports", reportsCountMsg,
+		func(rows *sql.Rows, writer *bufio.Writer) (int, error) {
+			// used to compute a real record age
+			now := time.Now()
+
+			// reports count
+			count := 0
+
+			// iterate over all old records
+			for rows.Next() {
+				var (
+					orgID       int
+					clusterName string
+					reported    time.Time
+					lastChecked time.Time
+				)
+
+				// read one old record from the report table
+				if err := rows.Scan(&orgID, &clusterName, &reported, &lastChecked); err != nil {
+					// close the result set in case of any error
+					if closeErr := rows.Close(); closeErr != nil {
+						log.Error().Err(closeErr).Msg(unableToCloseDBRowsHandle)
+					}
+					return count, err
+				}
+
+				// compute the real record age
+				age := int(math.Ceil(now.Sub(reported).Hours() / 24)) // in days
+
+				// prepare for the report
+				reportedF := reported.Format(time.RFC3339)
+				lastCheckedF := lastChecked.Format(time.RFC3339)
+
+				// just print the report
+				log.Info().Str(clusterNameMsg, clusterName).
+					Str(reportedMsg, reportedF).
+					Str(lastCheckedMsg, lastCheckedF).
+					Int(ageMsg, age).
+					Msg("Old DVO report")
+
+				if writer != nil {
+					_, err := fmt.Fprintf(writer, "%d,%s,%s,%s,%d\n", orgID, clusterName, reportedF, lastCheckedF, age)
 					if err != nil {
 						log.Error().Err(err).Msg(writeToFileMsg)
 					}
