@@ -29,7 +29,8 @@ package main
 // https://medium.com/@robiplus/golang-trick-export-for-test-aa16cbd7b8cd
 // to see why this trick is needed.
 var (
-	TablesAndKeys = tablesAndKeys
+	TablesAndKeysInOCPDatabase = tablesAndKeysInOCPDatabase
+	TablesAndKeysInDVODatabase = tablesAndKeysInDVODatabase
 
 	// functions from the storage.go source file
 	ReadOrgID                         = readOrgID
