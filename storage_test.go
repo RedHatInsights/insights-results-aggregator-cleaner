@@ -1604,7 +1604,7 @@ func TestPerformCleanupInDB(t *testing.T) {
 
 	mock.ExpectClose()
 
-	deletedRows, err := cleaner.PerformCleanupInDB(connection, clusterNames)
+	deletedRows, err := cleaner.PerformCleanupInDB(connection, clusterNames, main.DBSchemaOCPRecommendations)
 	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check tables have correct number of deleted rows for each table
