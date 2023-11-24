@@ -1344,9 +1344,9 @@ func TestPerformVacuumDB(t *testing.T) {
 	checkAllExpectations(t, mock)
 }
 
-// TestFillInDatabaseByTestData checks the basic behaviour of
-// fillInDatabaseByTestData function.
-func TestFillInDatabaseByTestData(t *testing.T) {
+// TestFillInOCPDatabaseByTestData checks the basic behaviour of
+// FillInOCPDatabaseByTestData function.
+func TestFillInOCPDatabaseByTestData(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
 	assert.NoError(t, err, "error creating SQL mock")
@@ -1377,10 +1377,10 @@ func TestFillInDatabaseByTestData(t *testing.T) {
 	checkAllExpectations(t, mock)
 }
 
-// TestFillInDatabaseByTestDataOnError1 checks the basic behaviour of
-// fillInDatabaseByTestDataOnError function. The last INSERT statement throws
+// TestFillInOCPDatabaseByTestDataOnError1 checks the basic behaviour of
+// FillInOCPDatabaseByTestDataOnError function. The last INSERT statement throws
 // error.
-func TestFillInDatabaseByTestDataOnError1(t *testing.T) {
+func TestFillInOCPDatabaseByTestDataOnError1(t *testing.T) {
 	// error to be thrown
 	mockedError := errors.New("insert into rule hit error")
 
@@ -1416,8 +1416,8 @@ func TestFillInDatabaseByTestDataOnError1(t *testing.T) {
 	checkAllExpectations(t, mock)
 }
 
-// TestFillInDatabaseByTestDataOnError2 checks the basic behaviour of
-// fillInDatabaseByTestDataOnError function. Now the first INSERT statement return error.
+// TestFillInOCPDatabaseByTestDataOnError2 checks the basic behaviour of
+// FillInOCPDatabaseByTestDataOnError function. Now the first INSERT statement return error.
 func TestFillInDatabaseByTestDataOnError2(t *testing.T) {
 	// error to be thrown
 	mockedError := errors.New("insert into report")
@@ -1446,6 +1446,34 @@ func TestFillInDatabaseByTestDataOnError2(t *testing.T) {
 	assert.Error(t, err, "error is expected while calling tested function")
 
 	assert.Equal(t, err, mockedError)
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
+// TestFillInDVODatabaseByTestData checks the basic behaviour of
+// FillInDVODatabaseByTestData function.
+func TestFillInDVODatabaseByTestData(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	const insert = "INSERT INTO dvo_report \\(org_id, cluster_id, namespace_id, namespace_name, report, recommendations, objects, reported_at, last_checked_at\\) values \\(\\$1, \\$2, \\$3, \\$4, \\$5, \\$6, \\$7, \\$8, \\$9\\);"
+
+	mock.ExpectExec(insert).WithArgs(1, "00000001-0001-0001-0001-000000000001", "fbcbe2d3-e398-4b40-9d5e-4eb46fe8286f", "not set", "", "Ensure the host's network namespace is not shared.", "", "2021-01-01", "2021-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(insert).WithArgs(1, "00000002-0002-0002-0002-000000000002", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", "Ensure the host's network namespace is not shared.", "", "2021-01-01", "2021-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(insert).WithArgs(2, "00000003-0003-0003-0003-000000000003", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", "Ensure pod does not accept unsafe traffic by isolating it with a NetworkPolicy.", "", "2021-01-01", "2021-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(insert).WithArgs(3, "00000001-0001-0001-0001-000000000001", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", "Set memory requests and limits for your container based on its requirements.", "", "2021-01-01", "2021-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(insert).WithArgs(3, "00000002-0002-0002-0002-000000000002", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", "Set memory requests and limits for your container based on its requirements.", "", "2022-01-01", "2022-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(insert).WithArgs(3, "00000003-0003-0003-0003-000000000003", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", "Set memory requests and limits for your container based on its requirements.", "", "2023-01-01", "2023-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
+
+	mock.ExpectClose()
+
+	err = cleaner.FillInDatabaseByTestData(connection, main.DBSchemaDVORecommendations)
+	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check if DB can be closed successfully
 	checkConnectionClose(t, connection)
