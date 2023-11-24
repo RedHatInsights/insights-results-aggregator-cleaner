@@ -573,7 +573,7 @@ func deleteRecordFromTable(connection *sql.DB, table, key string, clusterName Cl
 
 // tablesAndKeys contains list of all tables together with keys used to select
 // records to be deleted
-var tablesAndKeys = [...]TableAndKey{
+var tablesAndKeys = []TableAndKey{
 	{
 		TableName: "cluster_rule_toggle",
 		KeyName:   "cluster_id",
@@ -621,7 +621,7 @@ func performVacuumDB(connection *sql.DB) error {
 
 // performCleanupInDB function cleans up all data for selected cluster names
 func performCleanupInDB(connection *sql.DB,
-	clusterList ClusterList, schema string) (map[string]int, error) {
+	clusterList ClusterList, _ string) (map[string]int, error) {
 	// return value
 	deletionsForTable := make(map[string]int)
 
