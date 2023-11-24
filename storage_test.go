@@ -1576,9 +1576,9 @@ func TestFillInDatabaseByTestDataOnWrongSchema(t *testing.T) {
 	checkAllExpectations(t, mock)
 }
 
-// TestPerformCleanupInDB checks the basic behaviour of
-// performCleanupInDB function.
-func TestPerformCleanupInDB(t *testing.T) {
+// TestPerformCleanupInDBForOCPDatabase checks the basic behaviour of
+// performCleanupInDBForOCPDatabase function.
+func TestPerformCleanupInDBForOCPDatabase(t *testing.T) {
 	expectedResult := make(map[string]int)
 
 	// prepare new mocked connection to database
@@ -1614,6 +1614,89 @@ func TestPerformCleanupInDB(t *testing.T) {
 
 	// check if DB can be closed successfully
 	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
+// TestPerformCleanupInDBForDVODatabase checks the basic behaviour of
+// performCleanupInDBForDVODatabase function.
+func TestPerformCleanupInDBForDVODatabase(t *testing.T) {
+	expectedResult := make(map[string]int)
+
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	clusterNames := cleaner.ClusterList{
+		"00000000-0000-0000-0000-000000000000",
+		"11111111-1111-1111-1111-111111111111",
+		"5d5892d4-1f74-4ccf-91af-548dfc9767aa",
+	}
+
+	for _, clusterName := range clusterNames {
+		for _, tableAndKey := range cleaner.TablesAndKeysInDVODatabase {
+			// expected query performed by tested function
+			expectedExec := fmt.Sprintf("DELETE FROM %v WHERE %v = \\$", tableAndKey.TableName, tableAndKey.KeyName)
+			mock.ExpectExec(expectedExec).WithArgs(clusterName).WillReturnResult(sqlmock.NewResult(1, 2))
+
+			// two deleted rows for each cluster
+			expectedResult[tableAndKey.TableName] += 2
+		}
+	}
+
+	mock.ExpectClose()
+
+	deletedRows, err := cleaner.PerformCleanupInDB(connection, clusterNames, main.DBSchemaDVORecommendations)
+	assert.NoError(t, err, "error not expected while calling tested function")
+
+	// check tables have correct number of deleted rows for each table
+	for tableName, deletedRowCount := range deletedRows {
+		assert.Equal(t, expectedResult[tableName], deletedRowCount)
+	}
+
+	// check if DB can be closed successfully
+	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
+// TestPerformCleanupInDBNullSchema checks the basic behaviour of
+// performCleanupInDB function.
+func TestPerformCleanupInDBNullSchema(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	clusterNames := cleaner.ClusterList{
+		"00000000-0000-0000-0000-000000000000",
+		"11111111-1111-1111-1111-111111111111",
+		"5d5892d4-1f74-4ccf-91af-548dfc9767aa",
+	}
+
+	_, err = cleaner.PerformCleanupInDB(connection, clusterNames, "")
+	assert.Error(t, err, "error is expected while calling tested function")
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
+// TestPerformCleanupInDBWrongSchema checks the basic behaviour of
+// performCleanupInDB function.
+func TestPerformCleanupInDBWrongSchema(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	clusterNames := cleaner.ClusterList{
+		"00000000-0000-0000-0000-000000000000",
+		"11111111-1111-1111-1111-111111111111",
+		"5d5892d4-1f74-4ccf-91af-548dfc9767aa",
+	}
+
+	_, err = cleaner.PerformCleanupInDB(connection, clusterNames, "wrong schema")
+	assert.Error(t, err, "error is expected while calling tested function")
 
 	// check all DB expectactions happened correctly
 	checkAllExpectations(t, mock)
