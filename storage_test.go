@@ -1592,7 +1592,7 @@ func TestPerformCleanupInDB(t *testing.T) {
 	}
 
 	for _, clusterName := range clusterNames {
-		for _, tableAndKey := range cleaner.TablesAndKeys {
+		for _, tableAndKey := range cleaner.TablesAndKeysInOCPDatabase {
 			// expected query performed by tested function
 			expectedExec := fmt.Sprintf("DELETE FROM %v WHERE %v = \\$", tableAndKey.TableName, tableAndKey.KeyName)
 			mock.ExpectExec(expectedExec).WithArgs(clusterName).WillReturnResult(sqlmock.NewResult(1, 2))
@@ -1639,7 +1639,7 @@ func TestPerformCleanupInDBOnDeleteError(t *testing.T) {
 	}
 
 	for _, clusterName := range clusterNames {
-		for _, tableAndKey := range cleaner.TablesAndKeys {
+		for _, tableAndKey := range cleaner.TablesAndKeysInOCPDatabase {
 			// expected query performed by tested function
 			expectedExec := fmt.Sprintf("DELETE FROM %v WHERE %v = \\$", tableAndKey.TableName, tableAndKey.KeyName)
 			mock.ExpectExec(expectedExec).WithArgs(clusterName).WillReturnError(mockedError)

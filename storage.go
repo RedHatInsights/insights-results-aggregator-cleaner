@@ -571,9 +571,9 @@ func deleteRecordFromTable(connection *sql.DB, table, key string, clusterName Cl
 	return int(affected), nil
 }
 
-// tablesAndKeys contains list of all tables together with keys used to select
+// tablesAndKeysInOCPDatabase contains list of all tables together with keys used to select
 // records to be deleted
-var tablesAndKeys = []TableAndKey{
+var tablesAndKeysInOCPDatabase = []TableAndKey{
 	{
 		TableName: "cluster_rule_toggle",
 		KeyName:   "cluster_id",
@@ -631,6 +631,7 @@ func performCleanupInDB(connection *sql.DB,
 		return deletionsForTable, errors.New(connectionNotEstablished)
 	}
 
+	var tablesAndKeys []TableAndKey = tablesAndKeysInOCPDatabase
 	// initialize counters
 	for _, tableAndKey := range tablesAndKeys {
 		deletionsForTable[tableAndKey.TableName] = 0
