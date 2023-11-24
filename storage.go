@@ -668,6 +668,20 @@ func performCleanupInDB(connection *sql.DB,
 // used against production database)
 func fillInDatabaseByTestData(connection *sql.DB, schema string) error {
 	log.Info().Msg("Fill-in database started")
+
+	switch schema {
+	case DBSchemaOCPRecommendations:
+		return fillInOCPDatabaseByTestData(connection)
+	case DBSchemaDVORecommendations:
+		return fillInDVODatabaseByTestData(connection)
+	default:
+		return fmt.Errorf("Invalid DB schema '%s'", schema)
+	}
+}
+
+// fillInOCPDatabaseByTestData function fills-in OCP database by test data
+// (not to be used against production database)
+func fillInOCPDatabaseByTestData(connection *sql.DB) error {
 	var lastError error
 
 	clusterNames := [...]string{
@@ -691,18 +705,150 @@ func fillInDatabaseByTestData(connection *sql.DB, schema string) error {
 		for _, sqlStatement := range sqlStatements {
 			log.Info().
 				Str("SQL statement", sqlStatement).
-				Msg("inserting")
+				Msg("inserting into OCP database")
 			// perform the SQL statement
 			_, err := connection.Exec(sqlStatement, clusterName)
 			if err != nil {
 				// failure is usually ok - it might mean that
 				// the record with given cluster name already
 				// exists
-				log.Err(err).Msg("Insert error")
+				log.Err(err).Msg("Insert error (OCP)")
 				lastError = err
 			}
 		}
 	}
-	log.Info().Msg("Fill-in database finished")
+	log.Info().Msg("Fill-in OCP database finished")
+	return lastError
+}
+
+// fillInDVODatabaseByTestData function fills-in DVO database by test data
+// (not to be used against production database)
+func fillInDVODatabaseByTestData(connection *sql.DB) error {
+	/* Table that needs to be filled-in has the following schema:
+	    CREATE TABLE dvo_report (
+	    org_id          INTEGER NOT NULL,
+	    cluster_id      VARCHAR NOT NULL,
+	    namespace_id    VARCHAR NOT NULL,
+	    namespace_name  VARCHAR,
+	    report          TEXT,
+	    recommendations INTEGER NOT NULL,
+	    objects         INTEGER NOT NULL,
+	    reported_at     TIMESTAMP,
+	    last_checked_at TIMESTAMP,
+	    PRIMARY KEY(org_id, cluster_id, namespace_id)
+	)
+	*/
+
+	const insertStatement = `
+	    INSERT INTO dvo_report
+	           (org_id, cluster_id, namespace_id, namespace_name, report, recommendations, objects, reported_at, last_checked_at)
+		   values
+		   ($1, $2, $3, $4, $5, $6, $7, $8, $9);`
+
+	type Record struct {
+		OrgID           int
+		ClusterID       string
+		NamespaceID     string
+		NamespaceName   string
+		Report          string
+		Recommendations string
+		Objects         string
+		ReportedAt      string
+		LastCheckedAt   string
+	}
+
+	const cluster1 = "00000001-0001-0001-0001-000000000001"
+	const cluster2 = "00000002-0002-0002-0002-000000000002"
+	const cluster3 = "00000003-0003-0003-0003-000000000003"
+
+	records := []Record{
+		Record{
+			OrgID:           1,
+			ClusterID:       cluster1,
+			NamespaceID:     "fbcbe2d3-e398-4b40-9d5e-4eb46fe8286f",
+			NamespaceName:   "not set",
+			Report:          "",
+			Recommendations: "Ensure the host's network namespace is not shared.",
+			Objects:         "",
+			ReportedAt:      "2021-01-01",
+			LastCheckedAt:   "2021-01-01",
+		},
+		Record{
+			OrgID:           1,
+			ClusterID:       cluster2,
+			NamespaceID:     "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c",
+			NamespaceName:   "not set",
+			Report:          "",
+			Recommendations: "Ensure the host's network namespace is not shared.",
+			Objects:         "",
+			ReportedAt:      "2021-01-01",
+			LastCheckedAt:   "2021-01-01",
+		},
+		Record{
+			OrgID:           2,
+			ClusterID:       cluster3,
+			NamespaceID:     "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c",
+			NamespaceName:   "not set",
+			Report:          "",
+			Recommendations: "Ensure pod does not accept unsafe traffic by isolating it with a NetworkPolicy.",
+			Objects:         "",
+			ReportedAt:      "2021-01-01",
+			LastCheckedAt:   "2021-01-01",
+		},
+		Record{
+			OrgID:           3,
+			ClusterID:       cluster1,
+			NamespaceID:     "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c",
+			NamespaceName:   "not set",
+			Report:          "",
+			Recommendations: "Set memory requests and limits for your container based on its requirements.",
+			Objects:         "",
+			ReportedAt:      "2021-01-01",
+			LastCheckedAt:   "2021-01-01",
+		},
+		Record{
+			OrgID:           3,
+			ClusterID:       cluster2,
+			NamespaceID:     "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c",
+			NamespaceName:   "not set",
+			Report:          "",
+			Recommendations: "Set memory requests and limits for your container based on its requirements.",
+			Objects:         "",
+			ReportedAt:      "2022-01-01",
+			LastCheckedAt:   "2022-01-01",
+		},
+		Record{
+			OrgID:           3,
+			ClusterID:       cluster3,
+			NamespaceID:     "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c",
+			NamespaceName:   "not set",
+			Report:          "",
+			Recommendations: "Set memory requests and limits for your container based on its requirements.",
+			Objects:         "",
+			ReportedAt:      "2023-01-01",
+			LastCheckedAt:   "2023-01-01",
+		},
+	}
+
+	var lastError error
+
+	for _, record := range records {
+		log.Info().
+			Str("Insert statement", insertStatement).
+			Msg("inserting into DVO database")
+		// perform the SQL statement
+		_, err := connection.Exec(insertStatement,
+			record.OrgID, record.ClusterID, record.NamespaceID,
+			record.NamespaceName, record.Report, record.Recommendations,
+			record.Objects, record.ReportedAt, record.LastCheckedAt)
+		if err != nil {
+			// failure is usually ok - it might mean that
+			// the record with given org_id + cluster name already
+			// exists
+			log.Err(err).Msg("Insert error (DVO)")
+			lastError = err
+		}
+	}
+	log.Info().Msg("Fill-in DVO database finished")
 	return lastError
 }
