@@ -31,7 +31,6 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	cleaner "github.com/RedHatInsights/insights-results-aggregator-cleaner"
-	main "github.com/RedHatInsights/insights-results-aggregator-cleaner"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -1367,7 +1366,7 @@ func TestFillInOCPDatabaseByTestData(t *testing.T) {
 
 	mock.ExpectClose()
 
-	err = cleaner.FillInDatabaseByTestData(connection, main.DBSchemaOCPRecommendations)
+	err = cleaner.FillInDatabaseByTestData(connection, cleaner.DBSchemaOCPRecommendations)
 	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check if DB can be closed successfully
@@ -1404,7 +1403,7 @@ func TestFillInOCPDatabaseByTestDataOnError1(t *testing.T) {
 
 	mock.ExpectClose()
 
-	err = cleaner.FillInDatabaseByTestData(connection, main.DBSchemaOCPRecommendations)
+	err = cleaner.FillInDatabaseByTestData(connection, cleaner.DBSchemaOCPRecommendations)
 	assert.Error(t, err, "error is expected while calling tested function")
 
 	assert.Equal(t, err, mockedError)
@@ -1442,7 +1441,7 @@ func TestFillInDatabaseByTestDataOnError2(t *testing.T) {
 
 	mock.ExpectClose()
 
-	err = cleaner.FillInDatabaseByTestData(connection, main.DBSchemaOCPRecommendations)
+	err = cleaner.FillInDatabaseByTestData(connection, cleaner.DBSchemaOCPRecommendations)
 	assert.Error(t, err, "error is expected while calling tested function")
 
 	assert.Equal(t, err, mockedError)
@@ -1472,7 +1471,7 @@ func TestFillInDVODatabaseByTestData(t *testing.T) {
 
 	mock.ExpectClose()
 
-	err = cleaner.FillInDatabaseByTestData(connection, main.DBSchemaDVORecommendations)
+	err = cleaner.FillInDatabaseByTestData(connection, cleaner.DBSchemaDVORecommendations)
 	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check if DB can be closed successfully
@@ -1504,7 +1503,7 @@ func TestFillInDVODatabaseByTestDataOnError1(t *testing.T) {
 
 	mock.ExpectClose()
 
-	err = cleaner.FillInDatabaseByTestData(connection, main.DBSchemaDVORecommendations)
+	err = cleaner.FillInDatabaseByTestData(connection, cleaner.DBSchemaDVORecommendations)
 	assert.Error(t, err, "error is expected while calling tested function")
 
 	assert.Equal(t, err, mockedError)
@@ -1538,7 +1537,7 @@ func TestFillInDVODatabaseByTestDataOnError2(t *testing.T) {
 
 	mock.ExpectClose()
 
-	err = cleaner.FillInDatabaseByTestData(connection, main.DBSchemaDVORecommendations)
+	err = cleaner.FillInDatabaseByTestData(connection, cleaner.DBSchemaDVORecommendations)
 	assert.Error(t, err, "error is expected while calling tested function")
 
 	assert.Equal(t, err, mockedError)
@@ -1604,7 +1603,7 @@ func TestPerformCleanupInDBForOCPDatabase(t *testing.T) {
 
 	mock.ExpectClose()
 
-	deletedRows, err := cleaner.PerformCleanupInDB(connection, clusterNames, main.DBSchemaOCPRecommendations)
+	deletedRows, err := cleaner.PerformCleanupInDB(connection, clusterNames, cleaner.DBSchemaOCPRecommendations)
 	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check tables have correct number of deleted rows for each table
@@ -1647,7 +1646,7 @@ func TestPerformCleanupInDBForDVODatabase(t *testing.T) {
 
 	mock.ExpectClose()
 
-	deletedRows, err := cleaner.PerformCleanupInDB(connection, clusterNames, main.DBSchemaDVORecommendations)
+	deletedRows, err := cleaner.PerformCleanupInDB(connection, clusterNames, cleaner.DBSchemaDVORecommendations)
 	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check tables have correct number of deleted rows for each table
@@ -1734,7 +1733,7 @@ func TestPerformCleanupInDBOnDeleteError(t *testing.T) {
 
 	mock.ExpectClose()
 
-	deletedRows, err := cleaner.PerformCleanupInDB(connection, clusterNames, main.DBSchemaOCPRecommendations)
+	deletedRows, err := cleaner.PerformCleanupInDB(connection, clusterNames, cleaner.DBSchemaOCPRecommendations)
 	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check tables have correct number of deleted rows for each table
@@ -1761,7 +1760,7 @@ func TestPerformCleanupInDBNoConnection(t *testing.T) {
 		"5d5892d4-1f74-4ccf-91af-548dfc9767aa",
 	}
 
-	_, err := cleaner.PerformCleanupInDB(connection, clusterNames, main.DBSchemaOCPRecommendations)
+	_, err := cleaner.PerformCleanupInDB(connection, clusterNames, cleaner.DBSchemaOCPRecommendations)
 
 	assert.Error(t, err, "error is expected while calling tested function")
 }
