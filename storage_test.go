@@ -740,9 +740,9 @@ func TestPerformListOfOldConsumerErrorsDBError(t *testing.T) {
 	checkAllExpectations(t, mock)
 }
 
-// TestPerformListOfOldReportsNoResults checks the basic behaviour of
-// performListOfOldReports function.
-func TestPerformListOfOldReportsNoResults(t *testing.T) {
+// TestPerformListOfOldOCPReportsNoResults checks the basic behaviour of
+// PerformListOfOldOCPReports function.
+func TestPerformListOfOldOCPReportsNoResults(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
 	assert.NoError(t, err, "error creating SQL mock")
@@ -756,7 +756,7 @@ func TestPerformListOfOldReportsNoResults(t *testing.T) {
 	mock.ExpectClose()
 
 	// call the tested function
-	err = cleaner.PerformListOfOldReports(connection, "10", nil)
+	err = cleaner.PerformListOfOldOCPReports(connection, "10", nil)
 	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check if DB can be closed successfully
@@ -766,9 +766,9 @@ func TestPerformListOfOldReportsNoResults(t *testing.T) {
 	checkAllExpectations(t, mock)
 }
 
-// TestPerformListOfOldReportsResults checks the basic behaviour of
-// performListOfOldReports function.
-func TestPerformListOfOldReportsResults(t *testing.T) {
+// TestPerformListOfOldOCPReportsResults checks the basic behaviour of
+// PerformListOfOldOCPReports function.
+func TestPerformListOfOldOCPReportsResults(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
 	assert.NoError(t, err, "error creating SQL mock")
@@ -785,7 +785,7 @@ func TestPerformListOfOldReportsResults(t *testing.T) {
 	mock.ExpectClose()
 
 	// call the tested function
-	err = cleaner.PerformListOfOldReports(connection, "10", nil)
+	err = cleaner.PerformListOfOldOCPReports(connection, "10", nil)
 	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check if DB can be closed successfully
@@ -795,9 +795,9 @@ func TestPerformListOfOldReportsResults(t *testing.T) {
 	checkAllExpectations(t, mock)
 }
 
-// TestPerformListOfOldReportsScanError checks the basic behaviour of
-// performListOfOldReports function.
-func TestPerformListOfOldReportsScanError(t *testing.T) {
+// TestPerformListOfOldOCPReportsScanError checks the basic behaviour of
+// PerformListOfOldOCPReports function.
+func TestPerformListOfOldOCPReportsScanError(t *testing.T) {
 	// prepare new mocked connection to database
 	connection, mock, err := sqlmock.New()
 	assert.NoError(t, err, "error creating SQL mock")
@@ -814,7 +814,7 @@ func TestPerformListOfOldReportsScanError(t *testing.T) {
 	mock.ExpectClose()
 
 	// call the tested function
-	err = cleaner.PerformListOfOldReports(connection, "10", nil)
+	err = cleaner.PerformListOfOldOCPReports(connection, "10", nil)
 
 	// tested function should throw an error
 	assert.Error(t, err, "error is expected while calling tested function")
@@ -826,9 +826,9 @@ func TestPerformListOfOldReportsScanError(t *testing.T) {
 	checkAllExpectations(t, mock)
 }
 
-// TestPerformListOfOldReportsDBError checks the basic behaviour of
-// performListOfOldReports function.
-func TestPerformListOfOldReportsDBError(t *testing.T) {
+// TestPerformListOfOldOCPReportsDBError checks the basic behaviour of
+// PerformListOfOldOCPReports function.
+func TestPerformListOfOldOCPReportsDBError(t *testing.T) {
 	// error to be thrown
 	mockedError := errors.New("mocked error")
 
@@ -842,7 +842,7 @@ func TestPerformListOfOldReportsDBError(t *testing.T) {
 	mock.ExpectClose()
 
 	// call the tested function
-	err = cleaner.PerformListOfOldReports(connection, "10", nil)
+	err = cleaner.PerformListOfOldOCPReports(connection, "10", nil)
 	assert.Error(t, err)
 
 	if err != mockedError {
@@ -882,7 +882,7 @@ func TestDisplayAllOldRecordsNoOutput(t *testing.T) {
 	mock.ExpectClose()
 
 	// call the tested function without filename (stdout)
-	err = cleaner.DisplayAllOldRecords(connection, "10", "")
+	err = cleaner.DisplayAllOldRecords(connection, "10", "", cleaner.DBSchemaOCPRecommendations)
 	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check if DB can be closed successfully
@@ -921,7 +921,7 @@ func TestDisplayAllOldRecordsFileOutput(t *testing.T) {
 	mock.ExpectClose()
 
 	// call the tested function without filename (stdout)
-	err = cleaner.DisplayAllOldRecords(connection, "10", outFile)
+	err = cleaner.DisplayAllOldRecords(connection, "10", outFile, cleaner.DBSchemaOCPRecommendations)
 	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check if DB can be closed successfully
@@ -993,7 +993,7 @@ func TestDisplayAllOldRecordsWithFileError(t *testing.T) {
 	mock.ExpectClose()
 
 	// call the tested function with invalid filename ("/")
-	err = cleaner.DisplayAllOldRecords(connection, "10", "/")
+	err = cleaner.DisplayAllOldRecords(connection, "10", "/", cleaner.DBSchemaOCPRecommendations)
 	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check if DB can be closed successfully
@@ -1007,7 +1007,7 @@ func TestDisplayAllOldRecordsWithFileError(t *testing.T) {
 // displayAllOldRecords function when connection is not established
 func TestDisplayAllOldRecordsNoConnection(t *testing.T) {
 	// call the tested function with invalid filename ("/")
-	err := cleaner.DisplayAllOldRecords(nil, "10", "/")
+	err := cleaner.DisplayAllOldRecords(nil, "10", "/", cleaner.DBSchemaOCPRecommendations)
 	assert.Error(t, err, "error is expected while calling tested function")
 }
 
@@ -1034,7 +1034,7 @@ func TestDisplayAllOldRecordsErrorFirstList(t *testing.T) {
 	mock.ExpectClose()
 
 	// call the tested function without filename (stdout)
-	err = cleaner.DisplayAllOldRecords(connection, "10", "")
+	err = cleaner.DisplayAllOldRecords(connection, "10", "", cleaner.DBSchemaOCPRecommendations)
 	assert.Error(t, err, "error not expected while calling tested function")
 
 	assert.Equal(t, err, mockedError)
@@ -1072,7 +1072,7 @@ func TestDisplayAllOldRecordsErrorInMiddleList(t *testing.T) {
 	mock.ExpectClose()
 
 	// call the tested function without filename (stdout)
-	err = cleaner.DisplayAllOldRecords(connection, "10", "")
+	err = cleaner.DisplayAllOldRecords(connection, "10", "", cleaner.DBSchemaOCPRecommendations)
 	assert.Error(t, err, "error not expected while calling tested function")
 
 	assert.Equal(t, err, mockedError)
@@ -1113,7 +1113,7 @@ func TestDisplayAllOldRecordsErrorInLastList(t *testing.T) {
 	mock.ExpectClose()
 
 	// call the tested function without filename (stdout)
-	err = cleaner.DisplayAllOldRecords(connection, "10", "")
+	err = cleaner.DisplayAllOldRecords(connection, "10", "", cleaner.DBSchemaOCPRecommendations)
 	assert.Error(t, err, "error not expected while calling tested function")
 
 	assert.Equal(t, err, mockedError)
@@ -1125,9 +1125,9 @@ func TestDisplayAllOldRecordsErrorInLastList(t *testing.T) {
 	checkAllExpectations(t, mock)
 }
 
-// TestPerformListOfOldReportsOnError checks the error handling
-// ability in performListOfOldReports function.
-func TestPerformListOfOldReportsOnError(t *testing.T) {
+// TestPerformListOfOldOCPReportsOnError checks the error handling
+// ability in PerformListOfOldOCPReports function.
+func TestPerformListOfOldOCPReportsOnError(t *testing.T) {
 	// error to be thrown
 	mockedError := errors.New("mocked error")
 
@@ -1141,7 +1141,7 @@ func TestPerformListOfOldReportsOnError(t *testing.T) {
 	mock.ExpectClose()
 
 	// call the tested function
-	err = cleaner.PerformListOfOldReports(connection, "10", nil)
+	err = cleaner.PerformListOfOldOCPReports(connection, "10", nil)
 	if err == nil {
 		t.Fatalf("error was expected while updating stats")
 	}
