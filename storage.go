@@ -67,7 +67,7 @@ const (
 
 // SQL commands
 const (
-	selectOldReports = `
+	selectOldOCPReports = `
 	    SELECT cluster, reported_at, last_checked_at
 	      FROM report
 	     WHERE reported_at < NOW() - $1::INTERVAL
@@ -84,6 +84,12 @@ const (
 	      FROM consumer_error
 	     WHERE consumed_at < NOW() - $1::INTERVAL
 	     ORDER BY consumed_at`
+
+	selectOldDVOReports = `
+	    SELECT org_id, cluster_id, reported_at, last_checked_at
+	      FROM dvo_report
+	     WHERE reported_at < NOW() - $1::INTERVAL
+	     ORDER BY reported_at`
 )
 
 // DB schemas
@@ -404,7 +410,7 @@ func listOldDatabaseRecords(connection *sql.DB, maxAge string,
 // performListOfOldOCPReports read and displays old records read from reported_at
 // table
 func performListOfOldOCPReports(connection *sql.DB, maxAge string, writer *bufio.Writer) error {
-	return listOldDatabaseRecords(connection, maxAge, writer, selectOldReports, "List of old reports", "reports count",
+	return listOldDatabaseRecords(connection, maxAge, writer, selectOldOCPReports, "List of old reports", "reports count",
 		func(rows *sql.Rows, writer *bufio.Writer) (int, error) {
 			// used to compute a real record age
 			now := time.Now()
@@ -458,7 +464,56 @@ func performListOfOldOCPReports(connection *sql.DB, maxAge string, writer *bufio
 // performListOfOldDVOReports read and displays old records read from dvo_report
 // table
 func performListOfOldDVOReports(connection *sql.DB, maxAge string, writer *bufio.Writer) error {
-	return nil
+	return listOldDatabaseRecords(connection, maxAge, writer, selectOldDVOReports, "List of old DVO reports", "reports count",
+		func(rows *sql.Rows, writer *bufio.Writer) (int, error) {
+			// used to compute a real record age
+			now := time.Now()
+
+			// reports count
+			count := 0
+
+			// iterate over all old records
+			for rows.Next() {
+				var (
+					orgID       int
+					clusterName string
+					reported    time.Time
+					lastChecked time.Time
+				)
+
+				// read one old record from the report table
+				if err := rows.Scan(&orgID, &clusterName, &reported, &lastChecked); err != nil {
+					// close the result set in case of any error
+					if closeErr := rows.Close(); closeErr != nil {
+						log.Error().Err(closeErr).Msg(unableToCloseDBRowsHandle)
+					}
+					return count, err
+				}
+
+				// compute the real record age
+				age := int(math.Ceil(now.Sub(reported).Hours() / 24)) // in days
+
+				// prepare for the report
+				reportedF := reported.Format(time.RFC3339)
+				lastCheckedF := lastChecked.Format(time.RFC3339)
+
+				// just print the report
+				log.Info().Str(clusterNameMsg, clusterName).
+					Str("reported", reportedF).
+					Str("lastChecked", lastCheckedF).
+					Int("age", age).
+					Msg("Old report")
+
+				if writer != nil {
+					_, err := fmt.Fprintf(writer, "%s,%s,%s,%d\n", clusterName, reportedF, lastCheckedF, age)
+					if err != nil {
+						log.Error().Err(err).Msg(writeToFileMsg)
+					}
+				}
+				count++
+			}
+			return count, nil
+		})
 }
 
 // performListOfOldRatings read and displays old Advisor ratings read from
