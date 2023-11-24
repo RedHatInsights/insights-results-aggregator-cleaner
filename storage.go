@@ -53,6 +53,10 @@ const (
 	canNotConnectToDataStorageMessage = "Can not connect to data storage"
 	unableToCloseDBRowsHandle         = "Unable to close the DB rows handle"
 	connectionNotEstablished          = "Connection to database was not established"
+	reportedMsg                       = "reported"
+	lastCheckedMsg                    = "lastChecked"
+	ageMsg                            = "age"
+	reportsCountMsg                   = "reports count"
 )
 
 // Other messages
@@ -410,7 +414,7 @@ func listOldDatabaseRecords(connection *sql.DB, maxAge string,
 // performListOfOldOCPReports read and displays old records read from reported_at
 // table
 func performListOfOldOCPReports(connection *sql.DB, maxAge string, writer *bufio.Writer) error {
-	return listOldDatabaseRecords(connection, maxAge, writer, selectOldOCPReports, "List of old reports", "reports count",
+	return listOldDatabaseRecords(connection, maxAge, writer, selectOldOCPReports, "List of old OCP reports", reportsCountMsg,
 		func(rows *sql.Rows, writer *bufio.Writer) (int, error) {
 			// used to compute a real record age
 			now := time.Now()
@@ -444,10 +448,10 @@ func performListOfOldOCPReports(connection *sql.DB, maxAge string, writer *bufio
 
 				// just print the report
 				log.Info().Str(clusterNameMsg, clusterName).
-					Str("reported", reportedF).
-					Str("lastChecked", lastCheckedF).
-					Int("age", age).
-					Msg("Old report")
+					Str(reportedMsg, reportedF).
+					Str(lastCheckedMsg, lastCheckedF).
+					Int(ageMsg, age).
+					Msg("Old OCP report")
 
 				if writer != nil {
 					_, err := fmt.Fprintf(writer, "%s,%s,%s,%d\n", clusterName, reportedF, lastCheckedF, age)
@@ -464,7 +468,7 @@ func performListOfOldOCPReports(connection *sql.DB, maxAge string, writer *bufio
 // performListOfOldDVOReports read and displays old records read from dvo_report
 // table
 func performListOfOldDVOReports(connection *sql.DB, maxAge string, writer *bufio.Writer) error {
-	return listOldDatabaseRecords(connection, maxAge, writer, selectOldDVOReports, "List of old DVO reports", "reports count",
+	return listOldDatabaseRecords(connection, maxAge, writer, selectOldDVOReports, "List of old DVO reports", reportsCountMsg,
 		func(rows *sql.Rows, writer *bufio.Writer) (int, error) {
 			// used to compute a real record age
 			now := time.Now()
@@ -499,13 +503,13 @@ func performListOfOldDVOReports(connection *sql.DB, maxAge string, writer *bufio
 
 				// just print the report
 				log.Info().Str(clusterNameMsg, clusterName).
-					Str("reported", reportedF).
-					Str("lastChecked", lastCheckedF).
-					Int("age", age).
-					Msg("Old report")
+					Str(reportedMsg, reportedF).
+					Str(lastCheckedMsg, lastCheckedF).
+					Int(ageMsg, age).
+					Msg("Old DVO report")
 
 				if writer != nil {
-					_, err := fmt.Fprintf(writer, "%s,%s,%s,%d\n", clusterName, reportedF, lastCheckedF, age)
+					_, err := fmt.Fprintf(writer, "%d,%s,%s,%s,%d\n", orgID, clusterName, reportedF, lastCheckedF, age)
 					if err != nil {
 						log.Error().Err(err).Msg(writeToFileMsg)
 					}
