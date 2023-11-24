@@ -364,7 +364,7 @@ func doSelectedOperation(configuration *ConfigStruct, connection *sql.DB, cliFla
 	case cliFlags.VacuumDatabase:
 		return vacuumDB(connection)
 	case cliFlags.PerformCleanup:
-		return cleanup(configuration, connection, cliFlags)
+		return cleanup(configuration, connection, cliFlags, configuration.Storage.Schema)
 	case cliFlags.DetectMultipleRuleDisable:
 		return detectMultipleRuleDisable(connection, cliFlags)
 	case cliFlags.FillInDatabase:
