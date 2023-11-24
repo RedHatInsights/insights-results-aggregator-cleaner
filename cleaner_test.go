@@ -1075,7 +1075,7 @@ func TestFillInDatabase(t *testing.T) {
 
 	mock.ExpectClose()
 
-	exitCode, err := main.FillInDatabase(connection)
+	exitCode, err := main.FillInDatabase(connection, main.DBSchemaOCPRecommendations)
 	assert.NoError(t, err, "error not expected while calling tested function")
 	assert.Equal(t, exitCode, main.ExitStatusOK)
 
@@ -1112,7 +1112,7 @@ func TestFillInDatabaseOnError(t *testing.T) {
 
 	mock.ExpectClose()
 
-	exitCode, err := main.FillInDatabase(connection)
+	exitCode, err := main.FillInDatabase(connection, main.DBSchemaOCPRecommendations)
 	assert.Error(t, err, "error is expected while calling tested function")
 	assert.Equal(t, exitCode, main.ExitStatusFillInStorageError)
 	assert.Equal(t, err, mockedError)
@@ -1127,7 +1127,15 @@ func TestFillInDatabaseOnError(t *testing.T) {
 // TestFillInDatabaseNoConnection checks the basic behaviour of
 // fillInDatabase function when connection is not established.
 func TestFillInDatabaseNoConnection(t *testing.T) {
-	exitCode, err := main.FillInDatabase(nil)
+	exitCode, err := main.FillInDatabase(nil, main.DBSchemaOCPRecommendations)
+	assert.Error(t, err, "error is expected while calling tested function")
+	assert.Equal(t, exitCode, main.ExitStatusFillInStorageError)
+
+	exitCode, err = main.FillInDatabase(nil, main.DBSchemaDVORecommendations)
+	assert.Error(t, err, "error is expected while calling tested function")
+	assert.Equal(t, exitCode, main.ExitStatusFillInStorageError)
+
+	exitCode, err = main.FillInDatabase(nil, "")
 	assert.Error(t, err, "error is expected while calling tested function")
 	assert.Equal(t, exitCode, main.ExitStatusFillInStorageError)
 }

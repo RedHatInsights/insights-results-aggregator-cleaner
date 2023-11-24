@@ -31,6 +31,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	cleaner "github.com/RedHatInsights/insights-results-aggregator-cleaner"
+	main "github.com/RedHatInsights/insights-results-aggregator-cleaner"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -1366,7 +1367,7 @@ func TestFillInDatabaseByTestData(t *testing.T) {
 
 	mock.ExpectClose()
 
-	err = cleaner.FillInDatabaseByTestData(connection, DBSchemaOCPRecommendations)
+	err = cleaner.FillInDatabaseByTestData(connection, main.DBSchemaOCPRecommendations)
 	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check if DB can be closed successfully
@@ -1403,7 +1404,7 @@ func TestFillInDatabaseByTestDataOnError1(t *testing.T) {
 
 	mock.ExpectClose()
 
-	err = cleaner.FillInDatabaseByTestData(connection, DBSchemaDVORecommendations)
+	err = cleaner.FillInDatabaseByTestData(connection, main.DBSchemaOCPRecommendations)
 	assert.Error(t, err, "error is expected while calling tested function")
 
 	assert.Equal(t, err, mockedError)
@@ -1441,13 +1442,39 @@ func TestFillInDatabaseByTestDataOnError2(t *testing.T) {
 
 	mock.ExpectClose()
 
-	err = cleaner.FillInDatabaseByTestData(connection, DBSchemaDVORecommendations)
+	err = cleaner.FillInDatabaseByTestData(connection, main.DBSchemaOCPRecommendations)
 	assert.Error(t, err, "error is expected while calling tested function")
 
 	assert.Equal(t, err, mockedError)
 
 	// check if DB can be closed successfully
 	checkConnectionClose(t, connection)
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
+// TestFillInDatabaseByTestDataOnNullSchema tests if schema is checked during fill-in operation
+func TestFillInDatabaseByTestDataOnNullSchema(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	err = cleaner.FillInDatabaseByTestData(connection, "")
+	assert.Error(t, err, "error is expected while calling tested function")
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
+// TestFillInDatabaseByTestDataOnWrongSchema tests if schema is checked during fill-in operation
+func TestFillInDatabaseByTestDataOnWrongSchema(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	err = cleaner.FillInDatabaseByTestData(connection, "wrong-schema")
+	assert.Error(t, err, "error is expected while calling tested function")
 
 	// check all DB expectactions happened correctly
 	checkAllExpectations(t, mock)
