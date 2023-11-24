@@ -571,9 +571,9 @@ func deleteRecordFromTable(connection *sql.DB, table, key string, clusterName Cl
 	return int(affected), nil
 }
 
-// tablesAndKeys contains list of all tables together with keys used to select
+// tablesAndKeysInOCPDatabase contains list of all tables together with keys used to select
 // records to be deleted
-var tablesAndKeys = [...]TableAndKey{
+var tablesAndKeysInOCPDatabase = []TableAndKey{
 	{
 		TableName: "cluster_rule_toggle",
 		KeyName:   "cluster_id",
@@ -605,6 +605,13 @@ var tablesAndKeys = [...]TableAndKey{
 	},
 }
 
+var tablesAndKeysInDVODatabase = []TableAndKey{
+	{
+		TableName: "dvo_report",
+		KeyName:   "cluster_id",
+	},
+}
+
 // performVacuumDB vacuums the whole database
 func performVacuumDB(connection *sql.DB) error {
 	log.Info().Msg("Vacuuming started")
@@ -629,6 +636,18 @@ func performCleanupInDB(connection *sql.DB,
 	if connection == nil {
 		log.Error().Msg(connectionNotEstablished)
 		return deletionsForTable, errors.New(connectionNotEstablished)
+	}
+
+	// this is actually shorter than using map + map selector + test for key existence
+	// and it allow us to do fine tuning for (any) DB schema in future
+	var tablesAndKeys []TableAndKey
+	switch schema {
+	case DBSchemaOCPRecommendations:
+		tablesAndKeys = tablesAndKeysInOCPDatabase
+	case DBSchemaDVORecommendations:
+		tablesAndKeys = tablesAndKeysInDVODatabase
+	default:
+		return deletionsForTable, fmt.Errorf("Invalid DB schema to be cleaned up: '%s'", schema)
 	}
 
 	// initialize counters
