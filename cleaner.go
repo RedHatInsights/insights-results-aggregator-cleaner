@@ -136,6 +136,7 @@ func showConfiguration(config *ConfigStruct) {
 		Str("Username", storageConfig.PGUsername). // password is omitted on purpose
 		Str("Host", storageConfig.PGHost).
 		Int("DB Port", storageConfig.PGPort).
+		Str("Schema", storageConfig.Schema).
 		Msg("Storage configuration")
 
 	loggingConfig := GetLoggingConfiguration(config)
@@ -319,14 +320,14 @@ func detectMultipleRuleDisable(connection *sql.DB, cliFlags CliFlags) (int, erro
 }
 
 // fillInDatabase function fills-in database by test data
-func fillInDatabase(connection *sql.DB) (int, error) {
+func fillInDatabase(connection *sql.DB, schema string) (int, error) {
 	// connection might be nil when DB init does not finish correctly
 	if connection == nil {
 		log.Error().Msg(connectionToDBNotEstablished)
 		return ExitStatusFillInStorageError, errors.New(connectionToDBNotEstablished)
 	}
 
-	err := fillInDatabaseByTestData(connection)
+	err := fillInDatabaseByTestData(connection, schema)
 	if err != nil {
 		log.Err(err).Msg("Fill-in database by test data")
 		return ExitStatusFillInStorageError, err
@@ -367,7 +368,7 @@ func doSelectedOperation(configuration *ConfigStruct, connection *sql.DB, cliFla
 	case cliFlags.DetectMultipleRuleDisable:
 		return detectMultipleRuleDisable(connection, cliFlags)
 	case cliFlags.FillInDatabase:
-		return fillInDatabase(connection)
+		return fillInDatabase(connection, configuration.Storage.Schema)
 	default:
 		return displayOldRecords(configuration, connection, cliFlags)
 	}
