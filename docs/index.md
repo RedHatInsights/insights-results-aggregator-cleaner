@@ -81,6 +81,7 @@ pg_host = "localhost"
 pg_port = 5432
 pg_db_name = "aggregator"
 pg_params = "sslmode=disable"
+schema = "ocp_recommendations"
 
 [logging]
 debug = true
@@ -100,10 +101,14 @@ INSIGHTS_RESULTS_CLEANER__STORAGE__PG_HOST
 INSIGHTS_RESULTS_CLEANER__STORAGE__PG_PORT
 INSIGHTS_RESULTS_CLEANER__STORAGE__PG_DB_NAME
 INSIGHTS_RESULTS_CLEANER__STORAGE__PG_PARAMS
+INSIGHTS_RESULTS_CLEANER__STORAGE__SCHEMA
 INSIGHTS_RESULTS_CLEANER__LOGGING__DEBUG
 INSIGHTS_RESULTS_CLEANER__LOGGING__LOG_DEVEL
 INSIGHTS_RESULTS_CLEANER__CLEANER__MAX_AGE
 ```
+
+* `db_driver` can be set to "postgres" or "sqlite3"
+* `schema` can be set to "ocp_recommendations" or "dvo_recommendations"
 
 ### Usage
 
@@ -155,6 +160,8 @@ Just the service needs to be started:
 
 ## Database structure
 
+### Database schema `ocp_recommendations`
+
 List of tables:
 
 ```
@@ -168,9 +175,13 @@ List of tables:
  public | migration_info                     | table | postgres
  public | report                             | table | postgres
  public | rule_hit                           | table | postgres
+ public | recommendation                     | table | postgres
+ public | advisor_ratings                    | table | postgres
+ public | rule_disable                       | table | postgres
+
 ```
 
-### Table `report`
+#### Table `report`
 
 ```
      Column      |            Type             |     Modifiers
@@ -189,7 +200,7 @@ Referenced by:
     TABLE "cluster_rule_user_feedback" CONSTRAINT "cluster_rule_user_feedback_cluster_id_fkey" FOREIGN KEY (cluster_id) REFERENCES report(cluster) ON DELETE CASCADE
 ```
 
-### Table `cluster_rule_toggle`
+#### Table `cluster_rule_toggle`
 
 ```
    Column    |            Type             | Modifiers
@@ -207,7 +218,7 @@ Check constraints:
     "cluster_rule_toggle_disabled_check" CHECK (disabled >= 0 AND disabled <= 1)
 ```
 
-### Table `cluster_rule_user_feedback`
+#### Table `cluster_rule_user_feedback`
 
 ```
    Column   |            Type             | Modifiers
@@ -225,7 +236,7 @@ Foreign-key constraints:
     "cluster_rule_user_feedback_cluster_id_fkey" FOREIGN KEY (cluster_id) REFERENCES report(cluster) ON DELETE CASCADE
 ```
 
-### Table `cluster_user_rule_disable_feedback`
+#### Table `cluster_user_rule_disable_feedback`
 
 ```
    Column   |            Type             | Modifiers
@@ -240,7 +251,7 @@ Indexes:
     "cluster_user_rule_disable_feedback_pkey" PRIMARY KEY, btree (cluster_id, user_id, rule_id)
 ```
 
-### Table `consumer_error`
+#### Table `consumer_error`
 
 ```
              Table "public.consumer_error"
@@ -258,7 +269,7 @@ Indexes:
     "consumer_error_pkey" PRIMARY KEY, btree (topic, partition, topic_offset)
 ```
 
-### Table `migration_info `
+#### Table `migration_info `
 
 ```
  Column  |  Type   | Modifiers
@@ -266,7 +277,7 @@ Indexes:
  version | integer | not null
 ```
 
-### Table `rule_hit`
+#### Table `rule_hit`
 
 ```
     Column     |       Type        | Modifiers
@@ -280,7 +291,7 @@ Indexes:
     "rule_hit_pkey" PRIMARY KEY, btree (cluster_id, org_id, rule_fqdn, error_key)
 ```
 
-### Database tables affected by this service
+#### Database tables affected by this service
 
 Figuring out which reports are older than the specified time:
 * `report`
@@ -292,6 +303,28 @@ Actually cleaning the data for given cluster:
 * `cluster_rule_user_feedback` by `cluster_id`
 * `cluster_user_rule_disable_feedback` by `cluster_id`
 * `rule_hit` by `cluster_id`
+* `recommendation` by `cluster_id`
+
+
+### Database schema `dvo_recommendations`
+
+#### Table `dvo_report`
+
+```
+    Column        |       Type                  | Modifiers
+------------------+-----------------------------+-----------
+ org_id           | integer                     | not null
+ cluster_id       | character varying           | not null
+ namespace_id     | character varying           | not null
+ namespace_name   | character varying           |
+ report           | text varying                |
+ recommendations  | integer                     | not null
+ objects          | integer                     | not null
+ reported_at      | timestamp without time zone |
+ last_checked_at  | timestamp without time zone |
+Indexes:
+    "report_pkey" PRIMARY KEY, btree (org_id, cluster_id, namespace_id)
+```
 
 ## Documentation for source files from this repository
 

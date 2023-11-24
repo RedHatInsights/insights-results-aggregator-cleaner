@@ -25,17 +25,20 @@
     * [Configuration](#configuration)
 * [BDD tests](#bdd-tests)
 * [Usage](#usage)
-    * [Output example](#output-example)
+        * [Output example](#output-example)
 * [Database structure](#database-structure)
-    * [Table `report`](#table-report)
-    * [Table `cluster_rule_toggle`](#table-cluster_rule_toggle)
-    * [Table `cluster_rule_user_feedback`](#table-cluster_rule_user_feedback)
-    * [Table `cluster_user_rule_disable_feedback`](#table-cluster_user_rule_disable_feedback)
-    * [Table `consumer_error`](#table-consumer_error)
-    * [Table `migration_info `](#table-migration_info-)
-    * [Table `rule_hit`](#table-rule_hit)
-    * [Table `recommendation`](#table-recommendation)
-    * [Database tables affected by this service](#database-tables-affected-by-this-service)
+    * [Database schema `ocp_recommendations`](#database-schema-ocp_recommendations)
+        * [Table `report`](#table-report)
+        * [Table `cluster_rule_toggle`](#table-cluster_rule_toggle)
+        * [Table `cluster_rule_user_feedback`](#table-cluster_rule_user_feedback)
+        * [Table `cluster_user_rule_disable_feedback`](#table-cluster_user_rule_disable_feedback)
+        * [Table `consumer_error`](#table-consumer_error)
+        * [Table `migration_info `](#table-migration_info-)
+        * [Table `rule_hit`](#table-rule_hit)
+        * [Table `recommendation`](#table-recommendation)
+        * [Database tables affected by this service](#database-tables-affected-by-this-service)
+    * [Database schema `dvo_recommendations`](#database-schema-dvo_recommendations)
+        * [Table `dvo_report`](#table-dvo_report)
 * [Documentation](#documentation-1)
     * [Documentation for source files from this repository](#documentation-for-source-files-from-this-repository)
     * [Documentation for unit tests from this repository](#documentation-for-unit-tests-from-this-repository)
@@ -179,6 +182,7 @@ pg_host = "localhost"
 pg_port = 5432
 pg_db_name = "aggregator"
 pg_params = "sslmode=disable"
+schema = "ocp_recommendations"
 
 [logging]
 debug = true
@@ -198,10 +202,14 @@ INSIGHTS_RESULTS_CLEANER__STORAGE__PG_HOST
 INSIGHTS_RESULTS_CLEANER__STORAGE__PG_PORT
 INSIGHTS_RESULTS_CLEANER__STORAGE__PG_DB_NAME
 INSIGHTS_RESULTS_CLEANER__STORAGE__PG_PARAMS
+INSIGHTS_RESULTS_CLEANER__STORAGE__SCHEMA
 INSIGHTS_RESULTS_CLEANER__LOGGING__DEBUG
 INSIGHTS_RESULTS_CLEANER__LOGGING__LOG_DEVEL
 INSIGHTS_RESULTS_CLEANER__CLEANER__MAX_AGE
 ```
+
+* `db_driver` can be set to "postgres" or "sqlite3"
+* `schema` can be set to "ocp_recommendations" or "dvo_recommendations"
 
 ## BDD tests
 
@@ -224,7 +232,7 @@ Just the service needs to be started:
 ./insights-results-aggregator-cleaner
 ```
 
-### Output example
+#### Output example
 
 * Logging is set to `true`
 
@@ -266,6 +274,8 @@ Just the service needs to be started:
 
 ## Database structure
 
+### Database schema `ocp_recommendations`
+
 List of tables:
 
 ```
@@ -285,7 +295,7 @@ List of tables:
 
 ```
 
-### Table `report`
+#### Table `report`
 
 ```
      Column      |            Type             |     Modifiers
@@ -304,7 +314,7 @@ Referenced by:
     TABLE "cluster_rule_user_feedback" CONSTRAINT "cluster_rule_user_feedback_cluster_id_fkey" FOREIGN KEY (cluster_id) REFERENCES report(cluster) ON DELETE CASCADE
 ```
 
-### Table `cluster_rule_toggle`
+#### Table `cluster_rule_toggle`
 
 ```
    Column    |            Type             | Modifiers
@@ -322,7 +332,7 @@ Check constraints:
     "cluster_rule_toggle_disabled_check" CHECK (disabled >= 0 AND disabled <= 1)
 ```
 
-### Table `cluster_rule_user_feedback`
+#### Table `cluster_rule_user_feedback`
 
 ```
    Column   |            Type             | Modifiers
@@ -340,7 +350,7 @@ Foreign-key constraints:
     "cluster_rule_user_feedback_cluster_id_fkey" FOREIGN KEY (cluster_id) REFERENCES report(cluster) ON DELETE CASCADE
 ```
 
-### Table `cluster_user_rule_disable_feedback`
+#### Table `cluster_user_rule_disable_feedback`
 
 ```
    Column   |            Type             | Modifiers
@@ -355,7 +365,7 @@ Indexes:
     "cluster_user_rule_disable_feedback_pkey" PRIMARY KEY, btree (cluster_id, user_id, rule_id)
 ```
 
-### Table `consumer_error`
+#### Table `consumer_error`
 
 ```
              Table "public.consumer_error"
@@ -373,7 +383,7 @@ Indexes:
     "consumer_error_pkey" PRIMARY KEY, btree (topic, partition, topic_offset)
 ```
 
-### Table `migration_info `
+#### Table `migration_info `
 
 ```
  Column  |  Type   | Modifiers
@@ -381,7 +391,7 @@ Indexes:
  version | integer | not null
 ```
 
-### Table `rule_hit`
+#### Table `rule_hit`
 
 ```
     Column     |       Type        | Modifiers
@@ -395,7 +405,7 @@ Indexes:
     "rule_hit_pkey" PRIMARY KEY, btree (cluster_id, org_id, rule_fqdn, error_key)
 ```
 
-### Table `recommendation`
+#### Table `recommendation`
 
 ```
                                  Table "public.recommendation"
@@ -411,7 +421,7 @@ Indexes:
     "recommendation_pk" PRIMARY KEY, btree (org_id, cluster_id, rule_fqdn, error_key)
 ```
 
-### Database tables affected by this service
+#### Database tables affected by this service
 
 Figuring out which reports are older than the specified time:
 * `report`
@@ -426,6 +436,25 @@ Actually cleaning the data for given cluster:
 * `recommendation` by `cluster_id`
 
 
+### Database schema `dvo_recommendations`
+
+#### Table `dvo_report`
+
+```
+    Column        |       Type                  | Modifiers
+------------------+-----------------------------+-----------
+ org_id           | integer                     | not null
+ cluster_id       | character varying           | not null
+ namespace_id     | character varying           | not null
+ namespace_name   | character varying           |
+ report           | text varying                |
+ recommendations  | integer                     | not null
+ objects          | integer                     | not null
+ reported_at      | timestamp without time zone |
+ last_checked_at  | timestamp without time zone |
+Indexes:
+    "report_pkey" PRIMARY KEY, btree (org_id, cluster_id, namespace_id)
+```
 
 ## Documentation
 
