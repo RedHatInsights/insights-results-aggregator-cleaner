@@ -1011,6 +1011,17 @@ func TestDisplayAllOldRecordsNoConnection(t *testing.T) {
 	assert.Error(t, err, "error is expected while calling tested function")
 }
 
+// TestDisplayAllOldRecordsNullSchema checks the basic behaviour of
+// displayAllOldRecords function when null schema is provided
+func TestDisplayAllOldRecordsNullSchema(t *testing.T) {
+	connection, _, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	// call the tested function with null schema
+	err = cleaner.DisplayAllOldRecords(connection, "10", "", "")
+	assert.Error(t, err, "error is expected while calling tested function")
+}
+
 // TestDisplayAllOldRecordErrorInFirstList checks the basic behaviour of
 // displayAllOldRecords function when error occurs.
 func TestDisplayAllOldRecordsErrorFirstList(t *testing.T) {
