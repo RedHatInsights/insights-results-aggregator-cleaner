@@ -262,7 +262,7 @@ func allSupportedDrivers() StringSet {
 	return drivers
 }
 
-// allSupportedSchmeas constructs set with names of all supported database
+// allSupportedSchemas constructs set with names of all supported database
 // schemas
 func allSupportedSchemas() StringSet {
 	var schemas = make(StringSet)
