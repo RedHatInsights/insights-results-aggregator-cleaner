@@ -6,7 +6,7 @@
 APP_NAME="ccx-data-pipeline"  # name of app-sre "application" folder this component lives in
 COMPONENT_NAME="insights-aggregator-cleaner"  # name of app-sre "resourceTemplate" in deploy.yaml for this component
 IMAGE="quay.io/cloudservices/insights-results-aggregator-cleaner"
-COMPONENTS="ccx-insights-results insights-aggregator-cleaner"  # space-separated list of components to laod
+COMPONENTS="ccx-insights-results insights-aggregator-cleaner dvo-writer"  # space-separated list of components to laod
 COMPONENTS_W_RESOURCES="insights-aggregator-cleaner"  # component to keep
 CACHE_FROM_LATEST_IMAGE="false"
 
@@ -17,6 +17,8 @@ export IQE_FILTER_EXPRESSION="test_plugin_accessible"
 export IQE_REQUIREMENTS_PRIORITY=""
 export IQE_TEST_IMPORTANCE=""
 export IQE_CJI_TIMEOUT="30m"
+export IQE_ENV="ephemeral"
+export IQE_ENV_VARS="DYNACONF_USER_PROVIDER__rbac_enabled=false"
 
 
 function build_image() {
