@@ -36,6 +36,11 @@ type TableAndKey struct {
 	KeyName   string
 }
 
+type TableAndDeleteStatement struct {
+	TableName       string
+	DeleteStatement string
+}
+
 // Summary represents summary info to be displayed in a table after cleanup
 // part
 type Summary struct {
@@ -52,6 +57,7 @@ type CliFlags struct {
 	PrintSummaryTable         bool
 	Output                    string
 	PerformCleanup            bool
+	PerformCleanupAll         bool
 	DetectMultipleRuleDisable bool
 	FillInDatabase            bool
 	VacuumDatabase            bool

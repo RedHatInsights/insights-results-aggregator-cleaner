@@ -57,6 +57,7 @@ const (
 	lastCheckedMsg                    = "lastChecked"
 	ageMsg                            = "age"
 	reportsCountMsg                   = "reports count"
+	maxAgeMissing                     = "max-age parameter is missing"
 )
 
 // Other messages
@@ -94,6 +95,23 @@ const (
 	      FROM dvo_report
 	     WHERE reported_at < NOW() - $1::INTERVAL
 	     ORDER BY reported_at`
+
+	deleteOldOCPReports = `
+		DELETE FROM report
+		 WHERE reported_at < NOW() - $1::INTERVAL`
+
+	deleteOldConsumerErrors = `
+		DELETE FROM consumer_error
+		 WHERE consumed_at < NOW() - $1::INTERVAL`
+
+	deleteOldOCPRuleHits       = `` // TODO: How to filter? This table has no date column
+	deleteOldOCPRecommendation = `
+		DELETE FROM recommendation
+		 WHERE created_at < NOW() - $1::INTERVAL`
+
+	deleteOldDVOReports = `
+		DELETE FROM dvo_report
+		 WHERE reported_at < NOW() - $1::INTERVAL`
 )
 
 // DB schemas
@@ -648,6 +666,49 @@ func deleteRecordFromTable(connection *sql.DB, table, key string, clusterName Cl
 	return int(affected), nil
 }
 
+var tablesToDeleteOCP = []TableAndDeleteStatement{
+	{
+		TableName:       "report",
+		DeleteStatement: deleteOldOCPReports,
+	},
+	{
+		TableName:       "consumer_error",
+		DeleteStatement: deleteOldConsumerErrors,
+	},
+	{
+		TableName:       "rule_hit",
+		DeleteStatement: deleteOldOCPRuleHits,
+	},
+	{
+		TableName:       "recommendation",
+		DeleteStatement: deleteOldOCPRecommendation,
+	},
+}
+
+var tablesToDeleteDVO = []TableAndDeleteStatement{
+	{
+		TableName:       "dvo_report",
+		DeleteStatement: deleteOldDVOReports,
+	},
+}
+
+// deleteOldRecordsFromTable function deletes old records from database
+// each delete query must have just one parameter that will be populated with
+// the maxAge value
+func deleteOldRecordsFromTable(connection *sql.DB, sqlStatement, maxAge string) (int, error) {
+	result, err := connection.Exec(sqlStatement, maxAge)
+	if err != nil {
+		return 0, err
+	}
+
+	// read number of affected (deleted) rows
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	return int(affected), nil
+}
+
 // tablesAndKeysInOCPDatabase contains list of all tables together with keys used to select
 // records to be deleted
 var tablesAndKeysInOCPDatabase = []TableAndKey{
@@ -754,6 +815,54 @@ func performCleanupInDB(connection *sql.DB,
 					Msg("Delete record")
 				deletionsForTable[tableAndKey.TableName] += affected
 			}
+		}
+	}
+	log.Info().Msg("Cleanup finished")
+	return deletionsForTable, nil
+}
+
+// performCleanupAllInDB function cleans up all data for all cluster names
+func performCleanupAllInDB(connection *sql.DB, schema, maxAge string) (
+	map[string]int, error) {
+	deletionsForTable := make(map[string]int)
+	if maxAge == "" {
+		return deletionsForTable, errors.New(maxAgeMissing)
+	}
+	log.Debug().Str("Max age", maxAge).Msg("Cleaning all old records from DB")
+
+	if connection == nil {
+		log.Error().Msg(connectionNotEstablished)
+		return deletionsForTable, errors.New(connectionNotEstablished)
+	}
+
+	var tablesAndDeleteStatements []TableAndDeleteStatement
+	switch schema {
+	case DBSchemaOCPRecommendations:
+		tablesAndDeleteStatements = tablesToDeleteOCP
+	case DBSchemaDVORecommendations:
+		tablesAndDeleteStatements = tablesToDeleteDVO
+	default:
+		return deletionsForTable, fmt.Errorf("Invalid DB schema to be cleaned up: '%s'", schema)
+	}
+
+	// perform cleanup for selected cluster names
+	log.Info().Msg("Cleanup started")
+	for _, tableAndDeleteStatement := range tablesAndDeleteStatements {
+		// try to delete record from selected table
+		affected, err := deleteOldRecordsFromTable(connection,
+			tableAndDeleteStatement.DeleteStatement,
+			maxAge)
+		if err != nil {
+			log.Error().
+				Err(err).
+				Str(tableName, tableAndDeleteStatement.TableName).
+				Msg("Unable to delete record")
+		} else {
+			log.Info().
+				Int("Affected", affected).
+				Str(tableName, tableAndDeleteStatement.TableName).
+				Msg("Delete record")
+			deletionsForTable[tableAndDeleteStatement.TableName] = affected
 		}
 	}
 	log.Info().Msg("Cleanup finished")

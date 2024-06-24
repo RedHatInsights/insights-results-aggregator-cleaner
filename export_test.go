@@ -43,6 +43,7 @@ var (
 	PerformListOfOldConsumerErrors    = performListOfOldConsumerErrors
 	DeleteRecordFromTable             = deleteRecordFromTable
 	PerformCleanupInDB                = performCleanupInDB
+	PerformCleanupAllInDB             = performCleanupAllInDB
 	PerformVacuumDB                   = performVacuumDB
 	FillInDatabaseByTestData          = fillInDatabaseByTestData
 	InitDatabaseConnection            = initDatabaseConnection
@@ -57,7 +58,13 @@ var (
 	ReadClusterListFromCLIArgument = readClusterListFromCLIArgument
 	VacuumDB                       = vacuumDB
 	Cleanup                        = cleanup
+	CleanupAll                     = cleanupAll
 	FillInDatabase                 = fillInDatabase
 	DisplayOldRecords              = displayOldRecords
 	DetectMultipleRuleDisable      = detectMultipleRuleDisable
+
+	// constants
+	MaxAgeMissing     = maxAgeMissing
+	TablesToDeleteOCP = tablesToDeleteOCP
+	TablesToDeleteDVO = tablesToDeleteDVO
 )
