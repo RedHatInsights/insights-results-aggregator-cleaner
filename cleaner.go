@@ -404,6 +404,7 @@ func main() {
 	err = CheckConfiguration(&config)
 	if err != nil {
 		log.Err(err).Msg("Check configuration")
+		return
 	}
 
 	if config.Logging.Debug {
