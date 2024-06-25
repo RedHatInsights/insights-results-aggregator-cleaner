@@ -38,6 +38,7 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"strings"
 	"time"
 
 	"database/sql"
@@ -703,7 +704,10 @@ var tablesToDeleteDVO = []TableAndDeleteStatement{
 // deleteOldRecordsFromTable function deletes old records from database
 // each delete query must have just one parameter that will be populated with
 // the maxAge value
-func deleteOldRecordsFromTable(connection *sql.DB, sqlStatement, maxAge string) (int, error) {
+func deleteOldRecordsFromTable(connection *sql.DB, sqlStatement, maxAge string, dryRun bool) (int, error) {
+	if dryRun {
+		sqlStatement = strings.Replace(sqlStatement, "DELETE", "SELECT", -1)
+	}
 	result, err := connection.Exec(sqlStatement, maxAge)
 	if err != nil {
 		return 0, err
@@ -830,7 +834,7 @@ func performCleanupInDB(connection *sql.DB,
 }
 
 // performCleanupAllInDB function cleans up all data for all cluster names
-func performCleanupAllInDB(connection *sql.DB, schema, maxAge string) (
+func performCleanupAllInDB(connection *sql.DB, schema, maxAge string, dryRun bool) (
 	map[string]int, error) {
 	deletionsForTable := make(map[string]int)
 	if maxAge == "" {
@@ -859,7 +863,7 @@ func performCleanupAllInDB(connection *sql.DB, schema, maxAge string) (
 		// try to delete record from selected table
 		affected, err := deleteOldRecordsFromTable(connection,
 			tableAndDeleteStatement.DeleteStatement,
-			maxAge)
+			maxAge, dryRun)
 		if err != nil {
 			log.Error().
 				Err(err).
@@ -869,6 +873,7 @@ func performCleanupAllInDB(connection *sql.DB, schema, maxAge string) (
 			log.Info().
 				Int(affectedMsg, affected).
 				Str(tableName, tableAndDeleteStatement.TableName).
+				Bool("Dry run", dryRun).
 				Msg("Delete records")
 			deletionsForTable[tableAndDeleteStatement.TableName] = affected
 		}

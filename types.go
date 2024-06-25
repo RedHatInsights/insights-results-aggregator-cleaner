@@ -61,6 +61,7 @@ type CliFlags struct {
 	Output                    string
 	PerformCleanup            bool
 	PerformCleanupAll         bool
+	DryRun                    bool
 	DetectMultipleRuleDisable bool
 	FillInDatabase            bool
 	VacuumDatabase            bool

@@ -303,7 +303,7 @@ func cleanup(configuration *ConfigStruct, connection *sql.DB, cliFlags CliFlags,
 
 // cleanup function starts the cleanup-all operation
 func cleanupAll(configuration *ConfigStruct, connection *sql.DB, cliFlags CliFlags, schema string) (int, error) {
-	deletionsForTable, err := performCleanupAllInDB(connection, schema, configuration.Cleaner.MaxAge)
+	deletionsForTable, err := performCleanupAllInDB(connection, schema, configuration.Cleaner.MaxAge, cliFlags.DryRun)
 	if err != nil {
 		log.Err(err).Msg("Performing cleanup-all")
 		return ExitStatusPerformCleanupError, err
@@ -399,6 +399,7 @@ func main() {
 	// define and parse all command line options
 	flag.BoolVar(&cliFlags.PerformCleanup, "cleanup", false, "perform database cleanup")
 	flag.BoolVar(&cliFlags.PerformCleanupAll, "cleanup-all", false, "perform database cleanup for all old clusters")
+	flag.BoolVar(&cliFlags.DryRun, "dry-run", true, "if true, the cleanup-all method won't delete any row, just print how many are affected")
 	flag.BoolVar(&cliFlags.PrintSummaryTable, "summary", false, "print summary table after cleanup")
 	flag.BoolVar(&cliFlags.DetectMultipleRuleDisable, "multiple-rule-disable", false, "list clusters with the same rule(s) disabled by different users")
 	flag.BoolVar(&cliFlags.FillInDatabase, "fill-in-db", false, "fill-in database by test data")
