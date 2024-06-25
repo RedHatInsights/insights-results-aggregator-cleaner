@@ -36,6 +36,9 @@ type TableAndKey struct {
 	KeyName   string
 }
 
+// TableAndDeleteStatement represents a delete statement for the given table.
+// The idea is to pass a parameter to filter by, for example a maximum age for
+// a reported_at column
 type TableAndDeleteStatement struct {
 	TableName       string
 	DeleteStatement string
