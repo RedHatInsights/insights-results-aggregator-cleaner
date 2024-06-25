@@ -82,8 +82,12 @@ Usage of cleaner:
         show authors
   -cleanup
         perform database cleanup
+  -cleanup-all
+        perform database cleanup for all old clusters
   -clusters string
-        list of clusters to cleanup
+        list of clusters to cleanup. Ignored when cleanup-all is selected
+  -dry-run
+        if true, the cleanup-all method won't delete any row, just print how many are affected (default true)
   -fill-in-db
         fill-in database by test data
   -max-age string
