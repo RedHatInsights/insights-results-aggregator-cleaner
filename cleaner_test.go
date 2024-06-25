@@ -1036,6 +1036,68 @@ func TestCleanupCheckSummaryTableContent(t *testing.T) {
 	assert.Equal(t, status, main.ExitStatusOK)
 }
 
+// TestCleanupAll check the function cleanupAll when
+// summary table should not be printed
+func TestCleanupAll(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, _, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	// stub for structures needed to call the tested function
+	configuration := main.ConfigStruct{}
+
+	configuration.Cleaner = main.CleanerConfiguration{
+		MaxAge: "3 days",
+	}
+
+	cliFlags := main.CliFlags{
+		ShowVersion:       false,
+		ShowAuthors:       false,
+		ShowConfiguration: false,
+		PrintSummaryTable: false,
+	}
+
+	// call the tested function
+	status, err := main.CleanupAll(&configuration, connection, cliFlags, main.DBSchemaOCPRecommendations)
+
+	// error is not expected
+	assert.NoError(t, err, "error is not expected while calling main.cleanupAll")
+
+	// check the status
+	assert.Equal(t, status, main.ExitStatusOK)
+}
+
+// TestCleanupAllMissingMaxAge check the function cleanup fails if no MaxAge
+// is specified
+func TestCleanupAllMissingMaxAge(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, _, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	// stub for structures needed to call the tested function
+	configuration := main.ConfigStruct{}
+
+	configuration.Cleaner = main.CleanerConfiguration{
+		MaxAge: "",
+	}
+
+	cliFlags := main.CliFlags{
+		ShowVersion:       false,
+		ShowAuthors:       false,
+		ShowConfiguration: false,
+		PrintSummaryTable: false,
+	}
+
+	// call the tested function
+	status, err := main.CleanupAll(&configuration, connection, cliFlags, main.DBSchemaOCPRecommendations)
+
+	// error is not expected
+	assert.EqualError(t, err, main.MaxAgeMissing)
+
+	// check the status
+	assert.Equal(t, status, main.ExitStatusPerformCleanupError)
+}
+
 // TestDetectMultipleRuleDisable check the function detectMultipleRuleDisable when the
 // connection to DB is not established
 func TestDetectMultipleRuleDisable(t *testing.T) {

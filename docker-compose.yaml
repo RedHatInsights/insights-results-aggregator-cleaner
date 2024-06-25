@@ -1,0 +1,51 @@
+version: "3.9"
+services:
+  database:
+    ports:
+      - 5432:5432
+    image: postgres:13.9
+    environment:
+      - POSTGRES_USER=postgres
+      - PGUSER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=aggregator
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 2s
+      timeout: 2s
+      retries: 4
+      start_period: 2s
+  db-writer-ocp:
+    image: quay.io/cloudservices/insights-results-aggregator:latest
+    environment:
+      - INSIGHTS_RESULTS_AGGREGATOR__OCP_RECOMMENDATIONS_STORAGE__TYPE=sql
+      - INSIGHTS_RESULTS_AGGREGATOR__OCP_RECOMMENDATIONS_STORAGE__DB_DRIVER=postgres
+      - INSIGHTS_RESULTS_AGGREGATOR__OCP_RECOMMENDATIONS_STORAGE__PG_PARAMS=sslmode=disable
+      - INSIGHTS_RESULTS_AGGREGATOR__OCP_RECOMMENDATIONS_STORAGE__PG_USERNAME=postgres
+      - INSIGHTS_RESULTS_AGGREGATOR__OCP_RECOMMENDATIONS_STORAGE__PG_PASSWORD=postgres
+      - INSIGHTS_RESULTS_AGGREGATOR__OCP_RECOMMENDATIONS_STORAGE__PG_HOST=database
+      - INSIGHTS_RESULTS_AGGREGATOR__OCP_RECOMMENDATIONS_STORAGE__PG_PORT=5432
+      - INSIGHTS_RESULTS_AGGREGATOR__OCP_RECOMMENDATIONS_STORAGE__PG_DB_NAME=aggregator
+      - INSIGHTS_RESULTS_AGGREGATOR__LOGGING__LOG_LEVEL=debug
+      - INSIGHTS_RESULTS_AGGREGATOR__LOGGING__DEBUG=true
+      - INSIGHTS_RESULTS_AGGREGATOR__STORAGE_BACKEND__USE=ocp_recommendations
+    command: bash -c "/insights-results-aggregator migration latest"
+    depends_on:
+      - db
+  db-writer-dvo:
+    image: quay.io/cloudservices/insights-results-aggregator:latest
+    environment:
+      - INSIGHTS_RESULTS_AGGREGATOR__DVO_RECOMMENDATIONS_STORAGE__TYPE=sql
+      - INSIGHTS_RESULTS_AGGREGATOR__DVO_RECOMMENDATIONS_STORAGE__DB_DRIVER=postgres
+      - INSIGHTS_RESULTS_AGGREGATOR__DVO_RECOMMENDATIONS_STORAGE__PG_PARAMS=sslmode=disable
+      - INSIGHTS_RESULTS_AGGREGATOR__DVO_RECOMMENDATIONS_STORAGE__PG_USERNAME=postgres
+      - INSIGHTS_RESULTS_AGGREGATOR__DVO_RECOMMENDATIONS_STORAGE__PG_PASSWORD=postgres
+      - INSIGHTS_RESULTS_AGGREGATOR__DVO_RECOMMENDATIONS_STORAGE__PG_HOST=database
+      - INSIGHTS_RESULTS_AGGREGATOR__DVO_RECOMMENDATIONS_STORAGE__PG_PORT=5432
+      - INSIGHTS_RESULTS_AGGREGATOR__DVO_RECOMMENDATIONS_STORAGE__PG_DB_NAME=aggregator
+      - INSIGHTS_RESULTS_AGGREGATOR__LOGGING__LOG_LEVEL=debug
+      - INSIGHTS_RESULTS_AGGREGATOR__LOGGING__DEBUG=true
+      - INSIGHTS_RESULTS_AGGREGATOR__STORAGE_BACKEND__USE=dvo_recommendations
+    command: bash -c "/insights-results-aggregator migration latest"
+    depends_on:
+      - db

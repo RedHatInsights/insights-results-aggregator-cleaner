@@ -12,38 +12,39 @@
 
 <!-- vim-markdown-toc GFM -->
 
-* [Description](#description)
-* [Documentation](#documentation)
-* [Contribution](#contribution)
-* [Start the service](#start-the-service)
-    * [Default operation](#default-operation)
-    * [Data cleanup](#data-cleanup)
-    * [Test data generation](#test-data-generation)
-    * [Exit status](#exit-status)
-    * [Building](#building)
-    * [Makefile targets](#makefile-targets)
-    * [Configuration](#configuration)
-* [BDD tests](#bdd-tests)
-* [Usage](#usage)
-        * [Output example](#output-example)
-* [Database structure](#database-structure)
-    * [Database schema `ocp_recommendations`](#database-schema-ocp_recommendations)
-        * [Table `report`](#table-report)
-        * [Table `cluster_rule_toggle`](#table-cluster_rule_toggle)
-        * [Table `cluster_rule_user_feedback`](#table-cluster_rule_user_feedback)
-        * [Table `cluster_user_rule_disable_feedback`](#table-cluster_user_rule_disable_feedback)
-        * [Table `consumer_error`](#table-consumer_error)
-        * [Table `migration_info `](#table-migration_info-)
-        * [Table `rule_hit`](#table-rule_hit)
-        * [Table `recommendation`](#table-recommendation)
-        * [Database tables affected by this service](#database-tables-affected-by-this-service)
-    * [Database schema `dvo_recommendations`](#database-schema-dvo_recommendations)
-        * [Table `dvo_report`](#table-dvo_report)
-* [Documentation](#documentation-1)
-    * [Documentation for source files from this repository](#documentation-for-source-files-from-this-repository)
-    * [Documentation for unit tests from this repository](#documentation-for-unit-tests-from-this-repository)
-* [Contribution](#contribution-1)
-* [Package manifest](#package-manifest)
+- [insights-results-aggregator-cleaner](#insights-results-aggregator-cleaner)
+  - [Description](#description)
+  - [Documentation](#documentation)
+  - [Contribution](#contribution)
+  - [Start the service](#start-the-service)
+    - [Default operation](#default-operation)
+    - [Data cleanup](#data-cleanup)
+    - [Test data generation](#test-data-generation)
+    - [Exit status](#exit-status)
+    - [Building](#building)
+    - [Makefile targets](#makefile-targets)
+    - [Configuration](#configuration)
+  - [BDD tests](#bdd-tests)
+  - [Usage](#usage)
+      - [Output example](#output-example)
+  - [Database structure](#database-structure)
+    - [Database schema `ocp_recommendations`](#database-schema-ocp_recommendations)
+      - [Table `report`](#table-report)
+      - [Table `cluster_rule_toggle`](#table-cluster_rule_toggle)
+      - [Table `cluster_rule_user_feedback`](#table-cluster_rule_user_feedback)
+      - [Table `cluster_user_rule_disable_feedback`](#table-cluster_user_rule_disable_feedback)
+      - [Table `consumer_error`](#table-consumer_error)
+      - [Table `migration_info `](#table-migration_info-)
+      - [Table `rule_hit`](#table-rule_hit)
+      - [Table `recommendation`](#table-recommendation)
+      - [Database tables affected by this service](#database-tables-affected-by-this-service)
+    - [Database schema `dvo_recommendations`](#database-schema-dvo_recommendations)
+      - [Table `dvo_report`](#table-dvo_report)
+  - [Documentation](#documentation-1)
+    - [Documentation for source files from this repository](#documentation-for-source-files-from-this-repository)
+    - [Documentation for unit tests from this repository](#documentation-for-unit-tests-from-this-repository)
+  - [Contribution](#contribution-1)
+  - [Package manifest](#package-manifest)
 
 <!-- vim-markdown-toc -->
 
@@ -81,8 +82,12 @@ Usage of cleaner:
         show authors
   -cleanup
         perform database cleanup
+  -cleanup-all
+        perform database cleanup for all old clusters
   -clusters string
-        list of clusters to cleanup
+        list of clusters to cleanup. Ignored when cleanup-all is selected
+  -dry-run
+        if true, the cleanup-all method won't delete any row, just print how many are affected (default true)
   -fill-in-db
         fill-in database by test data
   -max-age string
@@ -115,10 +120,16 @@ deleted.
 Optionally it is possible to specify list of clusters to be cleaned up by using
 the `clusters ...` command line option.
 
+If you run `-cleanup-all` there is no need to use `cluster_list.txt` or 
+the `clusters` option. It will delete all the records older than `-max-age`.
+
 ### Test data generation
 
 Command line option `-fill-in-db` can be used to insert some test data into
 database. Don't use it on production, of course.
+
+You can run and initialize a database by running `podman-compose up -d`. Then
+you will be able to run `./insights-results-aggregator-cleaner -fill-in-db`.
 
 ### Exit status
 

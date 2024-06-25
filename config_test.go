@@ -188,7 +188,7 @@ func TestCheckConfigurationPositiveTestCases(t *testing.T) {
 	config1 := main.ConfigStruct{
 		Storage: main.StorageConfiguration{
 			Driver: "postgres",
-			Schema: "ocm_recommendations",
+			Schema: "ocp_recommendations",
 		},
 	}
 	err := main.CheckConfiguration(&config1)
@@ -209,7 +209,7 @@ func TestCheckConfigurationNegativeTestCases(t *testing.T) {
 	config1 := main.ConfigStruct{
 		Storage: main.StorageConfiguration{
 			Driver: "unknown",
-			Schema: "ocm_recommendations",
+			Schema: "ocp_recommendations",
 		},
 	}
 	err := main.CheckConfiguration(&config1)
@@ -227,7 +227,7 @@ func TestCheckConfigurationNegativeTestCases(t *testing.T) {
 	config3 := main.ConfigStruct{
 		Storage: main.StorageConfiguration{
 			Driver: "",
-			Schema: "ocm_recommendations",
+			Schema: "ocp_recommendations",
 		},
 	}
 	err = main.CheckConfiguration(&config3)

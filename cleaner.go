@@ -301,6 +301,21 @@ func cleanup(configuration *ConfigStruct, connection *sql.DB, cliFlags CliFlags,
 	return ExitStatusOK, nil
 }
 
+// cleanup function starts the cleanup-all operation
+func cleanupAll(configuration *ConfigStruct, connection *sql.DB, cliFlags CliFlags, schema string) (int, error) {
+	deletionsForTable, err := performCleanupAllInDB(connection, schema, configuration.Cleaner.MaxAge, cliFlags.DryRun)
+	if err != nil {
+		log.Err(err).Msg("Performing cleanup-all")
+		return ExitStatusPerformCleanupError, err
+	}
+	if cliFlags.PrintSummaryTable {
+		var summary Summary
+		summary.DeletionsForTable = deletionsForTable
+		PrintSummaryTable(summary)
+	}
+	return ExitStatusOK, nil
+}
+
 // detectMultipleRuleDisable function detects clusters that have the same
 // rule(s) disabled by different users
 func detectMultipleRuleDisable(connection *sql.DB, cliFlags CliFlags) (int, error) {
@@ -363,6 +378,8 @@ func doSelectedOperation(configuration *ConfigStruct, connection *sql.DB, cliFla
 		return ExitStatusOK, nil
 	case cliFlags.VacuumDatabase:
 		return vacuumDB(connection)
+	case cliFlags.PerformCleanupAll:
+		return cleanupAll(configuration, connection, cliFlags, configuration.Storage.Schema)
 	case cliFlags.PerformCleanup:
 		return cleanup(configuration, connection, cliFlags, configuration.Storage.Schema)
 	case cliFlags.DetectMultipleRuleDisable:
@@ -381,6 +398,8 @@ func main() {
 
 	// define and parse all command line options
 	flag.BoolVar(&cliFlags.PerformCleanup, "cleanup", false, "perform database cleanup")
+	flag.BoolVar(&cliFlags.PerformCleanupAll, "cleanup-all", false, "perform database cleanup for all old clusters")
+	flag.BoolVar(&cliFlags.DryRun, "dry-run", true, "if true, the cleanup-all method won't delete any row, just print how many are affected")
 	flag.BoolVar(&cliFlags.PrintSummaryTable, "summary", false, "print summary table after cleanup")
 	flag.BoolVar(&cliFlags.DetectMultipleRuleDisable, "multiple-rule-disable", false, "list clusters with the same rule(s) disabled by different users")
 	flag.BoolVar(&cliFlags.FillInDatabase, "fill-in-db", false, "fill-in database by test data")
@@ -389,7 +408,7 @@ func main() {
 	flag.BoolVar(&cliFlags.ShowAuthors, "authors", false, "show authors")
 	flag.BoolVar(&cliFlags.VacuumDatabase, "vacuum", false, "vacuum database")
 	flag.StringVar(&cliFlags.MaxAge, "max-age", "", "max age for displaying old records")
-	flag.StringVar(&cliFlags.Clusters, "clusters", "", "list of clusters to cleanup")
+	flag.StringVar(&cliFlags.Clusters, "clusters", "", "list of clusters to cleanup. Ignored when cleanup-all is selected")
 	flag.StringVar(&cliFlags.Output, "output", "", "filename for old cluster listing")
 
 	// parse all command line flags
@@ -404,6 +423,7 @@ func main() {
 	err = CheckConfiguration(&config)
 	if err != nil {
 		log.Err(err).Msg("Check configuration")
+		return
 	}
 
 	if config.Logging.Debug {

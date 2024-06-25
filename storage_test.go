@@ -25,6 +25,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -39,6 +40,7 @@ const (
 	cluster2ID   = "567e4567-4321-12d3-a456-426614173777"
 	rule1ID      = "rule.test|KEY"
 	defaultOrgID = 42
+	maxAge       = "3 days"
 )
 
 // checkConnectionClose function performs mocked DB closing operation and checks
@@ -2044,4 +2046,140 @@ func TestDisplayAllOldDVORecordsFileOutput(t *testing.T) {
 	// delete test file from filesystem
 	err = os.Remove(outFile)
 	assert.NoError(t, err)
+}
+
+// TestPerformCleanupAllInDBForOCPDatabase checks the basic behaviour of
+// performCleanupAllInDB
+func TestPerformCleanupAllInDB(t *testing.T) {
+	for _, schema := range []string{cleaner.DBSchemaOCPRecommendations, cleaner.DBSchemaDVORecommendations} {
+		for _, dryRun := range []bool{true, false} {
+			expectedResult := make(map[string]int)
+
+			t.Run(fmt.Sprintf("Schema: %s - Dry run: %t", schema, dryRun), func(t *testing.T) {
+				// prepare new mocked connection to database
+				connection, mock, err := sqlmock.New()
+				assert.NoError(t, err, "error creating SQL mock")
+
+				var tables []cleaner.TableAndDeleteStatement
+				switch schema {
+				case cleaner.DBSchemaOCPRecommendations:
+					tables = cleaner.TablesToDeleteOCP
+				case cleaner.DBSchemaDVORecommendations:
+					tables = cleaner.TablesToDeleteDVO
+				}
+
+				for _, tableAndDeleteStatement := range tables {
+					stmt := regexp.QuoteMeta(tableAndDeleteStatement.DeleteStatement)
+					if dryRun {
+						stmt = strings.Replace(stmt, "DELETE", "SELECT", -1)
+					}
+					mock.ExpectExec(stmt).WithArgs(maxAge).WillReturnResult(sqlmock.NewResult(1, 2))
+					// two deleted rows for each table
+					expectedResult[tableAndDeleteStatement.TableName] = 2
+				}
+
+				mock.ExpectClose()
+
+				deletedRows, err := cleaner.PerformCleanupAllInDB(connection, schema, maxAge, dryRun)
+				assert.NoError(t, err, "error not expected while calling tested function")
+
+				// check tables have correct number of deleted rows for each table
+				for tableName, deletedRowCount := range deletedRows {
+					assert.Equal(t, expectedResult[tableName], deletedRowCount)
+				}
+
+				// check if DB can be closed successfully
+				checkConnectionClose(t, connection)
+
+				// check all DB expectactions happened correctly
+				checkAllExpectations(t, mock)
+			})
+		}
+	}
+}
+
+// TestPerformCleanupAllInDBNullSchema checks the basic behaviour of
+// performCleanupAllInDB function when the schema is null.
+func TestPerformCleanupAllInDBNullSchema(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	_, err = cleaner.PerformCleanupAllInDB(connection, "", maxAge, false)
+	assert.Error(t, err, "error is expected while calling tested function")
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
+// TestPerformCleanupAllInDBWrongSchema checks the basic behaviour of
+// performCleanupAllInDB function with a wrong schema.
+func TestPerformCleanupAllInDBWrongSchema(t *testing.T) {
+	// prepare new mocked connection to database
+	connection, mock, err := sqlmock.New()
+	assert.NoError(t, err, "error creating SQL mock")
+
+	_, err = cleaner.PerformCleanupAllInDB(connection, "wrong schema", maxAge, false)
+	assert.Error(t, err, "error is expected while calling tested function")
+
+	// check all DB expectactions happened correctly
+	checkAllExpectations(t, mock)
+}
+
+// TestPerformCleanupAllInDBOnDeleteError checks the basic behaviour of
+// performCleanupAllInDB function when error in called DeleteRecordFromTable.
+// is thrown
+func TestPerformCleanupAllInDBOnDeleteError(t *testing.T) {
+	mockedError := errors.New("delete from table")
+	for _, schema := range []string{cleaner.DBSchemaOCPRecommendations, cleaner.DBSchemaDVORecommendations} {
+		expectedResult := make(map[string]int)
+
+		t.Run(schema, func(t *testing.T) {
+			// prepare new mocked connection to database
+			connection, mock, err := sqlmock.New()
+			assert.NoError(t, err, "error creating SQL mock")
+
+			var tables []cleaner.TableAndDeleteStatement
+			switch schema {
+			case cleaner.DBSchemaOCPRecommendations:
+				tables = cleaner.TablesToDeleteOCP
+			case cleaner.DBSchemaDVORecommendations:
+				tables = cleaner.TablesToDeleteDVO
+			}
+
+			for _, tableAndDeleteStatement := range tables {
+				stmt := regexp.QuoteMeta(tableAndDeleteStatement.DeleteStatement)
+				mock.ExpectExec(stmt).WithArgs(maxAge).WillReturnError(mockedError)
+				expectedResult[tableAndDeleteStatement.TableName] = 0
+			}
+
+			mock.ExpectClose()
+
+			deletedRows, err := cleaner.PerformCleanupAllInDB(connection, schema, maxAge, false)
+			assert.NoError(t, err, "error not expected while calling tested function")
+			// There is no error because the cleaner just does log.Error, not exit
+
+			// check tables have correct number of deleted rows for each table
+			for tableName, deletedRowCount := range deletedRows {
+				assert.Equal(t, expectedResult[tableName], deletedRowCount)
+			}
+
+			// check if DB can be closed successfully
+			checkConnectionClose(t, connection)
+
+			// check all DB expectactions happened correctly
+			checkAllExpectations(t, mock)
+		})
+	}
+}
+
+// TestPerformCleanupAllInDBNoConnection checks the basic behaviour of
+// performCleanupAllInDB function when connection is not established.
+func TestPerformCleanupAllInDBNoConnection(t *testing.T) {
+	// connection that is not constructed correctly
+	var connection *sql.DB
+
+	_, err := cleaner.PerformCleanupAllInDB(connection, cleaner.DBSchemaOCPRecommendations, maxAge, false)
+
+	assert.Error(t, err, "error is expected while calling tested function")
 }

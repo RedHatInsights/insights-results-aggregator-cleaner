@@ -266,7 +266,7 @@ func allSupportedDrivers() StringSet {
 // schemas
 func allSupportedSchemas() StringSet {
 	var schemas = make(StringSet)
-	schemas["ocm_recommendations"] = struct{}{}
+	schemas["ocp_recommendations"] = struct{}{}
 	schemas["dvo_recommendations"] = struct{}{}
 	return schemas
 }
