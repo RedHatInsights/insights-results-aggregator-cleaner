@@ -106,7 +106,13 @@ const (
 		DELETE FROM consumer_error
 		 WHERE consumed_at < NOW() - $1::INTERVAL`
 
-	deleteOldOCPRuleHits       = `` // TODO: How to filter? This table has no date column
+	deleteOldOCPRuleHits = `
+		DELETE FROM rule_hit
+		 WHERE (cluster_id, org_id) IN (
+			SELECT cluster, org_id
+			FROM report
+			WHERE reported_at < NOW() - $1::INTERVAL)`
+
 	deleteOldOCPRecommendation = `
 		DELETE FROM recommendation
 		 WHERE created_at < NOW() - $1::INTERVAL`
