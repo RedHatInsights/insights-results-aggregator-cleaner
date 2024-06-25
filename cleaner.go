@@ -305,7 +305,7 @@ func cleanup(configuration *ConfigStruct, connection *sql.DB, cliFlags CliFlags,
 func cleanupAll(configuration *ConfigStruct, connection *sql.DB, cliFlags CliFlags, schema string) (int, error) {
 	deletionsForTable, err := performCleanupAllInDB(connection, schema, configuration.Cleaner.MaxAge)
 	if err != nil {
-		log.Err(err).Msg("Performing cleanup")
+		log.Err(err).Msg("Performing cleanup-all")
 		return ExitStatusPerformCleanupError, err
 	}
 	if cliFlags.PrintSummaryTable {

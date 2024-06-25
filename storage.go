@@ -58,6 +58,8 @@ const (
 	ageMsg                            = "age"
 	reportsCountMsg                   = "reports count"
 	maxAgeMissing                     = "max-age parameter is missing"
+	invalidSchemaMsg                  = "Invalid DB schema to be cleaned up: '%s'"
+	affectedMsg                       = "Affected"
 )
 
 // Other messages
@@ -785,7 +787,7 @@ func performCleanupInDB(connection *sql.DB,
 	case DBSchemaDVORecommendations:
 		tablesAndKeys = tablesAndKeysInDVODatabase
 	default:
-		return deletionsForTable, fmt.Errorf("Invalid DB schema to be cleaned up: '%s'", schema)
+		return deletionsForTable, fmt.Errorf(invalidSchemaMsg, schema)
 	}
 
 	// initialize counters
@@ -809,7 +811,7 @@ func performCleanupInDB(connection *sql.DB,
 					Msg("Unable to delete record")
 			} else {
 				log.Info().
-					Int("Affected", affected).
+					Int(affectedMsg, affected).
 					Str(tableName, tableAndKey.TableName).
 					Str(clusterNameMsg, string(clusterName)).
 					Msg("Delete record")
@@ -842,11 +844,11 @@ func performCleanupAllInDB(connection *sql.DB, schema, maxAge string) (
 	case DBSchemaDVORecommendations:
 		tablesAndDeleteStatements = tablesToDeleteDVO
 	default:
-		return deletionsForTable, fmt.Errorf("Invalid DB schema to be cleaned up: '%s'", schema)
+		return deletionsForTable, fmt.Errorf(invalidSchemaMsg, schema)
 	}
 
 	// perform cleanup for selected cluster names
-	log.Info().Msg("Cleanup started")
+	log.Info().Msg("Cleanup-all started")
 	for _, tableAndDeleteStatement := range tablesAndDeleteStatements {
 		// try to delete record from selected table
 		affected, err := deleteOldRecordsFromTable(connection,
@@ -856,16 +858,16 @@ func performCleanupAllInDB(connection *sql.DB, schema, maxAge string) (
 			log.Error().
 				Err(err).
 				Str(tableName, tableAndDeleteStatement.TableName).
-				Msg("Unable to delete record")
+				Msg("Unable to delete records")
 		} else {
 			log.Info().
-				Int("Affected", affected).
+				Int(affectedMsg, affected).
 				Str(tableName, tableAndDeleteStatement.TableName).
-				Msg("Delete record")
+				Msg("Delete records")
 			deletionsForTable[tableAndDeleteStatement.TableName] = affected
 		}
 	}
-	log.Info().Msg("Cleanup finished")
+	log.Info().Msg("Cleanup-all finished")
 	return deletionsForTable, nil
 }
 
