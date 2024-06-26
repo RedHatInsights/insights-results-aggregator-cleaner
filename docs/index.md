@@ -308,7 +308,7 @@ Actually cleaning the data for given cluster:
 
 ### Database schema `dvo_recommendations`
 
-#### Table `dvo_report`
+#### Table `dvo.dvo_report`
 
 ```
     Column        |       Type                  | Modifiers

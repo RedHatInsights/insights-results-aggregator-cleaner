@@ -39,7 +39,7 @@
       - [Table `recommendation`](#table-recommendation)
       - [Database tables affected by this service](#database-tables-affected-by-this-service)
     - [Database schema `dvo_recommendations`](#database-schema-dvo_recommendations)
-      - [Table `dvo_report`](#table-dvo_report)
+      - [Table `dvo.dvo_report`](#table-dvodvo_report)
   - [Documentation](#documentation-1)
     - [Documentation for source files from this repository](#documentation-for-source-files-from-this-repository)
     - [Documentation for unit tests from this repository](#documentation-for-unit-tests-from-this-repository)
@@ -449,7 +449,7 @@ Actually cleaning the data for given cluster:
 
 ### Database schema `dvo_recommendations`
 
-#### Table `dvo_report`
+#### Table `dvo.dvo_report`
 
 ```
     Column        |       Type                  | Modifiers

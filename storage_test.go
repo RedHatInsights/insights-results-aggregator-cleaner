@@ -1484,7 +1484,7 @@ func TestFillInDVODatabaseByTestData(t *testing.T) {
 	connection, mock, err := sqlmock.New()
 	assert.NoError(t, err, "error creating SQL mock")
 
-	const insert = "INSERT INTO dvo_report \\(org_id, cluster_id, namespace_id, namespace_name, report, recommendations, objects, reported_at, last_checked_at\\) values \\(\\$1, \\$2, \\$3, \\$4, \\$5, \\$6, \\$7, \\$8, \\$9\\);"
+	const insert = "INSERT INTO dvo.dvo_report \\(org_id, cluster_id, namespace_id, namespace_name, report, recommendations, objects, reported_at, last_checked_at\\) values \\(\\$1, \\$2, \\$3, \\$4, \\$5, \\$6, \\$7, \\$8, \\$9\\);"
 
 	mock.ExpectExec(insert).WithArgs(1, "00000001-0001-0001-0001-000000000001", "fbcbe2d3-e398-4b40-9d5e-4eb46fe8286f", "not set", "", "Ensure the host's network namespace is not shared.", "", "2021-01-01", "2021-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectExec(insert).WithArgs(1, "00000002-0002-0002-0002-000000000002", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", "Ensure the host's network namespace is not shared.", "", "2021-01-01", "2021-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
@@ -1516,7 +1516,7 @@ func TestFillInDVODatabaseByTestDataOnError1(t *testing.T) {
 	connection, mock, err := sqlmock.New()
 	assert.NoError(t, err, "error creating SQL mock")
 
-	const insert = "INSERT INTO dvo_report \\(org_id, cluster_id, namespace_id, namespace_name, report, recommendations, objects, reported_at, last_checked_at\\) values \\(\\$1, \\$2, \\$3, \\$4, \\$5, \\$6, \\$7, \\$8, \\$9\\);"
+	const insert = "INSERT INTO dvo.dvo_report \\(org_id, cluster_id, namespace_id, namespace_name, report, recommendations, objects, reported_at, last_checked_at\\) values \\(\\$1, \\$2, \\$3, \\$4, \\$5, \\$6, \\$7, \\$8, \\$9\\);"
 
 	mock.ExpectExec(insert).WithArgs(1, "00000001-0001-0001-0001-000000000001", "fbcbe2d3-e398-4b40-9d5e-4eb46fe8286f", "not set", "", "Ensure the host's network namespace is not shared.", "", "2021-01-01", "2021-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectExec(insert).WithArgs(1, "00000002-0002-0002-0002-000000000002", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", "Ensure the host's network namespace is not shared.", "", "2021-01-01", "2021-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
@@ -1550,7 +1550,7 @@ func TestFillInDVODatabaseByTestDataOnError2(t *testing.T) {
 	connection, mock, err := sqlmock.New()
 	assert.NoError(t, err, "error creating SQL mock")
 
-	const insert = "INSERT INTO dvo_report \\(org_id, cluster_id, namespace_id, namespace_name, report, recommendations, objects, reported_at, last_checked_at\\) values \\(\\$1, \\$2, \\$3, \\$4, \\$5, \\$6, \\$7, \\$8, \\$9\\);"
+	const insert = "INSERT INTO dvo.dvo_report \\(org_id, cluster_id, namespace_id, namespace_name, report, recommendations, objects, reported_at, last_checked_at\\) values \\(\\$1, \\$2, \\$3, \\$4, \\$5, \\$6, \\$7, \\$8, \\$9\\);"
 
 	mock.ExpectExec(insert).WithArgs(1, "00000001-0001-0001-0001-000000000001", "fbcbe2d3-e398-4b40-9d5e-4eb46fe8286f", "not set", "", "Ensure the host's network namespace is not shared.", "", "2021-01-01", "2021-01-01").WillReturnError(mockedError)
 	mock.ExpectExec(insert).WithArgs(1, "00000002-0002-0002-0002-000000000002", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", "Ensure the host's network namespace is not shared.", "", "2021-01-01", "2021-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
@@ -1870,7 +1870,7 @@ func TestPerformListOfOldDVOReportsNoResults(t *testing.T) {
 	rows := sqlmock.NewRows([]string{})
 
 	// expected query performed by tested function
-	expectedQuery := "SELECT org_id, cluster_id, reported_at, last_checked_at FROM dvo_report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
+	expectedQuery := "SELECT org_id, cluster_id, reported_at, last_checked_at FROM dvo.dvo_report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
 	mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
 	mock.ExpectClose()
 
@@ -1899,7 +1899,7 @@ func TestPerformListOfOldDVOReportsScanError(t *testing.T) {
 	rows.AddRow(42, nil, reportedAt, updatedAt)
 
 	// expected query performed by tested function
-	expectedQuery := "SELECT org_id, cluster_id, reported_at, last_checked_at FROM dvo_report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
+	expectedQuery := "SELECT org_id, cluster_id, reported_at, last_checked_at FROM dvo.dvo_report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
 	mock.ExpectQuery(expectedQuery).WillReturnRows(rows)
 	mock.ExpectClose()
 
@@ -1927,7 +1927,7 @@ func TestPerformListOfOldDVOReportsDBError(t *testing.T) {
 	assert.NoError(t, err, "error creating SQL mock")
 
 	// expected query performed by tested function
-	expectedQuery := "SELECT org_id, cluster_id, reported_at, last_checked_at FROM dvo_report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
+	expectedQuery := "SELECT org_id, cluster_id, reported_at, last_checked_at FROM dvo.dvo_report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
 	mock.ExpectQuery(expectedQuery).WillReturnError(mockedError)
 	mock.ExpectClose()
 
@@ -1960,7 +1960,7 @@ func TestDisplayAllOldDVORecordsNoOutput(t *testing.T) {
 	rows.AddRow(1, cluster1ID, reportedAt, updatedAt)
 
 	// expected queries performed by tested function
-	expectedQuery1 := "SELECT org_id, cluster_id, reported_at, last_checked_at FROM dvo_report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
+	expectedQuery1 := "SELECT org_id, cluster_id, reported_at, last_checked_at FROM dvo.dvo_report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
 	mock.ExpectQuery(expectedQuery1).WillReturnRows(rows)
 
 	mock.ExpectClose()
@@ -1994,7 +1994,7 @@ func TestDisplayAllOldDVORecordsFileOutput(t *testing.T) {
 	rows.AddRow(orgID, cluster2ID, reportedAt, updatedAt)
 
 	// expected queries performed by tested function
-	expectedQuery1 := "SELECT org_id, cluster_id, reported_at, last_checked_at FROM dvo_report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
+	expectedQuery1 := "SELECT org_id, cluster_id, reported_at, last_checked_at FROM dvo.dvo_report WHERE reported_at < NOW\\(\\) - \\$1::INTERVAL ORDER BY reported_at"
 	mock.ExpectQuery(expectedQuery1).WillReturnRows(rows)
 
 	mock.ExpectClose()

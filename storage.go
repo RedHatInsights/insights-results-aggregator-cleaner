@@ -34,6 +34,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math"
@@ -95,7 +96,7 @@ const (
 
 	selectOldDVOReports = `
 	    SELECT org_id, cluster_id, reported_at, last_checked_at
-	      FROM dvo_report
+	      FROM dvo.dvo_report
 	     WHERE reported_at < NOW() - $1::INTERVAL
 	     ORDER BY reported_at`
 
@@ -119,7 +120,7 @@ const (
 		 WHERE created_at < NOW() - $1::INTERVAL`
 
 	deleteOldDVOReports = `
-		DELETE FROM dvo_report
+		DELETE FROM dvo.dvo_report
 		 WHERE reported_at < NOW() - $1::INTERVAL`
 )
 
@@ -492,7 +493,7 @@ func performListOfOldOCPReports(connection *sql.DB, maxAge string, writer *bufio
 		})
 }
 
-// performListOfOldDVOReports read and displays old records read from dvo_report
+// performListOfOldDVOReports read and displays old records read from dvo.dvo_report
 // table
 func performListOfOldDVOReports(connection *sql.DB, maxAge string, writer *bufio.Writer) error {
 	return listOldDatabaseRecords(connection, maxAge, writer, selectOldDVOReports, "List of old DVO reports", reportsCountMsg,
@@ -696,7 +697,7 @@ var tablesToDeleteOCP = []TableAndDeleteStatement{
 
 var tablesToDeleteDVO = []TableAndDeleteStatement{
 	{
-		TableName:       "dvo_report",
+		TableName:       "dvo.dvo_report",
 		DeleteStatement: deleteOldDVOReports,
 	},
 }
@@ -943,7 +944,7 @@ func fillInOCPDatabaseByTestData(connection *sql.DB) error {
 // (not to be used against production database)
 func fillInDVODatabaseByTestData(connection *sql.DB) error {
 	/* Table that needs to be filled-in has the following schema:
-	    CREATE TABLE dvo_report (
+	    CREATE TABLE dvo.dvo_report (
 	    org_id          INTEGER NOT NULL,
 	    cluster_id      VARCHAR NOT NULL,
 	    namespace_id    VARCHAR NOT NULL,
@@ -953,15 +954,16 @@ func fillInDVODatabaseByTestData(connection *sql.DB) error {
 	    objects         INTEGER NOT NULL,
 	    reported_at     TIMESTAMP,
 	    last_checked_at TIMESTAMP,
+		rule_hits_count JSONB
 	    PRIMARY KEY(org_id, cluster_id, namespace_id)
 	)
 	*/
 
 	const insertStatement = `
-	    INSERT INTO dvo_report
-	           (org_id, cluster_id, namespace_id, namespace_name, report, recommendations, objects, reported_at, last_checked_at)
+	    INSERT INTO dvo.dvo_report
+	           (org_id, cluster_id, namespace_id, namespace_name, report, recommendations, objects, reported_at, last_checked_at, rule_hits_count)
 		   values
-		   ($1, $2, $3, $4, $5, $6, $7, $8, $9);`
+		   ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);`
 
 	type Record struct {
 		OrgID           int
@@ -969,10 +971,11 @@ func fillInDVODatabaseByTestData(connection *sql.DB) error {
 		NamespaceID     string
 		NamespaceName   string
 		Report          string
-		Recommendations string
-		Objects         string
+		Recommendations int
+		Objects         int
 		ReportedAt      string
 		LastCheckedAt   string
+		RuleHitsCount   json.RawMessage
 	}
 
 	const cluster1 = "00000001-0001-0001-0001-000000000001"
@@ -980,71 +983,77 @@ func fillInDVODatabaseByTestData(connection *sql.DB) error {
 	const cluster3 = "00000003-0003-0003-0003-000000000003"
 
 	records := []Record{
-		Record{
+		{
 			OrgID:           1,
 			ClusterID:       cluster1,
 			NamespaceID:     "fbcbe2d3-e398-4b40-9d5e-4eb46fe8286f",
 			NamespaceName:   "not set",
 			Report:          "",
-			Recommendations: "Ensure the host's network namespace is not shared.",
-			Objects:         "",
+			Recommendations: 1,
+			Objects:         6,
 			ReportedAt:      "2021-01-01",
 			LastCheckedAt:   "2021-01-01",
+			RuleHitsCount:   json.RawMessage(`{}`),
 		},
-		Record{
+		{
 			OrgID:           1,
 			ClusterID:       cluster2,
 			NamespaceID:     "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c",
 			NamespaceName:   "not set",
 			Report:          "",
-			Recommendations: "Ensure the host's network namespace is not shared.",
-			Objects:         "",
+			Recommendations: 2,
+			Objects:         5,
 			ReportedAt:      "2021-01-01",
 			LastCheckedAt:   "2021-01-01",
+			RuleHitsCount:   json.RawMessage(`{}`),
 		},
-		Record{
+		{
 			OrgID:           2,
 			ClusterID:       cluster3,
 			NamespaceID:     "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c",
 			NamespaceName:   "not set",
 			Report:          "",
-			Recommendations: "Ensure pod does not accept unsafe traffic by isolating it with a NetworkPolicy.",
-			Objects:         "",
+			Recommendations: 3,
+			Objects:         4,
 			ReportedAt:      "2021-01-01",
 			LastCheckedAt:   "2021-01-01",
+			RuleHitsCount:   json.RawMessage(`{}`),
 		},
-		Record{
+		{
 			OrgID:           3,
 			ClusterID:       cluster1,
 			NamespaceID:     "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c",
 			NamespaceName:   "not set",
 			Report:          "",
-			Recommendations: "Set memory requests and limits for your container based on its requirements.",
-			Objects:         "",
+			Recommendations: 4,
+			Objects:         3,
 			ReportedAt:      "2021-01-01",
 			LastCheckedAt:   "2021-01-01",
+			RuleHitsCount:   json.RawMessage(`{}`),
 		},
-		Record{
+		{
 			OrgID:           3,
 			ClusterID:       cluster2,
 			NamespaceID:     "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c",
 			NamespaceName:   "not set",
 			Report:          "",
-			Recommendations: "Set memory requests and limits for your container based on its requirements.",
-			Objects:         "",
+			Recommendations: 5,
+			Objects:         2,
 			ReportedAt:      "2022-01-01",
 			LastCheckedAt:   "2022-01-01",
+			RuleHitsCount:   json.RawMessage(`{}`),
 		},
-		Record{
+		{
 			OrgID:           3,
 			ClusterID:       cluster3,
 			NamespaceID:     "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c",
 			NamespaceName:   "not set",
 			Report:          "",
-			Recommendations: "Set memory requests and limits for your container based on its requirements.",
-			Objects:         "",
+			Recommendations: 6,
+			Objects:         1,
 			ReportedAt:      "2023-01-01",
 			LastCheckedAt:   "2023-01-01",
+			RuleHitsCount:   json.RawMessage(`{}`),
 		},
 	}
 
@@ -1058,7 +1067,8 @@ func fillInDVODatabaseByTestData(connection *sql.DB) error {
 		_, err := connection.Exec(insertStatement,
 			record.OrgID, record.ClusterID, record.NamespaceID,
 			record.NamespaceName, record.Report, record.Recommendations,
-			record.Objects, record.ReportedAt, record.LastCheckedAt)
+			record.Objects, record.ReportedAt, record.LastCheckedAt,
+			record.RuleHitsCount)
 		if err != nil {
 			// failure is usually ok - it might mean that
 			// the record with given org_id + cluster name already
