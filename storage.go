@@ -130,6 +130,8 @@ const (
 	DBSchemaDVORecommendations = "dvo_recommendations"
 )
 
+var emptyJson = json.RawMessage(`{}`)
+
 // initDatabaseConnection initializes driver, checks if it's supported and
 // initializes connection to the storage.
 func initDatabaseConnection(configuration *StorageConfiguration) (*sql.DB, error) {
@@ -993,7 +995,7 @@ func fillInDVODatabaseByTestData(connection *sql.DB) error {
 			Objects:         6,
 			ReportedAt:      "2021-01-01",
 			LastCheckedAt:   "2021-01-01",
-			RuleHitsCount:   json.RawMessage(`{}`),
+			RuleHitsCount:   emptyJson,
 		},
 		{
 			OrgID:           1,
@@ -1005,7 +1007,7 @@ func fillInDVODatabaseByTestData(connection *sql.DB) error {
 			Objects:         5,
 			ReportedAt:      "2021-01-01",
 			LastCheckedAt:   "2021-01-01",
-			RuleHitsCount:   json.RawMessage(`{}`),
+			RuleHitsCount:   emptyJson,
 		},
 		{
 			OrgID:           2,
@@ -1017,7 +1019,7 @@ func fillInDVODatabaseByTestData(connection *sql.DB) error {
 			Objects:         4,
 			ReportedAt:      "2021-01-01",
 			LastCheckedAt:   "2021-01-01",
-			RuleHitsCount:   json.RawMessage(`{}`),
+			RuleHitsCount:   emptyJson,
 		},
 		{
 			OrgID:           3,
@@ -1029,7 +1031,7 @@ func fillInDVODatabaseByTestData(connection *sql.DB) error {
 			Objects:         3,
 			ReportedAt:      "2021-01-01",
 			LastCheckedAt:   "2021-01-01",
-			RuleHitsCount:   json.RawMessage(`{}`),
+			RuleHitsCount:   emptyJson,
 		},
 		{
 			OrgID:           3,
@@ -1041,7 +1043,7 @@ func fillInDVODatabaseByTestData(connection *sql.DB) error {
 			Objects:         2,
 			ReportedAt:      "2022-01-01",
 			LastCheckedAt:   "2022-01-01",
-			RuleHitsCount:   json.RawMessage(`{}`),
+			RuleHitsCount:   emptyJson,
 		},
 		{
 			OrgID:           3,
@@ -1053,7 +1055,7 @@ func fillInDVODatabaseByTestData(connection *sql.DB) error {
 			Objects:         1,
 			ReportedAt:      "2023-01-01",
 			LastCheckedAt:   "2023-01-01",
-			RuleHitsCount:   json.RawMessage(`{}`),
+			RuleHitsCount:   emptyJson,
 		},
 	}
 

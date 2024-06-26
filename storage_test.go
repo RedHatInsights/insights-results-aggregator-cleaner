@@ -1484,15 +1484,14 @@ func TestFillInDVODatabaseByTestData(t *testing.T) {
 	connection, mock, err := sqlmock.New()
 	assert.NoError(t, err, "error creating SQL mock")
 
-	const insert = "INSERT INTO dvo.dvo_report \\(org_id, cluster_id, namespace_id, namespace_name, report, recommendations, objects, reported_at, last_checked_at\\) values \\(\\$1, \\$2, \\$3, \\$4, \\$5, \\$6, \\$7, \\$8, \\$9\\);"
+	const insert = "INSERT INTO dvo.dvo_report \\(org_id, cluster_id, namespace_id, namespace_name, report, recommendations, objects, reported_at, last_checked_at, rule_hits_count\\) values \\(\\$1, \\$2, \\$3, \\$4, \\$5, \\$6, \\$7, \\$8, \\$9, \\$10\\);"
 
-	mock.ExpectExec(insert).WithArgs(1, "00000001-0001-0001-0001-000000000001", "fbcbe2d3-e398-4b40-9d5e-4eb46fe8286f", "not set", "", "Ensure the host's network namespace is not shared.", "", "2021-01-01", "2021-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
-	mock.ExpectExec(insert).WithArgs(1, "00000002-0002-0002-0002-000000000002", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", "Ensure the host's network namespace is not shared.", "", "2021-01-01", "2021-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
-	mock.ExpectExec(insert).WithArgs(2, "00000003-0003-0003-0003-000000000003", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", "Ensure pod does not accept unsafe traffic by isolating it with a NetworkPolicy.", "", "2021-01-01", "2021-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
-	mock.ExpectExec(insert).WithArgs(3, "00000001-0001-0001-0001-000000000001", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", "Set memory requests and limits for your container based on its requirements.", "", "2021-01-01", "2021-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
-	mock.ExpectExec(insert).WithArgs(3, "00000002-0002-0002-0002-000000000002", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", "Set memory requests and limits for your container based on its requirements.", "", "2022-01-01", "2022-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
-	mock.ExpectExec(insert).WithArgs(3, "00000003-0003-0003-0003-000000000003", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", "Set memory requests and limits for your container based on its requirements.", "", "2023-01-01", "2023-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
-
+	mock.ExpectExec(insert).WithArgs(1, "00000001-0001-0001-0001-000000000001", "fbcbe2d3-e398-4b40-9d5e-4eb46fe8286f", "not set", "", 1, 6, "2021-01-01", "2021-01-01", cleaner.EmptyJSON).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(insert).WithArgs(1, "00000002-0002-0002-0002-000000000002", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", 2, 5, "2021-01-01", "2021-01-01", cleaner.EmptyJSON).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(insert).WithArgs(2, "00000003-0003-0003-0003-000000000003", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", 3, 4, "2021-01-01", "2021-01-01", cleaner.EmptyJSON).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(insert).WithArgs(3, "00000001-0001-0001-0001-000000000001", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", 4, 3, "2021-01-01", "2021-01-01", cleaner.EmptyJSON).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(insert).WithArgs(3, "00000002-0002-0002-0002-000000000002", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", 5, 2, "2022-01-01", "2022-01-01", cleaner.EmptyJSON).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(insert).WithArgs(3, "00000003-0003-0003-0003-000000000003", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", 6, 1, "2023-01-01", "2023-01-01", cleaner.EmptyJSON).WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectClose()
 
 	err = cleaner.FillInDatabaseByTestData(connection, cleaner.DBSchemaDVORecommendations)
@@ -1516,14 +1515,14 @@ func TestFillInDVODatabaseByTestDataOnError1(t *testing.T) {
 	connection, mock, err := sqlmock.New()
 	assert.NoError(t, err, "error creating SQL mock")
 
-	const insert = "INSERT INTO dvo.dvo_report \\(org_id, cluster_id, namespace_id, namespace_name, report, recommendations, objects, reported_at, last_checked_at\\) values \\(\\$1, \\$2, \\$3, \\$4, \\$5, \\$6, \\$7, \\$8, \\$9\\);"
+	const insert = "INSERT INTO dvo.dvo_report \\(org_id, cluster_id, namespace_id, namespace_name, report, recommendations, objects, reported_at, last_checked_at, rule_hits_count\\) values \\(\\$1, \\$2, \\$3, \\$4, \\$5, \\$6, \\$7, \\$8, \\$9, \\$10\\);"
 
-	mock.ExpectExec(insert).WithArgs(1, "00000001-0001-0001-0001-000000000001", "fbcbe2d3-e398-4b40-9d5e-4eb46fe8286f", "not set", "", "Ensure the host's network namespace is not shared.", "", "2021-01-01", "2021-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
-	mock.ExpectExec(insert).WithArgs(1, "00000002-0002-0002-0002-000000000002", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", "Ensure the host's network namespace is not shared.", "", "2021-01-01", "2021-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
-	mock.ExpectExec(insert).WithArgs(2, "00000003-0003-0003-0003-000000000003", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", "Ensure pod does not accept unsafe traffic by isolating it with a NetworkPolicy.", "", "2021-01-01", "2021-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
-	mock.ExpectExec(insert).WithArgs(3, "00000001-0001-0001-0001-000000000001", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", "Set memory requests and limits for your container based on its requirements.", "", "2021-01-01", "2021-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
-	mock.ExpectExec(insert).WithArgs(3, "00000002-0002-0002-0002-000000000002", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", "Set memory requests and limits for your container based on its requirements.", "", "2022-01-01", "2022-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
-	mock.ExpectExec(insert).WithArgs(3, "00000003-0003-0003-0003-000000000003", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", "Set memory requests and limits for your container based on its requirements.", "", "2023-01-01", "2023-01-01").WillReturnError(mockedError)
+	mock.ExpectExec(insert).WithArgs(1, "00000001-0001-0001-0001-000000000001", "fbcbe2d3-e398-4b40-9d5e-4eb46fe8286f", "not set", "", 1, 6, "2021-01-01", "2021-01-01", cleaner.EmptyJSON).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(insert).WithArgs(1, "00000002-0002-0002-0002-000000000002", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", 2, 5, "2021-01-01", "2021-01-01", cleaner.EmptyJSON).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(insert).WithArgs(2, "00000003-0003-0003-0003-000000000003", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", 3, 4, "2021-01-01", "2021-01-01", cleaner.EmptyJSON).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(insert).WithArgs(3, "00000001-0001-0001-0001-000000000001", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", 4, 3, "2021-01-01", "2021-01-01", cleaner.EmptyJSON).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(insert).WithArgs(3, "00000002-0002-0002-0002-000000000002", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", 5, 2, "2022-01-01", "2022-01-01", cleaner.EmptyJSON).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(insert).WithArgs(3, "00000003-0003-0003-0003-000000000003", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", 6, 1, "2023-01-01", "2023-01-01", cleaner.EmptyJSON).WillReturnError(mockedError)
 
 	mock.ExpectClose()
 
@@ -1550,14 +1549,14 @@ func TestFillInDVODatabaseByTestDataOnError2(t *testing.T) {
 	connection, mock, err := sqlmock.New()
 	assert.NoError(t, err, "error creating SQL mock")
 
-	const insert = "INSERT INTO dvo.dvo_report \\(org_id, cluster_id, namespace_id, namespace_name, report, recommendations, objects, reported_at, last_checked_at\\) values \\(\\$1, \\$2, \\$3, \\$4, \\$5, \\$6, \\$7, \\$8, \\$9\\);"
+	const insert = "INSERT INTO dvo.dvo_report \\(org_id, cluster_id, namespace_id, namespace_name, report, recommendations, objects, reported_at, last_checked_at, rule_hits_count\\) values \\(\\$1, \\$2, \\$3, \\$4, \\$5, \\$6, \\$7, \\$8, \\$9, \\$10\\);"
 
-	mock.ExpectExec(insert).WithArgs(1, "00000001-0001-0001-0001-000000000001", "fbcbe2d3-e398-4b40-9d5e-4eb46fe8286f", "not set", "", "Ensure the host's network namespace is not shared.", "", "2021-01-01", "2021-01-01").WillReturnError(mockedError)
-	mock.ExpectExec(insert).WithArgs(1, "00000002-0002-0002-0002-000000000002", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", "Ensure the host's network namespace is not shared.", "", "2021-01-01", "2021-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
-	mock.ExpectExec(insert).WithArgs(2, "00000003-0003-0003-0003-000000000003", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", "Ensure pod does not accept unsafe traffic by isolating it with a NetworkPolicy.", "", "2021-01-01", "2021-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
-	mock.ExpectExec(insert).WithArgs(3, "00000001-0001-0001-0001-000000000001", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", "Set memory requests and limits for your container based on its requirements.", "", "2021-01-01", "2021-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
-	mock.ExpectExec(insert).WithArgs(3, "00000002-0002-0002-0002-000000000002", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", "Set memory requests and limits for your container based on its requirements.", "", "2022-01-01", "2022-01-01").WillReturnResult(sqlmock.NewResult(1, 1))
-	mock.ExpectExec(insert).WithArgs(3, "00000003-0003-0003-0003-000000000003", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", "Set memory requests and limits for your container based on its requirements.", "", "2023-01-01", "2023-01-01").WillReturnError(mockedError)
+	mock.ExpectExec(insert).WithArgs(1, "00000001-0001-0001-0001-000000000001", "fbcbe2d3-e398-4b40-9d5e-4eb46fe8286f", "not set", "", 1, 6, "2021-01-01", "2021-01-01", &cleaner.EmptyJSON).WillReturnError(mockedError)
+	mock.ExpectExec(insert).WithArgs(1, "00000002-0002-0002-0002-000000000002", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", 2, 5, "2021-01-01", "2021-01-01", &cleaner.EmptyJSON).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(insert).WithArgs(2, "00000003-0003-0003-0003-000000000003", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", 3, 4, "2021-01-01", "2021-01-01", &cleaner.EmptyJSON).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(insert).WithArgs(3, "00000001-0001-0001-0001-000000000001", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", 4, 3, "2021-01-01", "2021-01-01", &cleaner.EmptyJSON).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(insert).WithArgs(3, "00000002-0002-0002-0002-000000000002", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", 5, 2, "2022-01-01", "2022-01-01", &cleaner.EmptyJSON).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(insert).WithArgs(3, "00000003-0003-0003-0003-000000000003", "e6ed9bb3-efc3-46a6-b3ae-3f1a6e59546c", "not set", "", 6, 1, "2023-01-01", "2023-01-01", &cleaner.EmptyJSON).WillReturnError(mockedError)
 
 	mock.ExpectClose()
 
