@@ -554,7 +554,7 @@ func performListOfOldDVOReports(connection *sql.DB, maxAge string, writer *bufio
 // advisor_ratings table
 func performListOfOldRatings(connection *sql.DB, maxAge string) error {
 	return listOldDatabaseRecords(connection, maxAge, nil, selectOldAdvisorRatings, "List of old Advisor ratings", "ratings count",
-		func(rows *sql.Rows, writer *bufio.Writer) (int, error) {
+		func(rows *sql.Rows, _ *bufio.Writer) (int, error) {
 			// used to compute a real record age
 			now := time.Now()
 
@@ -606,7 +606,7 @@ func performListOfOldRatings(connection *sql.DB, maxAge string) error {
 // consumer_errors table
 func performListOfOldConsumerErrors(connection *sql.DB, maxAge string) error {
 	return listOldDatabaseRecords(connection, maxAge, nil, selectOldConsumerErrors, "List of old consumer errors", "errors count",
-		func(rows *sql.Rows, writer *bufio.Writer) (int, error) {
+		func(rows *sql.Rows, _ *bufio.Writer) (int, error) {
 			// used to compute a real record age
 			now := time.Now()
 
