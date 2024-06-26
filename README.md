@@ -463,6 +463,7 @@ Actually cleaning the data for given cluster:
  objects          | integer                     | not null
  reported_at      | timestamp without time zone |
  last_checked_at  | timestamp without time zone |
+ rule_hits_count  | jsonb                       |
 Indexes:
     "report_pkey" PRIMARY KEY, btree (org_id, cluster_id, namespace_id)
 ```
