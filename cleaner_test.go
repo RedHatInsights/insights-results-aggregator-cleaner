@@ -21,6 +21,7 @@ package main_test
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -1039,32 +1040,52 @@ func TestCleanupCheckSummaryTableContent(t *testing.T) {
 // TestCleanupAll check the function cleanupAll when
 // summary table should not be printed
 func TestCleanupAll(t *testing.T) {
-	// prepare new mocked connection to database
-	connection, _, err := sqlmock.New()
-	assert.NoError(t, err, "error creating SQL mock")
+	for _, schema := range []string{main.DBSchemaOCPRecommendations, main.DBSchemaDVORecommendations} {
+		t.Run(fmt.Sprintf("Schema: %s", schema), func(t *testing.T) {
 
-	// stub for structures needed to call the tested function
-	configuration := main.ConfigStruct{}
+			// prepare new mocked connection to database
+			connection, mock, err := sqlmock.New()
+			assert.NoError(t, err, "error creating SQL mock")
 
-	configuration.Cleaner = main.CleanerConfiguration{
-		MaxAge: "3 days",
+			// stub for structures needed to call the tested function
+			configuration := main.ConfigStruct{}
+
+			configuration.Cleaner = main.CleanerConfiguration{
+				MaxAge: "3 days",
+			}
+			configuration.Storage.Schema = schema
+
+			cliFlags := main.CliFlags{
+				ShowVersion:       false,
+				ShowAuthors:       false,
+				ShowConfiguration: false,
+				PrintSummaryTable: false,
+			}
+
+			var tables []main.TableAndDeleteStatement
+			switch configuration.Storage.Schema {
+			case main.DBSchemaOCPRecommendations:
+				tables = main.TablesToDeleteOCP
+			case main.DBSchemaDVORecommendations:
+				tables = main.TablesToDeleteDVO
+			}
+
+			for range tables {
+				mock.ExpectExec("DELETE*").WithArgs(configuration.Cleaner.MaxAge).
+					WillReturnResult(sqlmock.NewResult(1, 2))
+			}
+			mock.ExpectClose()
+
+			// call the tested function
+			status, err := main.CleanupAll(&configuration, connection, cliFlags, schema)
+
+			// error is not expected
+			assert.NoError(t, err, "error is not expected while calling main.cleanupAll")
+
+			// check the status
+			assert.Equal(t, status, main.ExitStatusOK)
+		})
 	}
-
-	cliFlags := main.CliFlags{
-		ShowVersion:       false,
-		ShowAuthors:       false,
-		ShowConfiguration: false,
-		PrintSummaryTable: false,
-	}
-
-	// call the tested function
-	status, err := main.CleanupAll(&configuration, connection, cliFlags, main.DBSchemaOCPRecommendations)
-
-	// error is not expected
-	assert.NoError(t, err, "error is not expected while calling main.cleanupAll")
-
-	// check the status
-	assert.Equal(t, status, main.ExitStatusOK)
 }
 
 // TestCleanupAllMissingMaxAge check the function cleanup fails if no MaxAge

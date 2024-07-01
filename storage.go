@@ -872,6 +872,7 @@ func performCleanupAllInDB(connection *sql.DB, schema, maxAge string, dryRun boo
 				Err(err).
 				Str(tableName, tableAndDeleteStatement.TableName).
 				Msg("Unable to delete records")
+			return deletionsForTable, err
 		} else {
 			log.Info().
 				Int(affectedMsg, affected).
