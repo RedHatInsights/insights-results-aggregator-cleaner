@@ -1042,7 +1042,6 @@ func TestCleanupCheckSummaryTableContent(t *testing.T) {
 func TestCleanupAll(t *testing.T) {
 	for _, schema := range []string{main.DBSchemaOCPRecommendations, main.DBSchemaDVORecommendations} {
 		t.Run(fmt.Sprintf("Schema: %s", schema), func(t *testing.T) {
-
 			// prepare new mocked connection to database
 			connection, mock, err := sqlmock.New()
 			assert.NoError(t, err, "error creating SQL mock")

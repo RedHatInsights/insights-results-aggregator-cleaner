@@ -873,14 +873,13 @@ func performCleanupAllInDB(connection *sql.DB, schema, maxAge string, dryRun boo
 				Str(tableName, tableAndDeleteStatement.TableName).
 				Msg("Unable to delete records")
 			return deletionsForTable, err
-		} else {
-			log.Info().
-				Int(affectedMsg, affected).
-				Str(tableName, tableAndDeleteStatement.TableName).
-				Bool("Dry run", dryRun).
-				Msg("Delete records")
-			deletionsForTable[tableAndDeleteStatement.TableName] = affected
 		}
+		log.Info().
+			Int(affectedMsg, affected).
+			Str(tableName, tableAndDeleteStatement.TableName).
+			Bool("Dry run", dryRun).
+			Msg("Delete records")
+		deletionsForTable[tableAndDeleteStatement.TableName] = affected
 	}
 	log.Info().Msg("Cleanup-all finished")
 	return deletionsForTable, nil
