@@ -2146,17 +2146,16 @@ func TestPerformCleanupAllInDBOnDeleteError(t *testing.T) {
 				tables = cleaner.TablesToDeleteDVO
 			}
 
-			for _, tableAndDeleteStatement := range tables {
-				stmt := regexp.QuoteMeta(tableAndDeleteStatement.DeleteStatement)
-				mock.ExpectExec(stmt).WithArgs(maxAge).WillReturnError(mockedError)
-				expectedResult[tableAndDeleteStatement.TableName] = 0
-			}
+			// just the first table query is expected as it will return an error
+			tableAndDeleteStatement := tables[0]
+			stmt := regexp.QuoteMeta(tableAndDeleteStatement.DeleteStatement)
+			mock.ExpectExec(stmt).WithArgs(maxAge).WillReturnError(mockedError)
+			expectedResult[tableAndDeleteStatement.TableName] = 0
 
 			mock.ExpectClose()
 
 			deletedRows, err := cleaner.PerformCleanupAllInDB(connection, schema, maxAge, false)
-			assert.NoError(t, err, "error not expected while calling tested function")
-			// There is no error because the cleaner just does log.Error, not exit
+			assert.Error(t, err, "error expected while calling tested function")
 
 			// check tables have correct number of deleted rows for each table
 			for tableName, deletedRowCount := range deletedRows {
