@@ -47,13 +47,6 @@ objects:
             - ./insights-results-aggregator-cleaner
             - -dry-run=${DRY_RUN}
             - -cleanup-all=${CLEANUP_ALL}
-          resources:
-            limits:
-              cpu: ${CPU_LIMIT}
-              memory: ${MEMORY_LIMIT}
-            requests:
-              cpu: ${CPU_REQUEST}
-              memory: ${MEMORY_REQUEST}
     database:
       sharedDbAppName: ccx-insights-results
 
