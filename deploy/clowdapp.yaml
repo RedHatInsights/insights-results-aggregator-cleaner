@@ -43,6 +43,7 @@ objects:
               value: "${LOG_LEVEL}"
             - name: INSIGHTS_RESULTS_CLEANER__CLEANER__MAX_AGE
               value: "${MAX_AGE}"
+          command: ./insights-results-aggregator-cleaner ${CLEANER_ARGS}
           resources:
             limits:
               cpu: ${CPU_LIMIT}
@@ -101,3 +102,6 @@ parameters:
 - name: MAX_AGE
   description: Maximum age allowed to be kept in the database
   value: "90 days"
+- name: CLEANER_ARGS
+  description: Command line arguments passed directly to the aggregator cleaner
+  value: "-dry-run -cleanup-all"
