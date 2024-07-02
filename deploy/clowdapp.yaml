@@ -45,8 +45,8 @@ objects:
               value: "${MAX_AGE}"
           command:
             - ./insights-results-aggregator-cleaner
-            - "-dry-run=${DRY_RUN}"
-            - "-cleanup-all=${CLEANUP_ALL}"
+            - -dry-run=${DRY_RUN}
+            - -cleanup-all=${CLEANUP_ALL}
           resources:
             limits:
               cpu: ${CPU_LIMIT}
@@ -107,7 +107,7 @@ parameters:
   value: "90 days"
 - name: DRY_RUN
   description: If true (default), the expected actions will be printed, but not executed into the database
-  value: true
+  value: "true"
 - name: CLEANUP_ALL
   description: If true (default), the program will be executed with the -cleanup-all argument, cleaning the database from old clusters
-  value: true
+  value: "true"
