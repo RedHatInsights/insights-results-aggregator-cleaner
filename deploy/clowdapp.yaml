@@ -45,8 +45,8 @@ objects:
               value: "${MAX_AGE}"
           command:
             - ./insights-results-aggregator-cleaner
-            - -dry-run=${DRY_RUN}
-            - -cleanup-all=${CLEANUP_ALL}
+            - "-dry-run=${DRY_RUN}"
+            - "-cleanup-all=${CLEANUP_ALL}"
           resources:
             limits:
               cpu: ${CPU_LIMIT}
