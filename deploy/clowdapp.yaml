@@ -42,7 +42,7 @@ objects:
             - name: INSIGHTS_RESULTS_CLEANER__LOGGING__LOG_DEVEL
               value: "${LOG_LEVEL}"
             - name: INSIGHTS_RESULTS_CLEANER__CLEANER__MAX_AGE
-              value: "90 days"
+              value: "${MAX_AGE}"
           resources:
             limits:
               cpu: ${CPU_LIMIT}
@@ -98,3 +98,6 @@ parameters:
   value: "600"
 - name: PG_PARAMS
   value: sslmode=require
+- name: MAX_AGE
+  description: Maximum age allowed to be kept in the database
+  value: "90 days"
