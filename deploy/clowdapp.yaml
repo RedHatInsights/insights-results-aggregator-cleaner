@@ -43,7 +43,10 @@ objects:
               value: "${LOG_LEVEL}"
             - name: INSIGHTS_RESULTS_CLEANER__CLEANER__MAX_AGE
               value: "${MAX_AGE}"
-          command: ./insights-results-aggregator-cleaner ${CLEANER_ARGS}
+          command:
+            - ./insights-results-aggregator-cleaner
+            - -dry-run=${DRY_RUN}"
+            - -cleanup-all=${CLEANUP_ALL}
           resources:
             limits:
               cpu: ${CPU_LIMIT}
@@ -102,6 +105,9 @@ parameters:
 - name: MAX_AGE
   description: Maximum age allowed to be kept in the database
   value: "90 days"
-- name: CLEANER_ARGS
-  description: Command line arguments passed directly to the aggregator cleaner
-  value: "-dry-run -cleanup-all"
+- name: DRY_RUN
+  description: If true (default), the expected actions will be printed, but not executed into the database
+  value: true
+- name: CLEANUP_ALL
+  description: If true (default), the program will be executed with the -cleanup-all argument, cleaning the database from old clusters
+  value: true
