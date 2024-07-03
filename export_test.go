@@ -67,5 +67,6 @@ var (
 	MaxAgeMissing     = maxAgeMissing
 	TablesToDeleteOCP = tablesToDeleteOCP
 	TablesToDeleteDVO = tablesToDeleteDVO
+	AllTablesToDelete = allTablesToDelete
 	EmptyJSON         = emptyJSON
 )
