@@ -680,16 +680,16 @@ func deleteRecordFromTable(connection *sql.DB, table, key string, clusterName Cl
 
 var tablesToDeleteOCP = []TableAndDeleteStatement{
 	{
+		TableName:       "rule_hit",
+		DeleteStatement: deleteOldOCPRuleHits,
+	},
+	{
 		TableName:       "report",
 		DeleteStatement: deleteOldOCPReports,
 	},
 	{
 		TableName:       "consumer_error",
 		DeleteStatement: deleteOldConsumerErrors,
-	},
-	{
-		TableName:       "rule_hit",
-		DeleteStatement: deleteOldOCPRuleHits,
 	},
 	{
 		TableName:       "recommendation",
