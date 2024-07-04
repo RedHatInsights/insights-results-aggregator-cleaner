@@ -115,12 +115,6 @@ const (
 			FROM report
 			WHERE reported_at < NOW() - $1::INTERVAL)`
 
-	deleteOrphanOCPRuleHits = `
-		DELETE FROM rule_hit
-		 WHERE (cluster_id, org_id) NOT IN (
-			SELECT cluster, org_id
-			FROM report)`
-
 	deleteOldOCPRecommendation = `
 		DELETE FROM recommendation
 		 WHERE created_at < NOW() - $1::INTERVAL`
@@ -688,10 +682,6 @@ var tablesToDeleteOCP = []TableAndDeleteStatement{
 	{
 		TableName:       "rule_hit",
 		DeleteStatement: deleteOldOCPRuleHits,
-	},
-	{
-		TableName:       "rule_hit",
-		DeleteStatement: deleteOrphanOCPRuleHits,
 	},
 	{
 		TableName:       "report",
