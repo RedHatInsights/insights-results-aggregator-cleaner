@@ -678,31 +678,34 @@ func deleteRecordFromTable(connection *sql.DB, table, key string, clusterName Cl
 	return int(affected), nil
 }
 
-var tablesToDeleteOCP = []TableAndDeleteStatement{
-	{
-		TableName:       "rule_hit",
-		DeleteStatement: deleteOldOCPRuleHits,
-	},
-	{
-		TableName:       "report",
-		DeleteStatement: deleteOldOCPReports,
-	},
-	{
-		TableName:       "consumer_error",
-		DeleteStatement: deleteOldConsumerErrors,
-	},
-	{
-		TableName:       "recommendation",
-		DeleteStatement: deleteOldOCPRecommendation,
-	},
-}
+var (
+	tablesToDeleteOCP = []TableAndDeleteStatement{
+		{
+			TableName:       "rule_hit",
+			DeleteStatement: deleteOldOCPRuleHits,
+		},
+		{
+			TableName:       "report",
+			DeleteStatement: deleteOldOCPReports,
+		},
+		{
+			TableName:       "consumer_error",
+			DeleteStatement: deleteOldConsumerErrors,
+		},
+		{
+			TableName:       "recommendation",
+			DeleteStatement: deleteOldOCPRecommendation,
+		},
+	}
 
-var tablesToDeleteDVO = []TableAndDeleteStatement{
-	{
-		TableName:       "dvo.dvo_report",
-		DeleteStatement: deleteOldDVOReports,
-	},
-}
+	tablesToDeleteDVO = []TableAndDeleteStatement{
+		{
+			TableName:       "dvo.dvo_report",
+			DeleteStatement: deleteOldDVOReports,
+		},
+	}
+	allTablesToDelete = append(tablesToDeleteOCP, tablesToDeleteDVO...)
+)
 
 // deleteOldRecordsFromTable function deletes old records from database
 // each delete query must have just one parameter that will be populated with
@@ -837,7 +840,7 @@ func performCleanupInDB(connection *sql.DB,
 }
 
 // performCleanupAllInDB function cleans up all data for all cluster names
-func performCleanupAllInDB(connection *sql.DB, schema, maxAge string, dryRun bool) (
+func performCleanupAllInDB(connection *sql.DB, maxAge string, dryRun bool) (
 	map[string]int, error) {
 	deletionsForTable := make(map[string]int)
 	if maxAge == "" {
@@ -850,19 +853,9 @@ func performCleanupAllInDB(connection *sql.DB, schema, maxAge string, dryRun boo
 		return deletionsForTable, errors.New(connectionNotEstablished)
 	}
 
-	var tablesAndDeleteStatements []TableAndDeleteStatement
-	switch schema {
-	case DBSchemaOCPRecommendations:
-		tablesAndDeleteStatements = tablesToDeleteOCP
-	case DBSchemaDVORecommendations:
-		tablesAndDeleteStatements = tablesToDeleteDVO
-	default:
-		return deletionsForTable, fmt.Errorf(invalidSchemaMsg, schema)
-	}
-
 	// perform cleanup for selected cluster names
 	log.Info().Msg("Cleanup-all started")
-	for _, tableAndDeleteStatement := range tablesAndDeleteStatements {
+	for _, tableAndDeleteStatement := range allTablesToDelete {
 		// try to delete record from selected table
 		affected, err := deleteOldRecordsFromTable(connection,
 			tableAndDeleteStatement.DeleteStatement,

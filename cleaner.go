@@ -302,8 +302,8 @@ func cleanup(configuration *ConfigStruct, connection *sql.DB, cliFlags CliFlags,
 }
 
 // cleanup function starts the cleanup-all operation
-func cleanupAll(configuration *ConfigStruct, connection *sql.DB, cliFlags CliFlags, schema string) (int, error) {
-	deletionsForTable, err := performCleanupAllInDB(connection, schema, configuration.Cleaner.MaxAge, cliFlags.DryRun)
+func cleanupAll(configuration *ConfigStruct, connection *sql.DB, cliFlags CliFlags) (int, error) {
+	deletionsForTable, err := performCleanupAllInDB(connection, configuration.Cleaner.MaxAge, cliFlags.DryRun)
 	if err != nil {
 		log.Err(err).Msg("Performing cleanup-all")
 		return ExitStatusPerformCleanupError, err
@@ -379,7 +379,7 @@ func doSelectedOperation(configuration *ConfigStruct, connection *sql.DB, cliFla
 	case cliFlags.VacuumDatabase:
 		return vacuumDB(connection)
 	case cliFlags.PerformCleanupAll:
-		return cleanupAll(configuration, connection, cliFlags, configuration.Storage.Schema)
+		return cleanupAll(configuration, connection, cliFlags)
 	case cliFlags.PerformCleanup:
 		return cleanup(configuration, connection, cliFlags, configuration.Storage.Schema)
 	case cliFlags.DetectMultipleRuleDisable:
