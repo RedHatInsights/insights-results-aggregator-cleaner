@@ -62,9 +62,6 @@ const (
 	maxAgeMissing                     = "max-age parameter is missing"
 	invalidSchemaMsg                  = "Invalid DB schema to be cleaned up: '%s'"
 	affectedMsg                       = "Affected"
-	dryRunMsg                         = "Dry run"
-	unableToDeleteRecords             = "Unable to delete records"
-	recordsDeletedMsg                 = "Delete records"
 )
 
 // Other messages
@@ -116,13 +113,11 @@ const (
 		 WHERE (cluster_id, org_id) IN (
 			SELECT cluster, org_id
 			FROM report
-			WHERE reported_at < NOW() - $1::INTERVAL)`
-
-	deleteOrphanOCPRuleHits = `
-		DELETE FROM rule_hit
-		 WHERE (cluster_id, org_id) NOT IN (
-			SELECT cluster, org_id
-			FROM report)`
+			WHERE reported_at < NOW() - $1::INTERVAL)
+		 OR (cluster_id, org_id) NOT IN (
+		    SELECT cluster, org_id
+			FROM report
+		 )`
 
 	deleteOldOCPRecommendation = `
 		DELETE FROM recommendation
@@ -716,18 +711,13 @@ var (
 	allTablesToDelete = append(tablesToDeleteOCP, tablesToDeleteDVO...)
 )
 
-var tablesToDeleteOrphanOCP = []TableAndDeleteStatement{
-	{
-		TableName:       "rule_hit",
-		DeleteStatement: deleteOrphanOCPRuleHits,
-	},
-}
-
 // deleteOldRecordsFromTable function deletes old records from database
 // each delete query must have just one parameter that will be populated with
 // the maxAge value
 func deleteOldRecordsFromTable(connection *sql.DB, sqlStatement, maxAge string, dryRun bool) (int, error) {
-	sqlStatement = dryRunQuerySelector(sqlStatement, dryRun)
+	if dryRun {
+		sqlStatement = strings.Replace(sqlStatement, "DELETE", "SELECT", -1)
+	}
 	result, err := connection.Exec(sqlStatement, maxAge)
 	if err != nil {
 		return 0, err
@@ -739,31 +729,6 @@ func deleteOldRecordsFromTable(connection *sql.DB, sqlStatement, maxAge string, 
 		return 0, err
 	}
 	return int(affected), nil
-}
-
-// deleteOrphanRecordsFromTable function deletes old records from database
-func deleteOrphanRecordsFromTable(connection *sql.DB, sqlStatement string, dryRun bool) (int, error) {
-	sqlStatement = dryRunQuerySelector(sqlStatement, dryRun)
-	result, err := connection.Exec(sqlStatement)
-	if err != nil {
-		return 0, err
-	}
-
-	// read number of affected (deleted) rows
-	affected, err := result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
-	return int(affected), nil
-}
-
-// dryRunQuerySelector function switches between DELETE and SELECT if needed when dry_run is true
-func dryRunQuerySelector(sqlStatement string, dryRun bool) string {
-	if dryRun {
-		sqlStatement = strings.Replace(sqlStatement, "DELETE", "SELECT", -1)
-	}
-
-	return sqlStatement
 }
 
 // tablesAndKeysInOCPDatabase contains list of all tables together with keys used to select
@@ -903,35 +868,16 @@ func performCleanupAllInDB(connection *sql.DB, maxAge string, dryRun bool) (
 			log.Error().
 				Err(err).
 				Str(tableName, tableAndDeleteStatement.TableName).
-				Msg(unableToDeleteRecords)
+				Msg("Unable to delete records")
 			return deletionsForTable, err
 		}
 		log.Info().
 			Int(affectedMsg, affected).
 			Str(tableName, tableAndDeleteStatement.TableName).
-			Bool(dryRunMsg, dryRun).
-			Msg(recordsDeletedMsg)
+			Bool("Dry run", dryRun).
+			Msg("Delete records")
 		deletionsForTable[tableAndDeleteStatement.TableName] = affected
 	}
-
-	log.Info().Msg("Cleanen orphaned nodes")
-	for _, tableAndDeleteStatement := range tablesToDeleteOrphanOCP {
-		affected, err := deleteOrphanRecordsFromTable(connection, tableAndDeleteStatement.DeleteStatement, dryRun)
-		if err != nil {
-			log.Error().
-				Err(err).
-				Str(tableName, tableAndDeleteStatement.TableName).
-				Msg(unableToDeleteRecords)
-			return deletionsForTable, err
-		}
-
-		log.Info().
-			Int(affectedMsg, affected).
-			Str(tableName, tableAndDeleteStatement.TableName).
-			Bool(dryRunMsg, dryRun).
-			Msg(recordsDeletedMsg)
-	}
-
 	log.Info().Msg("Cleanup-all finished")
 	return deletionsForTable, nil
 }
