@@ -113,7 +113,11 @@ const (
 		 WHERE (cluster_id, org_id) IN (
 			SELECT cluster, org_id
 			FROM report
-			WHERE reported_at < NOW() - $1::INTERVAL)`
+			WHERE reported_at < NOW() - $1::INTERVAL)
+		 OR (cluster_id, org_id) NOT IN (
+		    SELECT cluster, org_id
+			FROM report
+		 )`
 
 	deleteOldOCPRecommendation = `
 		DELETE FROM recommendation
