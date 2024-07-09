@@ -118,10 +118,13 @@ const (
 				WHERE report.reported_at < NOW() - $1::INTERVAL OR report.cluster IS NULL
 		)
 		DELETE FROM rule_hit
-			USING to_delete
-			WHERE
-				rule_hit.cluster_id = to_delete.cluster_id
-				AND rule_hit.org_id = to_delete.org_id`
+		WHERE EXISTS (
+			SELECT 1
+			FROM to_delete
+			WHERE rule_hit.cluster_id = to_delete.cluster_id
+				AND rule_hit.org_id = to_delete.org_id
+		)`
+
 	deleteOldOCPRecommendation = `
 		DELETE FROM recommendation
 		 WHERE created_at < NOW() - $1::INTERVAL`
