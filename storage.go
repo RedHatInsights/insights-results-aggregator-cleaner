@@ -131,7 +131,7 @@ const (
 
 	deleteOldDVOReports = `
 		DELETE FROM dvo.dvo_report
-		 WHERE reported_at < NOW() - $1::INTERVAL`
+		 WHERE last_checked_at < NOW() - $1::INTERVAL`
 )
 
 // DB schemas
