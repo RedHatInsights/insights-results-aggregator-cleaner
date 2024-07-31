@@ -75,6 +75,7 @@ import (
 	"strings"
 
 	"github.com/BurntSushi/toml"
+	"github.com/RedHatInsights/insights-operator-utils/logger"
 	clowder "github.com/redhatinsights/app-common-go/pkg/api/v1"
 
 	"path/filepath"
@@ -91,9 +92,10 @@ const (
 
 // ConfigStruct is a structure holding the whole service configuration
 type ConfigStruct struct {
-	Storage StorageConfiguration `mapstructure:"storage" toml:"storage"`
-	Logging LoggingConfiguration `mapstructure:"logging" toml:"logging"`
-	Cleaner CleanerConfiguration `mapstructure:"cleaner" toml:"cleaner"`
+	Storage StorageConfiguration              `mapstructure:"storage" toml:"storage"`
+	Logging logger.LoggingConfiguration       `mapstructure:"logging" toml:"logging"`
+	Cleaner CleanerConfiguration              `mapstructure:"cleaner" toml:"cleaner"`
+	Sentry  logger.SentryLoggingConfiguration `mapstructure:"sentry" toml:"sentry"`
 }
 
 // LoggingConfiguration represents configuration for logging in general
@@ -114,6 +116,7 @@ type LoggingConfiguration struct {
 	// LoggingToCloudWatchEnabled enables logging to CloudWatch
 	// (configuration for CloudWatch is in CloudWatchConfiguration)
 	LoggingToCloudWatchEnabled bool `mapstructure:"logging_to_cloud_watch_enabled" toml:"logging_to_cloud_watch_enabled"`
+	LoggingToSentryEnabled     bool `mapstructure:"logging_to_sentry_enabled" toml:"logging_to_sentry_enabled"`
 }
 
 // CleanerConfiguration represents configuration for the main cleaner
@@ -219,8 +222,13 @@ func GetStorageConfiguration(config *ConfigStruct) StorageConfiguration {
 }
 
 // GetLoggingConfiguration function returns logging configuration
-func GetLoggingConfiguration(config *ConfigStruct) LoggingConfiguration {
+func GetLoggingConfiguration(config *ConfigStruct) logger.LoggingConfiguration {
 	return config.Logging
+}
+
+// GetSentryConfiguration function returns sentry configuration
+func GetSentryConfiguration(config *ConfigStruct) logger.SentryLoggingConfiguration {
+	return config.Sentry
 }
 
 // GetCleanerConfiguration returns cleaner configuration

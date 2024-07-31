@@ -31,6 +31,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/tisnik/go-capture"
 
+	"github.com/RedHatInsights/insights-operator-utils/logger"
 	cleaner "github.com/RedHatInsights/insights-results-aggregator-cleaner"
 	main "github.com/RedHatInsights/insights-results-aggregator-cleaner"
 )
@@ -84,7 +85,7 @@ func TestShowConfiguration(t *testing.T) {
 		PGHost:     "baz",
 		PGDBName:   "aggregator",
 		PGParams:   ""}
-	configuration.Logging = main.LoggingConfiguration{
+	configuration.Logging = logger.LoggingConfiguration{
 		Debug:    true,
 		LogLevel: ""}
 	configuration.Cleaner = main.CleanerConfiguration{
