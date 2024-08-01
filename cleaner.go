@@ -54,6 +54,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
+	"github.com/RedHatInsights/insights-operator-utils/logger"
 	"github.com/olekukonko/tablewriter"
 )
 
@@ -429,7 +430,18 @@ func main() {
 	if config.Logging.Debug {
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}
-
+	if config.Logging.LoggingToSentryEnabled {
+		err = logger.InitZerolog(
+			config.Logging,
+			logger.CloudWatchConfiguration{},
+			config.Sentry,
+			logger.KafkaZerologConfiguration{},
+		)
+		if err != nil {
+			log.Error().Err(err).Msg("Unable to init ZeroLog")
+		}
+	}
+	log.Error().Msg("TEST CLEANER ERROR")
 	log.Debug().Msg("Started")
 
 	// override default value read from configuration file

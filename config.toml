@@ -11,6 +11,11 @@ schema = "ocp_recommendations"
 [logging]
 debug = true
 log_level = ""
+logging_to_sentry_enabled = true
+
+[sentry]
+dsn = ""
+environment = "dev"
 
 [cleaner]
 max_age = "90 days"
