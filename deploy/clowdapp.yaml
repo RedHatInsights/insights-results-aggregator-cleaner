@@ -116,4 +116,4 @@ parameters:
   description: If true (default), the program will be executed with the -cleanup-all argument, cleaning the database from old clusters
   value: "true"
 - name: SENTRY_ENABLED
-  value: "false"
+  value: "true"
