@@ -71,6 +71,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"github.com/RedHatInsights/insights-operator-utils/logger"
 	"os"
 	"strings"
 
@@ -91,9 +92,10 @@ const (
 
 // ConfigStruct is a structure holding the whole service configuration
 type ConfigStruct struct {
-	Storage StorageConfiguration `mapstructure:"storage" toml:"storage"`
-	Logging LoggingConfiguration `mapstructure:"logging" toml:"logging"`
-	Cleaner CleanerConfiguration `mapstructure:"cleaner" toml:"cleaner"`
+	Storage StorageConfiguration              `mapstructure:"storage" toml:"storage"`
+	Logging logger.LoggingConfiguration       `mapstructure:"logging" toml:"logging"`
+	Cleaner CleanerConfiguration              `mapstructure:"cleaner" toml:"cleaner"`
+	Sentry  logger.SentryLoggingConfiguration `mapstructure:"sentry" toml:"sentry"`
 }
 
 // LoggingConfiguration represents configuration for logging in general
@@ -219,13 +221,18 @@ func GetStorageConfiguration(config *ConfigStruct) StorageConfiguration {
 }
 
 // GetLoggingConfiguration function returns logging configuration
-func GetLoggingConfiguration(config *ConfigStruct) LoggingConfiguration {
+func GetLoggingConfiguration(config *ConfigStruct) logger.LoggingConfiguration {
 	return config.Logging
 }
 
 // GetCleanerConfiguration returns cleaner configuration
 func GetCleanerConfiguration(config *ConfigStruct) CleanerConfiguration {
 	return config.Cleaner
+}
+
+// GetSentryConfiguration runction returns sentry configuration
+func GetSentryConfiguration(config *ConfigStruct) logger.SentryLoggingConfiguration {
+	return config.Sentry
 }
 
 // updateConfigFromClowder function updates the current config with the values

@@ -43,6 +43,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/RedHatInsights/insights-operator-utils/logger"
 	"os"
 	"strconv"
 	"strings"
@@ -51,7 +52,6 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
 	"github.com/olekukonko/tablewriter"
@@ -425,13 +425,17 @@ func main() {
 		log.Err(err).Msg("Check configuration")
 		return
 	}
-
-	if config.Logging.Debug {
-		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	err = logger.InitZerolog(
+		GetLoggingConfiguration(&config),
+		logger.CloudWatchConfiguration{},
+		GetSentryConfiguration(&config),
+		logger.KafkaZerologConfiguration{},
+	)
+	if err != nil {
+		panic(err)
 	}
-
 	log.Debug().Msg("Started")
-
+	log.Error().Msg("test error for aggregator cleaner")
 	// override default value read from configuration file
 	if cliFlags.MaxAge != "" {
 		config.Cleaner.MaxAge = cliFlags.MaxAge
@@ -442,7 +446,6 @@ func main() {
 	if err != nil {
 		log.Err(err).Msg("Connection to database not established")
 	}
-
 	// perform selected operation
 	exitStatus, err := doSelectedOperation(&config, connection, cliFlags)
 	if err != nil {
