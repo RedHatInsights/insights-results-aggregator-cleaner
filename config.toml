@@ -11,7 +11,12 @@ schema = "ocp_recommendations"
 [logging]
 debug = true
 log_level = ""
+logging_to_sentry_enabled = false
 
 [cleaner]
 max_age = "90 days"
 cluster_list_file = "cluster_list.txt"
+
+[sentry]
+dsn = ""
+environment = "dev"

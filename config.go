@@ -72,13 +72,12 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/BurntSushi/toml"
+	"github.com/RedHatInsights/insights-operator-utils/logger"
 	clowder "github.com/redhatinsights/app-common-go/pkg/api/v1"
-
-	"path/filepath"
-
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 )
@@ -91,29 +90,10 @@ const (
 
 // ConfigStruct is a structure holding the whole service configuration
 type ConfigStruct struct {
-	Storage StorageConfiguration `mapstructure:"storage" toml:"storage"`
-	Logging LoggingConfiguration `mapstructure:"logging" toml:"logging"`
-	Cleaner CleanerConfiguration `mapstructure:"cleaner" toml:"cleaner"`
-}
-
-// LoggingConfiguration represents configuration for logging in general
-type LoggingConfiguration struct {
-	// Debug enables pretty colored logging
-	Debug bool `mapstructure:"debug" toml:"debug"`
-
-	// LogLevel sets logging level to show. Possible values are:
-	// "debug"
-	// "info"
-	// "warn", "warning"
-	// "error"
-	// "fatal"
-	//
-	// logging level won't be changed if value is not one of listed above
-	LogLevel string `mapstructure:"log_level" toml:"log_level"`
-
-	// LoggingToCloudWatchEnabled enables logging to CloudWatch
-	// (configuration for CloudWatch is in CloudWatchConfiguration)
-	LoggingToCloudWatchEnabled bool `mapstructure:"logging_to_cloud_watch_enabled" toml:"logging_to_cloud_watch_enabled"`
+	Storage StorageConfiguration              `mapstructure:"storage" toml:"storage"`
+	Logging logger.LoggingConfiguration       `mapstructure:"logging" toml:"logging"`
+	Cleaner CleanerConfiguration              `mapstructure:"cleaner" toml:"cleaner"`
+	Sentry  logger.SentryLoggingConfiguration `mapstructure:"sentry" toml:"sentry"`
 }
 
 // CleanerConfiguration represents configuration for the main cleaner
@@ -209,7 +189,6 @@ func LoadConfiguration(configFileEnvVariableName, defaultConfigFile string) (Con
 		fmt.Println("Error loading clowder configuration")
 		return config, err
 	}
-
 	return config, err
 }
 
@@ -219,8 +198,13 @@ func GetStorageConfiguration(config *ConfigStruct) StorageConfiguration {
 }
 
 // GetLoggingConfiguration function returns logging configuration
-func GetLoggingConfiguration(config *ConfigStruct) LoggingConfiguration {
+func GetLoggingConfiguration(config *ConfigStruct) logger.LoggingConfiguration {
 	return config.Logging
+}
+
+// GetSentryConfiguration function returns sentry configuration
+func GetSentryConfiguration(config *ConfigStruct) logger.SentryLoggingConfiguration {
+	return config.Sentry
 }
 
 // GetCleanerConfiguration returns cleaner configuration
