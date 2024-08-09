@@ -72,14 +72,12 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/BurntSushi/toml"
+	"github.com/RedHatInsights/insights-operator-utils/logger"
 	clowder "github.com/redhatinsights/app-common-go/pkg/api/v1"
-
-	"path/filepath"
-
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 )
 
@@ -91,9 +89,10 @@ const (
 
 // ConfigStruct is a structure holding the whole service configuration
 type ConfigStruct struct {
-	Storage StorageConfiguration `mapstructure:"storage" toml:"storage"`
-	Logging LoggingConfiguration `mapstructure:"logging" toml:"logging"`
-	Cleaner CleanerConfiguration `mapstructure:"cleaner" toml:"cleaner"`
+	Storage StorageConfiguration              `mapstructure:"storage" toml:"storage"`
+	Logging logger.LoggingConfiguration       `mapstructure:"logging" toml:"logging"`
+	Cleaner CleanerConfiguration              `mapstructure:"cleaner" toml:"cleaner"`
+	Sentry  logger.SentryLoggingConfiguration `mapstructure:"sentry" toml:"sentry"`
 }
 
 // LoggingConfiguration represents configuration for logging in general
@@ -145,7 +144,6 @@ func LoadConfiguration(configFileEnvVariableName, defaultConfigFile string) (Con
 	// env. variable holding name of configuration file
 	configFile, specified := os.LookupEnv(configFileEnvVariableName)
 	if specified {
-		log.Info().Str(filenameAttribute, configFile).Msg(parsingConfigurationFileMessage)
 		// we need to separate the directory name and filename without
 		// extension
 		directory, basename := filepath.Split(configFile)
@@ -154,7 +152,6 @@ func LoadConfiguration(configFileEnvVariableName, defaultConfigFile string) (Con
 		viper.SetConfigName(file)
 		viper.AddConfigPath(directory)
 	} else {
-		log.Info().Str(filenameAttribute, defaultConfigFile).Msg(parsingConfigurationFileMessage)
 		// parse the configuration
 		viper.SetConfigName(defaultConfigFile)
 		viper.AddConfigPath(".")
@@ -207,9 +204,15 @@ func LoadConfiguration(configFileEnvVariableName, defaultConfigFile string) (Con
 	// updated configuration by introducing Clowder-related things
 	if err := updateConfigFromClowder(&config); err != nil {
 		fmt.Println("Error loading clowder configuration")
+		if err != nil {
+			panic(err)
+		}
 		return config, err
 	}
 
+	if err != nil {
+		panic(err)
+	}
 	return config, err
 }
 
@@ -219,8 +222,13 @@ func GetStorageConfiguration(config *ConfigStruct) StorageConfiguration {
 }
 
 // GetLoggingConfiguration function returns logging configuration
-func GetLoggingConfiguration(config *ConfigStruct) LoggingConfiguration {
+func GetLoggingConfiguration(config *ConfigStruct) logger.LoggingConfiguration {
 	return config.Logging
+}
+
+// GetSentryConfiguration function returns sentry configuration
+func GetSentryConfiguration(config *ConfigStruct) logger.SentryLoggingConfiguration {
+	return config.Sentry
 }
 
 // GetCleanerConfiguration returns cleaner configuration

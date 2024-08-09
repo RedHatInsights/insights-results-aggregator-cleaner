@@ -40,6 +40,7 @@ package main
 
 import (
 	"bufio"
+	"database/sql"
 	"errors"
 	"flag"
 	"fmt"
@@ -47,14 +48,10 @@ import (
 	"strconv"
 	"strings"
 
-	"database/sql"
-
+	"github.com/RedHatInsights/insights-operator-utils/logger"
 	"github.com/google/uuid"
-
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
-
 	"github.com/olekukonko/tablewriter"
+	"github.com/rs/zerolog/log"
 )
 
 // Messages
@@ -419,17 +416,21 @@ func main() {
 	if err != nil {
 		log.Err(err).Msg("Load configuration")
 	}
-
 	err = CheckConfiguration(&config)
 	if err != nil {
 		log.Err(err).Msg("Check configuration")
 		return
 	}
-
-	if config.Logging.Debug {
-		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	err = logger.InitZerolog(
+		GetLoggingConfiguration(&config),
+		logger.CloudWatchConfiguration{},
+		GetSentryConfiguration(&config),
+		logger.KafkaZerologConfiguration{},
+	)
+	if err != nil {
+		panic(err)
 	}
-
+	log.Error().Msg("TEST ERROR FOR CLEANER")
 	log.Debug().Msg("Started")
 
 	// override default value read from configuration file

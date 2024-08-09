@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/RedHatInsights/insights-operator-utils/logger"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
@@ -84,7 +85,7 @@ func TestShowConfiguration(t *testing.T) {
 		PGHost:     "baz",
 		PGDBName:   "aggregator",
 		PGParams:   ""}
-	configuration.Logging = main.LoggingConfiguration{
+	configuration.Logging = logger.LoggingConfiguration{
 		Debug:    true,
 		LogLevel: ""}
 	configuration.Cleaner = main.CleanerConfiguration{
