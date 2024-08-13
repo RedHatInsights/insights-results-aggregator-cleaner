@@ -40,21 +40,17 @@ package main
 
 import (
 	"bufio"
+	"database/sql"
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/RedHatInsights/insights-operator-utils/logger"
+	"github.com/google/uuid"
+	"github.com/olekukonko/tablewriter"
+	"github.com/rs/zerolog/log"
 	"os"
 	"strconv"
 	"strings"
-
-	"database/sql"
-
-	"github.com/google/uuid"
-
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
-
-	"github.com/olekukonko/tablewriter"
 )
 
 // Messages
@@ -393,6 +389,7 @@ func doSelectedOperation(configuration *ConfigStruct, connection *sql.DB, cliFla
 }
 
 func main() {
+
 	// command line flags
 	var cliFlags CliFlags
 
@@ -419,24 +416,25 @@ func main() {
 	if err != nil {
 		log.Err(err).Msg("Load configuration")
 	}
-
 	err = CheckConfiguration(&config)
 	if err != nil {
 		log.Err(err).Msg("Check configuration")
 		return
 	}
-
-	if config.Logging.Debug {
-		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	err = logger.InitZerolog(
+		GetLoggingConfiguration(&config),
+		logger.CloudWatchConfiguration{},
+		GetSentryConfiguration(&config),
+		logger.KafkaZerologConfiguration{},
+	)
+	if err != nil {
+		panic(err)
 	}
-
 	log.Debug().Msg("Started")
-
 	// override default value read from configuration file
 	if cliFlags.MaxAge != "" {
 		config.Cleaner.MaxAge = cliFlags.MaxAge
 	}
-
 	// initialize connection to database
 	connection, err := initDatabaseConnection(&config.Storage)
 	if err != nil {
@@ -447,11 +445,13 @@ func main() {
 	exitStatus, err := doSelectedOperation(&config, connection, cliFlags)
 	if err != nil {
 		log.Err(err).Msg("Operation failed")
+		logger.CloseZerolog()
 		os.Exit(exitStatus)
 		return
 	}
-
 	// finito
+
 	log.Debug().Msg("Finished")
+	logger.CloseZerolog()
 	os.Exit(ExitStatusOK)
 }
