@@ -4,10 +4,8 @@ github.com/DATA-DOG/go-sqlmock v1.5.2 h1:OcvFkGmslmlZibjAjaHm3L//6LiuBgolP7Oputl
 github.com/DATA-DOG/go-sqlmock v1.5.2/go.mod h1:88MAG/4G7SMwSE3CeA0ZKzrT5CiOU3OJ+JlNzwDqpNU=
 github.com/RedHatInsights/cloudwatch v0.0.0-20210111105023-1df2bdfe3291 h1:f2RIq2LvG0Nz7TrPYr8clzUPXIEf+Q3oDoCfAHym4/I=
 github.com/RedHatInsights/cloudwatch v0.0.0-20210111105023-1df2bdfe3291/go.mod h1:8l+HqU8iWM6hA9kSAHgY3ItSlpEsPr8fb2R0GBp9S0U=
-github.com/RedHatInsights/insights-operator-utils v1.25.5 h1:xyk4UAolH6vAzd+D6zKf6CoyDYsN4lx603qQhGXIxxA=
-github.com/RedHatInsights/insights-operator-utils v1.25.5/go.mod h1:T9tCuJUXLThmmcg9sLkj+/ZMExsj7RFTmfyyHiHBCjQ=
-github.com/RedHatInsights/insights-operator-utils v1.25.6 h1:r82W8JGO1UUVYwoS8Uy61ok/lO/iN2ljw55S/Rr4igY=
-github.com/RedHatInsights/insights-operator-utils v1.25.6/go.mod h1:T9tCuJUXLThmmcg9sLkj+/ZMExsj7RFTmfyyHiHBCjQ=
+github.com/RedHatInsights/insights-operator-utils v1.25.7 h1:zSVkRS9PQh3uxsKic9lI5k4tU8oWkCp9u1eVocXJ/7s=
+github.com/RedHatInsights/insights-operator-utils v1.25.7/go.mod h1:T9tCuJUXLThmmcg9sLkj+/ZMExsj7RFTmfyyHiHBCjQ=
 github.com/RedHatInsights/insights-results-aggregator-data v1.3.9 h1:D6JtouoQs606xOIQaQVmAFi+tgw/UEv/POarE46VdEY=
 github.com/RedHatInsights/insights-results-types v1.23.4 h1:BWFxaaDRaNozhXmf1W25WnGI4qsulVACLD5PoUdWUE8=
 github.com/RedHatInsights/insights-results-types v1.23.4/go.mod h1:Cz4DzWtf860oCPtdjIRa26ZbDP++rMhCSPZvgXEuSHQ=
