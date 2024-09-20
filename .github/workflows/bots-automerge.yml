@@ -1,5 +1,5 @@
-# Set as automatically merge all the pull requests created by dependabot[bot]
-name: Dependabot auto-merge
+# Set as automatically merge all the pull requests created by dependabot[bot], red-hat-konflux[bot], InsightsDroid.
+name: Bots auto-merge
 on: pull_request
 
 # This section adds write permissions to the secrets.GITHUB_TOKEN. Default is just read
@@ -8,15 +8,13 @@ permissions:
   pull-requests: write
 
 jobs:
-  dependabot:
+  bot-automerge:
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]'
+    if: |
+      github.actor == 'red-hat-konflux[bot]' ||
+      github.actor == 'dependabot[bot]' ||
+      github.actor == 'InsightsDroid'
     steps:
-      - name: Dependabot metadata
-        id: metadata
-        uses: dependabot/fetch-metadata@v1
-        with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
       - name: Github Actions bot approves the PR
         run: gh pr review --approve "$PR_URL"
         env:
@@ -30,6 +28,11 @@ jobs:
       - name: Enable auto-merge for Dependabot PRs
         # We can filter depending on the semver major, minor, or patch updates,
         # but let's not do it for now
+        #   - name: Dependabot metadata
+        #     id: metadata
+        #     uses: dependabot/fetch-metadata@v1
+        #     with:
+        #       github-token: "${{ secrets.GITHUB_TOKEN }}"
         # if: steps.metadata.outputs.update-type == 'version-update:semver-patch'
         run: gh pr merge --auto --merge "$PR_URL"
         env:
