@@ -64,7 +64,7 @@ objects:
 parameters:
 - description: Image name
   name: IMAGE
-  value: quay.io/cloudservices/insights-results-aggregator-cleaner
+  value: quay.io/redhat-services-prod/obsint-processing-tenant/insights-results-aggregator-cleaner/insights-results-aggregator-cleaner
 - name: IMAGE_TAG
   required: true
   description: Image tag to use for apps
