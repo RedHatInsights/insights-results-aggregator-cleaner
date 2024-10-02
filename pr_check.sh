@@ -19,6 +19,9 @@ export IQE_TEST_IMPORTANCE=""
 export IQE_CJI_TIMEOUT="30m"
 export IQE_ENV="ephemeral"
 export IQE_ENV_VARS="DYNACONF_USER_PROVIDER__rbac_enabled=false"
+# Set the correct images for pull requests.
+# pr_check in pull requests still uses the old cloudservices images
+EXTRA_DEPLOY_ARGS="--set-parameter insights-aggregator-cleaner/IMAGE=quay.io/cloudservices/insights-results-aggregator-cleaner"
 
 
 function build_image() {
