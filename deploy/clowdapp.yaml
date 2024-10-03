@@ -44,6 +44,16 @@ objects:
               value: "${LOG_LEVEL}"
             - name: INSIGHTS_RESULTS_CLEANER__CLEANER__MAX_AGE
               value: "${MAX_AGE}"
+            - name: INSIGHTS_RESULTS_CLEANER__LOGGING__LOGGING_TO_SENTRY_ENABLED
+              value: ${SENTRY_ENABLED}
+            - name: INSIGHTS_RESULTS_CLEANER__SENTRY__DSN
+              valueFrom:
+                secretKeyRef:
+                  key: dsn
+                  name: insights-results-aggregator-cleaner-dsn
+                  optional: true
+            - name: INSIGHTS_RESULTS_CLEANER__SENTRY__ENVIRONMENT
+              value: ${ENV_NAME}
           command:
             - ./insights-results-aggregator-cleaner
             - -dry-run=${DRY_RUN}
@@ -54,7 +64,7 @@ objects:
 parameters:
 - description: Image name
   name: IMAGE
-  value: quay.io/cloudservices/insights-results-aggregator-cleaner
+  value: quay.io/redhat-services-prod/obsint-processing-tenant/insights-results-aggregator-cleaner/insights-results-aggregator-cleaner
 - name: IMAGE_TAG
   required: true
   description: Image tag to use for apps
@@ -105,3 +115,5 @@ parameters:
 - name: CLEANUP_ALL
   description: If true (default), the program will be executed with the -cleanup-all argument, cleaning the database from old clusters
   value: "true"
+- name: SENTRY_ENABLED
+  value: "false"
