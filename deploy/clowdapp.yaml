@@ -15,7 +15,6 @@ objects:
       iqePlugin: ccx
     dependencies:
       - ccx-insights-results
-      - rbac  # required by iqe-ccx-plugin in Konflux env.
     jobs:
       - name: cleaner
         schedule: ${JOB_SCHEDULE}
