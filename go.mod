@@ -1,6 +1,6 @@
 module github.com/RedHatInsights/insights-results-aggregator-cleaner
 
-go 1.20
+go 1.23
 
 require (
 	github.com/BurntSushi/toml v1.4.0
