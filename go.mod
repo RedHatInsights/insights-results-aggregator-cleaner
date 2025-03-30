@@ -19,7 +19,7 @@ require (
 
 require (
 	github.com/RedHatInsights/cloudwatch v0.0.0-20210111105023-1df2bdfe3291 // indirect
-	github.com/RedHatInsights/insights-results-types v1.23.4 // indirect
+	github.com/RedHatInsights/insights-results-types v1.23.5 // indirect
 	github.com/RedHatInsights/kafka-zerolog v1.0.0 // indirect
 	github.com/Shopify/sarama v1.27.1 // indirect
 	github.com/archdx/zerolog-sentry v1.8.4 // indirect
