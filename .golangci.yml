@@ -16,6 +16,12 @@ linters:
       - unused
       - whitespace
       - zerologlint
+    settings:
+        gocyclo:
+            min-complexity: 13
+        goconst:
+            min-occurrences: 2
+        
     exclusions:
         paths:
           - export_test.go
