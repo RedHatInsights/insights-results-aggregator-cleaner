@@ -1,6 +1,8 @@
 module github.com/RedHatInsights/insights-results-aggregator-cleaner
 
-go 1.20
+go 1.22
+
+toolchain go1.22.9
 
 require (
 	github.com/BurntSushi/toml v1.5.0
@@ -78,7 +80,7 @@ require (
 	golang.org/x/net v0.26.0 // indirect
 	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
-	google.golang.org/protobuf v1.34.2 // indirect
+	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/h2non/gock.v1 v1.1.2 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/jcmturner/aescts.v1 v1.0.1 // indirect
