@@ -29,11 +29,14 @@ function build_image() {
 }
 
 function deploy_ephemeral() {
+    # shellcheck disable=SC2317
     source $CICD_ROOT/deploy_ephemeral_env.sh
 }
 
 function run_smoke_tests() {
+    # shellcheck disable=SC2317
     source $CICD_ROOT/cji_smoke_test.sh
+    # shellcheck disable=SC2317
     source $CICD_ROOT/post_test_results.sh  # publish results in Ibutsu
 }
 
@@ -42,10 +45,13 @@ function run_smoke_tests() {
 CICD_URL=https://raw.githubusercontent.com/RedHatInsights/bonfire/master/cicd
 curl -s $CICD_URL/bootstrap.sh > .cicd_bootstrap.sh && source .cicd_bootstrap.sh
 echo "creating PR image"
+# shellcheck disable=SC2317
 build_image
 
 echo "deploying to ephemeral"
+# shellcheck disable=SC2317
 deploy_ephemeral
 
 echo "running PR smoke tests"
+# shellcheck disable=SC2317
 run_smoke_tests
