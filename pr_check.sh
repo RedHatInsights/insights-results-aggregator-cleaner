@@ -48,10 +48,12 @@ echo "creating PR image"
 # shellcheck disable=SC2317
 build_image
 
+# shellcheck disable=SC2317
 echo "deploying to ephemeral"
 # shellcheck disable=SC2317
 deploy_ephemeral
 
+# shellcheck disable=SC2317
 echo "running PR smoke tests"
 # shellcheck disable=SC2317
 run_smoke_tests
