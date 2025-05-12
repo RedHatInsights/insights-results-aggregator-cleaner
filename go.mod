@@ -23,7 +23,7 @@ require (
 	github.com/RedHatInsights/kafka-zerolog v1.0.0 // indirect
 	github.com/Shopify/sarama v1.27.1 // indirect
 	github.com/archdx/zerolog-sentry v1.8.4 // indirect
-	github.com/aws/aws-sdk-go v1.55.5 // indirect
+	github.com/aws/aws-sdk-go v1.55.7 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bitly/go-simplejson v0.5.1 // indirect
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
