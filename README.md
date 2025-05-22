@@ -156,15 +156,6 @@ Available targets are:
 clean                Run go clean
 build                Build binary containing service executable
 build-cover          Build binary with code coverage detection support
-fmt                  Run go fmt -w for all sources
-lint                 Run golint
-vet                  Run go vet. Report likely mistakes in source code
-cyclo                Run gocyclo
-ineffassign          Run ineffassign checker
-shellcheck           Run shellcheck
-errcheck             Run errcheck
-goconst              Run goconst checker
-gosec                Run gosec checker
 abcgo                Run ABC metrics checker
 json-check           Check all JSONs for basic syntax
 style                Run all the formatting related commands (fmt, vet, lint, cyclo) + check shell scripts
@@ -175,6 +166,7 @@ coverage             Display test coverage in terminal
 before_commit        Checks done before commit
 function_list        List all functions in generated binary file
 help                 Show this help screen
+golangci-lint        Run all golangci-lint linters commands
 ```
 
 ### Configuration
