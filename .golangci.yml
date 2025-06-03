@@ -1,3 +1,34 @@
+version: "2"
 run:
-    skip-files:
-        - export_test.go
+    timeout: 3m
+linters:
+    default: all
+    enable:
+      - goconst
+      - gocyclo
+      - gosec
+      - staticcheck
+      - nilerr
+      - prealloc
+      - revive
+      - staticcheck
+      - unconvert
+      - unused
+      - whitespace
+      - zerologlint
+    settings:
+        gocyclo:
+            min-complexity: 13
+        goconst:
+            min-occurrences: 2
+        
+    exclusions:
+        paths:
+          - export_test.go
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    paths:
+      - export_test.go

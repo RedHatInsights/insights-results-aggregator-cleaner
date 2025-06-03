@@ -19,46 +19,15 @@ build-cover:	${SOURCES}  ## Build binary with code coverage detection support
 ${BINARY}: ${SOURCES}
 	./build.sh
 
-fmt: ## Run go fmt -w for all sources
-	@echo "Running go formatting"
-	./gofmt.sh
-
-lint: ## Run golint
-	@echo "Running go lint"
-	./golint.sh
-
-vet: ## Run go vet. Report likely mistakes in source code
-	@echo "Running go vet"
-	./govet.sh
-
-cyclo: ## Run gocyclo
-	@echo "Running gocyclo"
-	./gocyclo.sh
-
-ineffassign: ## Run ineffassign checker
-	@echo "Running ineffassign checker"
-	./ineffassign.sh
-
-shellcheck: ## Run shellcheck
-	./shellcheck.sh
-
-errcheck: ## Run errcheck
-	@echo "Running errcheck"
-	./goerrcheck.sh
-
-goconst: ## Run goconst checker
-	@echo "Running goconst checker"
-	./goconst.sh ${VERBOSE}
-
-gosec: ## Run gosec checker
-	@echo "Running gosec checker"
-	./gosec.sh ${VERBOSE}
-
 abcgo: ## Run ABC metrics checker
 	@echo "Run ABC metrics checker"
 	./abcgo.sh ${VERBOSE}
 
-style: fmt vet lint cyclo shellcheck errcheck goconst gosec ineffassign abcgo## Run all the formatting related commands (fmt, vet, lint, cyclo) + check shell scripts
+golangci-lint: install_golangci_lint
+	golangci-lint run
+	glangci-lint fmt
+
+style: shellcheck abcgo golangci-lint
 
 run: ${BINARY} ## Build the project and executes the binary
 	./$^
@@ -95,13 +64,13 @@ docs/packages/%.html: %.go
 	docgo -outdir $(dir $@) $^
 	addlicense -c "Red Hat, Inc" -l "apache" -v $@
 
-godoc: export GO111MODULE=off
-godoc: install_docgo install_addlicense ${DOCFILES}
-
-install_docgo: export GO111MODULE=off
-install_docgo:
-	[[ `command -v docgo` ]] || GO111MODULE=off go get -u github.com/dhconnelly/docgo
-
-install_addlicense: export GO111MODULE=off
 install_addlicense:
-	[[ `command -v addlicense` ]] || GO111MODULE=off go get -u github.com/google/addlicense
+	[[ `command -v addlicense` ]] || go install github.com/google/addlicense
+
+install_golangci_lint:
+	@if [ "$$(uname)" = "Darwin" ]; then \
+		brew install golangci-lint; \
+		brew upgrade golangci-lint; \
+	else \
+		go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.0.2; \
+	fi
