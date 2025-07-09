@@ -612,15 +612,15 @@ func TestReadClusterListFromCLIArgumentImproperCluster(t *testing.T) {
 // TestPrintSummaryTableBasicCase check the behaviour of function
 // PrintSummaryTable for summary with zero changes made in database.
 func TestPrintSummaryTableBasicCase(t *testing.T) {
-	const expected = `+--------------------------+-------+
-|         SUMMARY          | COUNT |
-+--------------------------+-------+
-| Proper cluster entries   |     0 |
-| Improper cluster entries |     0 |
-|                          |       |
-+--------------------------+-------+
-|     TOTAL DELETIONS      |   0   |
-+--------------------------+-------+
+	const expected = `┌──────────────────────────┬───────┐
+│         SUMMARY          │ COUNT │
+├──────────────────────────┼───────┤
+│ Proper cluster entries   │ 0     │
+│ Improper cluster entries │ 0     │
+│                          │       │
+├──────────────────────────┼───────┤
+│          Total deletions │     0 │
+└──────────────────────────┴───────┘
 `
 
 	// try to call the tested function and capture its output
@@ -643,15 +643,15 @@ func TestPrintSummaryTableBasicCase(t *testing.T) {
 // TestPrintSummaryTableProperClusterEntries check the behaviour of function
 // PrintSummaryTable for summary with non zero changes made in database.
 func TestPrintSummaryTableProperClusterEntries(t *testing.T) {
-	const expected = `+--------------------------+-------+
-|         SUMMARY          | COUNT |
-+--------------------------+-------+
-| Proper cluster entries   |    42 |
-| Improper cluster entries |     0 |
-|                          |       |
-+--------------------------+-------+
-|     TOTAL DELETIONS      |   0   |
-+--------------------------+-------+
+	const expected = `┌──────────────────────────┬───────┐
+│         SUMMARY          │ COUNT │
+├──────────────────────────┼───────┤
+│ Proper cluster entries   │ 42    │
+│ Improper cluster entries │ 0     │
+│                          │       │
+├──────────────────────────┼───────┤
+│          Total deletions │     0 │
+└──────────────────────────┴───────┘
 `
 
 	// try to call the tested function and capture its output
@@ -674,15 +674,15 @@ func TestPrintSummaryTableProperClusterEntries(t *testing.T) {
 // TestPrintSummaryTableImproperClusterEntries check the behaviour of function
 // PrintSummaryTable for summary with non zero changes made in database.
 func TestPrintSummaryTableImproperClusterEntries(t *testing.T) {
-	const expected = `+--------------------------+-------+
-|         SUMMARY          | COUNT |
-+--------------------------+-------+
-| Proper cluster entries   |     0 |
-| Improper cluster entries |    42 |
-|                          |       |
-+--------------------------+-------+
-|     TOTAL DELETIONS      |   0   |
-+--------------------------+-------+
+	const expected = `┌──────────────────────────┬───────┐
+│         SUMMARY          │ COUNT │
+├──────────────────────────┼───────┤
+│ Proper cluster entries   │ 0     │
+│ Improper cluster entries │ 42    │
+│                          │       │
+├──────────────────────────┼───────┤
+│          Total deletions │     0 │
+└──────────────────────────┴───────┘
 `
 
 	// try to call the tested function and capture its output
@@ -705,16 +705,16 @@ func TestPrintSummaryTableImproperClusterEntries(t *testing.T) {
 // TestPrintSummaryTableOneTableDeletion check the behaviour of function
 // PrintSummaryTable for summary with one deletion in one table.
 func TestPrintSummaryTableOneTableDeletion(t *testing.T) {
-	const expected = `+--------------------------------+-------+
-|            SUMMARY             | COUNT |
-+--------------------------------+-------+
-| Proper cluster entries         |     0 |
-| Improper cluster entries       |     0 |
-|                                |       |
-| Deletions from table 'TABLE_X' |     1 |
-+--------------------------------+-------+
-|        TOTAL DELETIONS         |   1   |
-+--------------------------------+-------+
+	const expected = `┌────────────────────────────────┬───────┐
+│            SUMMARY             │ COUNT │
+├────────────────────────────────┼───────┤
+│ Proper cluster entries         │ 0     │
+│ Improper cluster entries       │ 0     │
+│                                │       │
+│ Deletions from table 'TABLE_X' │ 1     │
+├────────────────────────────────┼───────┤
+│                Total deletions │     1 │
+└────────────────────────────────┴───────┘
 `
 
 	deletions := map[string]int{
@@ -741,29 +741,30 @@ func TestPrintSummaryTableOneTableDeletion(t *testing.T) {
 // PrintSummaryTable for summary with multiple deletions in two tables.
 func TestPrintSummaryTableTwoTablesDeletions(t *testing.T) {
 	// we work with map and there is no guarantees which order will be choosen in runtime
-	const expected1 = `+--------------------------------+-------+
-|            SUMMARY             | COUNT |
-+--------------------------------+-------+
-| Proper cluster entries         |     0 |
-| Improper cluster entries       |     0 |
-|                                |       |
-| Deletions from table 'TABLE_X' |     1 |
-| Deletions from table 'TABLE_Y' |     2 |
-+--------------------------------+-------+
-|        TOTAL DELETIONS         |   3   |
-+--------------------------------+-------+
+	const expected1 = `┌────────────────────────────────┬───────┐
+│            SUMMARY             │ COUNT │
+├────────────────────────────────┼───────┤
+│ Proper cluster entries         │ 0     │
+│ Improper cluster entries       │ 0     │
+│                                │       │
+│ Deletions from table 'TABLE_X' │ 1     │
+│ Deletions from table 'TABLE_Y' │ 2     │
+├────────────────────────────────┼───────┤
+│                Total deletions │     3 │
+└────────────────────────────────┴───────┘
 `
-	const expected2 = `+--------------------------------+-------+
-|            SUMMARY             | COUNT |
-+--------------------------------+-------+
-| Proper cluster entries         |     0 |
-| Improper cluster entries       |     0 |
-|                                |       |
-| Deletions from table 'TABLE_Y' |     2 |
-| Deletions from table 'TABLE_X' |     1 |
-+--------------------------------+-------+
-|        TOTAL DELETIONS         |   3   |
-+--------------------------------+-------+
+
+	const expected2 = `┌────────────────────────────────┬───────┐
+│            SUMMARY             │ COUNT │
+├────────────────────────────────┼───────┤
+│ Proper cluster entries         │ 0     │
+│ Improper cluster entries       │ 0     │
+│                                │       │
+│ Deletions from table 'TABLE_Y' │ 2     │
+│ Deletions from table 'TABLE_X' │ 1     │
+├────────────────────────────────┼───────┤
+│                Total deletions │     3 │
+└────────────────────────────────┴───────┘
 `
 
 	deletions := map[string]int{
@@ -982,22 +983,22 @@ func TestCleanupPrintSummaryTable(t *testing.T) {
 // summary table should be printed
 func TestCleanupCheckSummaryTableContent(t *testing.T) {
 	var expectedOutputLines = []string{
-		"+-----------------------------------------------------------+-------+",
-		"|                          SUMMARY                          | COUNT |",
-		"+-----------------------------------------------------------+-------+",
-		"| Proper cluster entries                                    |     5 |",
-		"| Improper cluster entries                                  |     2 |",
-		"|                                                           |       |",
-		"| Deletions from table 'cluster_rule_user_feedback'         |     0 |",
-		"| Deletions from table 'cluster_user_rule_disable_feedback' |     0 |",
-		"| Deletions from table 'rule_hit'                           |     0 |",
-		"| Deletions from table 'recommendation'                     |     0 |",
-		"| Deletions from table 'report_info'                        |     0 |",
-		"| Deletions from table 'report'                             |     0 |",
-		"| Deletions from table 'cluster_rule_toggle'                |     0 |",
-		"+-----------------------------------------------------------+-------+",
-		"|                      TOTAL DELETIONS                      |   0   |",
-		"+-----------------------------------------------------------+-------+",
+		"┌───────────────────────────────────────────────────────────┬───────┐",
+		"│                          SUMMARY                          │ COUNT │",
+		"├───────────────────────────────────────────────────────────┼───────┤",
+		"│ Proper cluster entries                                    │ 5     │",
+		"│ Improper cluster entries                                  │ 2     │",
+		"│                                                           │       │",
+		"│ Deletions from table 'cluster_rule_user_feedback'         │ 0     │",
+		"│ Deletions from table 'cluster_user_rule_disable_feedback' │ 0     │",
+		"│ Deletions from table 'rule_hit'                           │ 0     │",
+		"│ Deletions from table 'recommendation'                     │ 0     │",
+		"│ Deletions from table 'report_info'                        │ 0     │",
+		"│ Deletions from table 'report'                             │ 0     │",
+		"│ Deletions from table 'cluster_rule_toggle'                │ 0     │",
+		"├───────────────────────────────────────────────────────────┼───────┤",
+		"│                                           Total deletions │     0 │",
+		"└───────────────────────────────────────────────────────────┴───────┘",
 	}
 
 	// prepare new mocked connection to database
