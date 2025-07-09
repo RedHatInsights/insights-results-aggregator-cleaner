@@ -227,25 +227,40 @@ func readClusterListFromFile(filename string) (ClusterList, int, error) {
 
 // PrintSummaryTable function displays a table with summary information about
 // cleanup step.
-func PrintSummaryTable(summary Summary) {
+func PrintSummaryTable(summary Summary) error {
 	table := tablewriter.NewTable(os.Stdout)
 
 	// table header
 	table.Header("Summary", "Count")
 
-	table.Append("Proper cluster entries",
+	err := table.Append("Proper cluster entries",
 		strconv.Itoa(summary.ProperClusterEntries))
-	table.Append("Improper cluster entries",
+	if err != nil {
+		return fmt.Errorf("append proper cluster entries: %w", err)
+	}
+
+	err = table.Append("Improper cluster entries",
 		strconv.Itoa(summary.ImproperClusterEntries))
-	table.Append("", "")
+	if err != nil {
+		return fmt.Errorf("append improper cluster entries: %w", err)
+	}
+
+	err = table.Append("", "")
+	if err != nil {
+		return fmt.Errorf("append empty row: %w", err)
+	}
 
 	totalDeletions := 0
 
 	// prepare rows with info about deletions
 	for tableName, deletions := range summary.DeletionsForTable {
 		totalDeletions += deletions
-		table.Append("Deletions from table '"+tableName+"'",
+
+		err = table.Append("Deletions from table '"+tableName+"'",
 			strconv.Itoa(deletions))
+		if err != nil {
+			return fmt.Errorf("append deletion info for table %s: %w", tableName, err)
+		}
 	}
 
 	// table footer
@@ -254,6 +269,8 @@ func PrintSummaryTable(summary Summary) {
 
 	// display the whole table
 	table.Render()
+
+	return nil
 }
 
 // vacuumDB function starts the database vacuuming operation
@@ -292,7 +309,13 @@ func cleanup(configuration *ConfigStruct, connection *sql.DB, cliFlags CliFlags,
 		summary.ProperClusterEntries = len(clusterList)
 		summary.ImproperClusterEntries = improperClusterCounter
 		summary.DeletionsForTable = deletionsForTable
-		PrintSummaryTable(summary)
+
+		err := PrintSummaryTable(summary)
+		if err != nil {
+			log.Err(err).Msg("Failed to print summary table")
+
+			return ExitStatusPerformCleanupError, err
+		}
 	}
 	return ExitStatusOK, nil
 }
@@ -307,7 +330,13 @@ func cleanupAll(configuration *ConfigStruct, connection *sql.DB, cliFlags CliFla
 	if cliFlags.PrintSummaryTable {
 		var summary Summary
 		summary.DeletionsForTable = deletionsForTable
-		PrintSummaryTable(summary)
+
+		err := PrintSummaryTable(summary)
+		if err != nil {
+			log.Err(err).Msg("Failed to print summary table")
+
+			return ExitStatusPerformCleanupError, err
+		}
 	}
 	return ExitStatusOK, nil
 }

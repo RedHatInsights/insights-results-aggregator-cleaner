@@ -16,11 +16,16 @@ linters:
       - unused
       - whitespace
       - zerologlint
+      - wsl_v5
     settings:
         gocyclo:
             min-complexity: 13
         goconst:
             min-occurrences: 2
+        wsl_v5:
+          allow-first-in-block: true
+          allow-whole-block: false
+          branch-max-lines: 2 
         
     exclusions:
         paths:
