@@ -44,7 +44,6 @@
     - [Documentation for source files from this repository](#documentation-for-source-files-from-this-repository)
     - [Documentation for unit tests from this repository](#documentation-for-unit-tests-from-this-repository)
   - [Contribution](#contribution-1)
-  - [Package manifest](#package-manifest)
 
 <!-- vim-markdown-toc -->
 
@@ -485,10 +484,3 @@ Sources are located in [docs](https://github.com/RedHatInsights/insights-results
 
 Please look into document [CONTRIBUTING.md](CONTRIBUTING.md) that contains all information about how to
 contribute to this project.
-
-
-
-## Package manifest
-
-Package manifest is available at [docs/manifest.txt](docs/manifest.txt).
-
