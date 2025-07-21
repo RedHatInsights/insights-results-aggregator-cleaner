@@ -454,7 +454,6 @@ func main() {
 		GetLoggingConfiguration(&config),
 		logger.CloudWatchConfiguration{},
 		GetSentryConfiguration(&config),
-		logger.KafkaZerologConfiguration{},
 	)
 	if err != nil {
 		panic(err)
