@@ -161,8 +161,8 @@ github.com/oasdiff/yaml v0.0.0-20250309154309-f31be36b4037 h1:G7ERwszslrBzRxj//J
 github.com/oasdiff/yaml v0.0.0-20250309154309-f31be36b4037/go.mod h1:2bpvgLBZEtENV5scfDFEtB/5+1M4hkQhDQrccEJ/qGw=
 github.com/oasdiff/yaml3 v0.0.0-20250309153720-d2182401db90 h1:bQx3WeLcUWy+RletIKwUIt4x3t8n2SxavmoclizMb8c=
 github.com/oasdiff/yaml3 v0.0.0-20250309153720-d2182401db90/go.mod h1:y5+oSEHCPT/DGrS++Wc/479ERge0zTFxaF8PbGKcg2o=
-github.com/olekukonko/cat v0.0.0-20250808191157-46fba99501f3 h1:3o1yj5hu9LOTwjey1RE0IBaB4u1HCLbD+lDPhJrl8Y4=
-github.com/olekukonko/cat v0.0.0-20250808191157-46fba99501f3/go.mod h1:rEKTHC9roVVicUIfZK7DYrdIoM0EOr8mK1Hj5s3JjH0=
+github.com/olekukonko/cat v0.0.0-20250817074551-3280053e4e00 h1:ZCnkxe9GgWqqBxAk3cIKlQJuaqgOUF/nUtQs8flVTHM=
+github.com/olekukonko/cat v0.0.0-20250817074551-3280053e4e00/go.mod h1:rEKTHC9roVVicUIfZK7DYrdIoM0EOr8mK1Hj5s3JjH0=
 github.com/olekukonko/errors v1.1.0 h1:RNuGIh15QdDenh+hNvKrJkmxxjV4hcS50Db478Ou5sM=
 github.com/olekukonko/errors v1.1.0/go.mod h1:ppzxA5jBKcO1vIpCXQ9ZqgDh8iwODz6OXIGKU8r5m4Y=
 github.com/olekukonko/ll v0.1.0 h1:7nX5bgpvfyxsvI90IJpOIU5zd4MBV6nRkD49e/dEx98=
