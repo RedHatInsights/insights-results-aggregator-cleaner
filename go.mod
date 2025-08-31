@@ -1,6 +1,8 @@
 module github.com/RedHatInsights/insights-results-aggregator-cleaner
 
-go 1.23.0
+go 1.24.0
+
+toolchain go1.24.6
 
 require (
 	github.com/BurntSushi/toml v1.5.0
@@ -18,7 +20,7 @@ require (
 )
 
 require (
-	github.com/IBM/sarama v1.45.2 // indirect
+	github.com/IBM/sarama v1.46.0 // indirect
 	github.com/RedHatInsights/insights-results-types v1.23.5 // indirect
 	github.com/archdx/zerolog-sentry v1.8.5 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.38.3 // indirect
@@ -56,8 +58,6 @@ require (
 	github.com/golang/snappy v1.0.0 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/h2non/parth v0.0.0-20190131123155-b4df798d6542 // indirect
-	github.com/hashicorp/errwrap v1.1.0 // indirect
-	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/jcmturner/aescts/v2 v2.0.0 // indirect
 	github.com/jcmturner/dnsutils/v2 v2.0.0 // indirect
@@ -96,7 +96,7 @@ require (
 	github.com/spf13/pflag v1.0.7 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/verdverm/frisby v0.0.0-20170604211311-b16556248a9a // indirect
-	github.com/woodsbury/decimal128 v1.3.0 // indirect
+	github.com/woodsbury/decimal128 v1.4.0 // indirect
 	golang.org/x/crypto v0.41.0 // indirect
 	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/sys v0.35.0 // indirect
