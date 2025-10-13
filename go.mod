@@ -2,7 +2,6 @@ module github.com/RedHatInsights/insights-results-aggregator-cleaner
 
 go 1.24.0
 
-
 require (
 	github.com/BurntSushi/toml v1.5.0
 	github.com/DATA-DOG/go-sqlmock v1.5.2
@@ -19,7 +18,7 @@ require (
 )
 
 require (
-	github.com/IBM/sarama v1.46.1 // indirect
+	github.com/IBM/sarama v1.46.2 // indirect
 	github.com/RedHatInsights/insights-results-types v1.23.5 // indirect
 	github.com/archdx/zerolog-sentry v1.8.5 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.39.2 // indirect
@@ -78,7 +77,7 @@ require (
 	github.com/oasdiff/yaml3 v0.0.0-20250309153720-d2182401db90 // indirect
 	github.com/olekukonko/cat v0.0.0-20250911104152-50322a0618f6 // indirect
 	github.com/olekukonko/errors v1.1.0 // indirect
-	github.com/olekukonko/ll v0.1.1 // indirect
+	github.com/olekukonko/ll v0.1.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/pierrec/lz4/v4 v4.1.22 // indirect
