@@ -9,7 +9,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/lib/pq v1.11.2
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
-	github.com/olekukonko/tablewriter v1.1.3
+	github.com/olekukonko/tablewriter v1.1.4
 	github.com/redhatinsights/app-common-go v1.6.9
 	github.com/rs/zerolog v1.34.0
 	github.com/spf13/viper v1.21.0
