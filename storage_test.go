@@ -2061,7 +2061,7 @@ func TestPerformCleanupAllInDB(t *testing.T) {
 			for _, tableAndDeleteStatement := range cleaner.AllTablesToDelete {
 				stmt := regexp.QuoteMeta(tableAndDeleteStatement.DeleteStatement)
 				if dryRun {
-					stmt = strings.Replace(stmt, "DELETE", "SELECT", -1)
+					stmt = strings.ReplaceAll(stmt, "DELETE", "SELECT")
 				}
 				mock.ExpectExec(stmt).WithArgs(maxAge).WillReturnResult(sqlmock.NewResult(1, 2))
 				// two deleted rows for each table

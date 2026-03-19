@@ -98,7 +98,7 @@
   <table>
     <thead><tr><th class="doc"><h1>cleaner.go</h1></th><th class="code"></th></tr></thead>
     <tbody>
-      
+
       <tr class="section">
 	<td class="doc"></td>
 	<td class="code"><pre><code><div class="comment">/*
@@ -119,7 +119,7 @@ limitations under the License.
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>Simple service that can be used to identify clusters, for which we are
 keeping very old data (&gt;30 days) in the database. This means that the
@@ -142,7 +142,7 @@ have to be deleted in order to maintain database consistency.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>Generated documentation is available at:
 https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner</p>
@@ -172,7 +172,7 @@ https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/cl
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>Messages</p>
 </td>
@@ -191,14 +191,14 @@ https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/cl
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>Exit codes</p>
 </td>
 	<td class="code"><pre><code><div class="keyword">const</div> <div class="operator">(</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>ExitStatusOK means that the tool finished with success</p>
 </td>
@@ -206,7 +206,7 @@ https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/cl
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>ExitStatusStorageError is returned in case of any storage-related
 error</p>
@@ -215,7 +215,7 @@ error</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>ExitStatusFillInStorageError is returned in case the fill-in DB
 operation failed</p>
@@ -224,7 +224,7 @@ operation failed</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>ExitStatusPerformCleanupError is returned when DB cleanup operation
 failed for any reason</p>
@@ -233,7 +233,7 @@ failed for any reason</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>ExitStatusPerformVacuumError is returned when DB vacuuming operation
 have failed for any reason</p>
@@ -248,7 +248,7 @@ have failed for any reason</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>showVersion function displays version information.</p>
 </td>
@@ -258,7 +258,7 @@ have failed for any reason</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>showAuthors function displays information about authors.</p>
 </td>
@@ -268,7 +268,7 @@ have failed for any reason</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>IsValidUUID function checks if provided string contains a correct UUID.</p>
 </td>
@@ -279,7 +279,7 @@ have failed for any reason</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>readClusterList function reads list of clusters from provided text file or
 from CLI argument.</p>
@@ -287,7 +287,7 @@ from CLI argument.</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">readClusterList</div><div class="operator">(</div><div class="ident">filename</div><div class="operator">,</div> <div class="ident">clusters</div> <div class="ident">string</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">ClusterList</div><div class="operator">,</div> <div class="ident">int</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>if clusters are not specified on command line, read list of clusters
 from file</p>
@@ -297,7 +297,7 @@ from file</p>
 	<div class="operator">}</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>apparently list of clusters is specified on command line, so let's
 use it properly</p>
@@ -307,7 +307,7 @@ use it properly</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>showConfiguration function displays actual configuration.</p>
 </td>
@@ -337,7 +337,7 @@ use it properly</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>readClusterListFromCLIArgument reads list of clusters from CLI argument</p>
 </td>
@@ -354,7 +354,7 @@ use it properly</p>
 		<div class="ident">cluster</div> <div class="operator">:=</div> <div class="ident">strings</div><div class="operator">.</div><div class="ident">Trim</div><div class="operator">(</div><div class="ident">cluster</div><div class="operator">,</div> <div class="literal">&#34; &#34;</div><div class="operator">)</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if line contains proper cluster ID (as UUID)</p>
 </td>
@@ -374,7 +374,7 @@ use it properly</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>readClusterListFromFile function reads list of clusters from provided text
 file.</p>
@@ -388,7 +388,7 @@ file.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>disable &quot;G304 (CWE-22): Potential file inclusion via variable&quot;</p>
 </td>
@@ -399,7 +399,7 @@ file.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>start reading from the file with a reader</p>
 </td>
@@ -413,7 +413,7 @@ file.</p>
 		<div class="ident">line</div> <div class="operator">=</div> <div class="ident">strings</div><div class="operator">.</div><div class="ident">Trim</div><div class="operator">(</div><div class="ident">line</div><div class="operator">,</div> <div class="literal">&#34;\n&#34;</div><div class="operator">)</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if line contains proper cluster ID (as UUID)</p>
 </td>
@@ -430,7 +430,7 @@ file.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>close file and catch any I/O error</p>
 </td>
@@ -438,7 +438,7 @@ file.</p>
 	<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>if error is detected during file close, we need to inform
 caller about it</p>
@@ -452,7 +452,7 @@ caller about it</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>PrintSummaryTable function displays a table with summary information about
 cleanup step.</p>
@@ -463,7 +463,7 @@ cleanup step.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>table header</p>
 </td>
@@ -479,7 +479,7 @@ cleanup step.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare rows with info about deletions</p>
 </td>
@@ -491,7 +491,7 @@ cleanup step.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>table footer</p>
 </td>
@@ -500,7 +500,7 @@ cleanup step.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>display the whole table</p>
 </td>
@@ -509,14 +509,14 @@ cleanup step.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>vacuumDB function starts the database vacuuming operation</p>
 </td>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">vacuumDB</div><div class="operator">(</div><div class="ident">connection</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">int</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>connection might be nil when DB init does not finish correctly</p>
 </td>
@@ -535,14 +535,14 @@ cleanup step.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>cleanup function starts the cleanup operation</p>
 </td>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">cleanup</div><div class="operator">(</div><div class="ident">configuration</div> <div class="operator">*</div><div class="ident">ConfigStruct</div><div class="operator">,</div> <div class="ident">connection</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">,</div> <div class="ident">cliFlags</div> <div class="ident">CliFlags</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">int</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>cleanup operation</p>
 </td>
@@ -570,7 +570,7 @@ cleanup step.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>detectMultipleRuleDisable function detects clusters that have the same
 rule(s) disabled by different users</p>
@@ -578,7 +578,7 @@ rule(s) disabled by different users</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">detectMultipleRuleDisable</div><div class="operator">(</div><div class="ident">connection</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">,</div> <div class="ident">cliFlags</div> <div class="ident">CliFlags</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">int</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>connection might be nil when DB init does not finish correctly</p>
 </td>
@@ -594,7 +594,7 @@ rule(s) disabled by different users</p>
 	<div class="operator">}</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>everything seems to be fine</p>
 </td>
@@ -603,7 +603,7 @@ rule(s) disabled by different users</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>fillInDatabase function fills-in database by test data</p>
 </td>
@@ -615,7 +615,7 @@ rule(s) disabled by different users</p>
 	<div class="operator">}</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>everything seems to be fine</p>
 </td>
@@ -624,7 +624,7 @@ rule(s) disabled by different users</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>displayOldRecords function displays old records in database</p>
 </td>
@@ -637,7 +637,7 @@ rule(s) disabled by different users</p>
 	<div class="operator">}</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>everything seems to be fine</p>
 </td>
@@ -646,7 +646,7 @@ rule(s) disabled by different users</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>doSelectedOperation function performs selected operation: check data
 retention, cleanup selected data, or fill-id database by test data</p>
@@ -675,7 +675,7 @@ retention, cleanup selected data, or fill-id database by test data</p>
 	<div class="operator">}</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>we should not end there</p>
 </td>
@@ -684,7 +684,7 @@ retention, cleanup selected data, or fill-id database by test data</p>
 <div class="keyword">func</div> <div class="ident">main</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>command line flags</p>
 </td>
@@ -692,7 +692,7 @@ retention, cleanup selected data, or fill-id database by test data</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>define and parse all command line options</p>
 </td>
@@ -710,7 +710,7 @@ retention, cleanup selected data, or fill-id database by test data</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>parse all command line flags</p>
 </td>
@@ -718,7 +718,7 @@ retention, cleanup selected data, or fill-id database by test data</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>config has exactly the same structure as *.toml file</p>
 </td>
@@ -735,7 +735,7 @@ retention, cleanup selected data, or fill-id database by test data</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>override default value read from configuration file</p>
 </td>
@@ -745,7 +745,7 @@ retention, cleanup selected data, or fill-id database by test data</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>initialize connection to database</p>
 </td>
@@ -756,7 +756,7 @@ retention, cleanup selected data, or fill-id database by test data</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>perform selected operation</p>
 </td>
@@ -769,7 +769,7 @@ retention, cleanup selected data, or fill-id database by test data</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>finito</p>
 </td>
@@ -779,7 +779,7 @@ retention, cleanup selected data, or fill-id database by test data</p>
 
 </code></pre></td>
       </tr>
-      
+
     </tbody>
   </table>
 </div>

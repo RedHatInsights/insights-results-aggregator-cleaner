@@ -119,7 +119,7 @@ deleted.
 Optionally it is possible to specify list of clusters to be cleaned up by using
 the `clusters ...` command line option.
 
-If you run `-cleanup-all` there is no need to use `cluster_list.txt` or 
+If you run `-cleanup-all` there is no need to use `cluster_list.txt` or
 the `clusters` option. It will delete all the records older than `-max-age`.
 
 ### Test data generation
@@ -411,12 +411,12 @@ Indexes:
 
 ```
                                  Table "public.recommendation"
-   Column   |            Type             | Collation | Nullable |           Default            
+   Column   |            Type             | Collation | Nullable |           Default
 ------------+-----------------------------+-----------+----------+------------------------------
- org_id     | integer                     |           | not null | 
- cluster_id | character varying           |           | not null | 
- rule_fqdn  | text                        |           | not null | 
- error_key  | character varying           |           | not null | 
+ org_id     | integer                     |           | not null |
+ cluster_id | character varying           |           | not null |
+ rule_fqdn  | text                        |           | not null |
+ error_key  | character varying           |           | not null |
  rule_id    | character varying           |           | not null | '.'::character varying
  created_at | timestamp without time zone |           |          | timezone('utc'::text, now())
 Indexes:

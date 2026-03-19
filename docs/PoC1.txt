@@ -9,4 +9,3 @@ Poc: Ability to remove all data for given cluster ID
         * Simplest solution
         * Git history, git diff, git show, git blame etc. is there for free
         * Need to be deployed on demand by changing # pods
-

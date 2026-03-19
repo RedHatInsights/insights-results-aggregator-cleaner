@@ -33,7 +33,6 @@ import (
 	"github.com/tisnik/go-capture"
 
 	cleaner "github.com/RedHatInsights/insights-results-aggregator-cleaner"
-	main "github.com/RedHatInsights/insights-results-aggregator-cleaner"
 )
 
 func init() {
@@ -52,7 +51,7 @@ func TestShowVersion(t *testing.T) {
 
 	// try to call the tested function and capture its output
 	output, err := capture.StandardOutput(func() {
-		main.ShowVersion()
+		cleaner.ShowVersion()
 	})
 
 	// check the captured text
@@ -65,7 +64,7 @@ func TestShowVersion(t *testing.T) {
 func TestShowAuthors(t *testing.T) {
 	// try to call the tested function and capture its output
 	output, err := capture.StandardOutput(func() {
-		main.ShowAuthors()
+		cleaner.ShowAuthors()
 	})
 
 	// check the captured text
@@ -77,8 +76,8 @@ func TestShowAuthors(t *testing.T) {
 // TestShowConfiguration checks the function ShowConfiguration
 func TestShowConfiguration(t *testing.T) {
 	// fill in configuration structure
-	configuration := main.ConfigStruct{}
-	configuration.Storage = main.StorageConfiguration{
+	configuration := cleaner.ConfigStruct{}
+	configuration.Storage = cleaner.StorageConfiguration{
 		Driver:     "postgres",
 		PGUsername: "foo",
 		PGPassword: "bar",
@@ -88,7 +87,7 @@ func TestShowConfiguration(t *testing.T) {
 	configuration.Logging = logger.LoggingConfiguration{
 		Debug:    true,
 		LogLevel: ""}
-	configuration.Cleaner = main.CleanerConfiguration{
+	configuration.Cleaner = cleaner.CleanerConfiguration{
 		MaxAge:          "3 days",
 		ClusterListFile: "cluster_list.txt"}
 
@@ -97,7 +96,7 @@ func TestShowConfiguration(t *testing.T) {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 		log.Logger = log.Output(zerolog.New(os.Stderr))
 
-		main.ShowConfiguration(&configuration)
+		cleaner.ShowConfiguration(&configuration)
 	})
 
 	// check the captured text
@@ -138,7 +137,7 @@ func TestIsValidUUID(t *testing.T) {
 	}
 
 	for _, uuid := range uuids {
-		v := main.IsValidUUID(uuid.id)
+		v := cleaner.IsValidUUID(uuid.id)
 		assert.Equal(t, v, uuid.valid)
 	}
 }
@@ -149,8 +148,8 @@ func TestDoSelectedOperationShowVersion(t *testing.T) {
 	const expected = "Insights Results Aggregator Cleaner version 1.0\n"
 
 	// stub for structures needed to call the tested function
-	configuration := main.ConfigStruct{}
-	cliFlags := main.CliFlags{
+	configuration := cleaner.ConfigStruct{}
+	cliFlags := cleaner.CliFlags{
 		ShowVersion:               true,
 		ShowAuthors:               false,
 		ShowConfiguration:         false,
@@ -162,8 +161,8 @@ func TestDoSelectedOperationShowVersion(t *testing.T) {
 
 	// try to call the tested function and capture its output
 	output, err := capture.StandardOutput(func() {
-		code, err := main.DoSelectedOperation(&configuration, nil, cliFlags)
-		assert.Equal(t, code, main.ExitStatusOK)
+		code, err := cleaner.DoSelectedOperation(&configuration, nil, cliFlags)
+		assert.Equal(t, code, cleaner.ExitStatusOK)
 		assert.Nil(t, err)
 	})
 
@@ -177,8 +176,8 @@ func TestDoSelectedOperationShowVersion(t *testing.T) {
 // via doSelectedOperation function
 func TestDoSelectedOperationShowAuthors(t *testing.T) {
 	// stub for structures needed to call the tested function
-	configuration := main.ConfigStruct{}
-	cliFlags := main.CliFlags{
+	configuration := cleaner.ConfigStruct{}
+	cliFlags := cleaner.CliFlags{
 		ShowVersion:               false,
 		ShowAuthors:               true,
 		ShowConfiguration:         false,
@@ -190,8 +189,8 @@ func TestDoSelectedOperationShowAuthors(t *testing.T) {
 
 	// try to call the tested function and capture its output
 	output, err := capture.StandardOutput(func() {
-		code, err := main.DoSelectedOperation(&configuration, nil, cliFlags)
-		assert.Equal(t, code, main.ExitStatusOK)
+		code, err := cleaner.DoSelectedOperation(&configuration, nil, cliFlags)
+		assert.Equal(t, code, cleaner.ExitStatusOK)
 		assert.Nil(t, err)
 	})
 
@@ -205,9 +204,9 @@ func TestDoSelectedOperationShowAuthors(t *testing.T) {
 // showConfiguration called via doSelectedOperation function
 func TestDoSelectedOperationShowConfiguration(t *testing.T) {
 	// fill in configuration structure
-	configuration := main.ConfigStruct{}
+	configuration := cleaner.ConfigStruct{}
 
-	cliFlags := main.CliFlags{
+	cliFlags := cleaner.CliFlags{
 		ShowVersion:               false,
 		ShowAuthors:               false,
 		ShowConfiguration:         true,
@@ -222,8 +221,8 @@ func TestDoSelectedOperationShowConfiguration(t *testing.T) {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 		log.Logger = log.Output(zerolog.New(os.Stderr))
 
-		code, err := main.DoSelectedOperation(&configuration, nil, cliFlags)
-		assert.Equal(t, code, main.ExitStatusOK)
+		code, err := cleaner.DoSelectedOperation(&configuration, nil, cliFlags)
+		assert.Equal(t, code, cleaner.ExitStatusOK)
 		assert.Nil(t, err)
 	})
 
@@ -239,9 +238,9 @@ func TestDoSelectedOperationShowConfiguration(t *testing.T) {
 // vacuumDB called via doSelectedOperation function
 func TestDoSelectedOperationVacuumDatabase(t *testing.T) {
 	// fill in configuration structure
-	configuration := main.ConfigStruct{}
+	configuration := cleaner.ConfigStruct{}
 
-	cliFlags := main.CliFlags{
+	cliFlags := cleaner.CliFlags{
 		ShowVersion:               false,
 		ShowAuthors:               false,
 		ShowConfiguration:         false,
@@ -252,22 +251,22 @@ func TestDoSelectedOperationVacuumDatabase(t *testing.T) {
 	}
 
 	// call tested function
-	code, err := main.DoSelectedOperation(&configuration, nil, cliFlags)
+	code, err := cleaner.DoSelectedOperation(&configuration, nil, cliFlags)
 
 	// error is expected
-	assert.Error(t, err, "error is expected while calling main.vacuumDB")
+	assert.Error(t, err, "error is expected while calling cleaner.vacuumDB")
 
 	// check the status
-	assert.Equal(t, code, main.ExitStatusPerformVacuumError)
+	assert.Equal(t, code, cleaner.ExitStatusPerformVacuumError)
 }
 
 // TestDoSelectedOperationPerformCleanup checks the function
 // performCleanup called via doSelectedOperation function
 func TestDoSelectedOperationPerformCleanup(t *testing.T) {
 	// fill in configuration structure
-	configuration := main.ConfigStruct{}
+	configuration := cleaner.ConfigStruct{}
 
-	cliFlags := main.CliFlags{
+	cliFlags := cleaner.CliFlags{
 		ShowVersion:               false,
 		ShowAuthors:               false,
 		ShowConfiguration:         false,
@@ -278,22 +277,22 @@ func TestDoSelectedOperationPerformCleanup(t *testing.T) {
 	}
 
 	// call tested function
-	code, err := main.DoSelectedOperation(&configuration, nil, cliFlags)
+	code, err := cleaner.DoSelectedOperation(&configuration, nil, cliFlags)
 
 	// error is expected
-	assert.Error(t, err, "error is expected while calling main.vacuumDB")
+	assert.Error(t, err, "error is expected while calling cleaner.vacuumDB")
 
 	// check the status
-	assert.Equal(t, code, main.ExitStatusPerformCleanupError)
+	assert.Equal(t, code, cleaner.ExitStatusPerformCleanupError)
 }
 
 // TestDoSelectedOperationDetectMultipleRuleDisable checks the function
 // detectMultipleRuleDisable called via doSelectedOperation function
 func TestDoSelectedOperationDetectMultipleRuleDisable(t *testing.T) {
 	// fill in configuration structure
-	configuration := main.ConfigStruct{}
+	configuration := cleaner.ConfigStruct{}
 
-	cliFlags := main.CliFlags{
+	cliFlags := cleaner.CliFlags{
 		ShowVersion:               false,
 		ShowAuthors:               false,
 		ShowConfiguration:         false,
@@ -304,22 +303,22 @@ func TestDoSelectedOperationDetectMultipleRuleDisable(t *testing.T) {
 	}
 
 	// call tested function
-	code, err := main.DoSelectedOperation(&configuration, nil, cliFlags)
+	code, err := cleaner.DoSelectedOperation(&configuration, nil, cliFlags)
 
 	// error is expected
-	assert.Error(t, err, "error is expected while calling main.vacuumDB")
+	assert.Error(t, err, "error is expected while calling cleaner.vacuumDB")
 
 	// check the status
-	assert.Equal(t, code, main.ExitStatusStorageError)
+	assert.Equal(t, code, cleaner.ExitStatusStorageError)
 }
 
 // TestDoSelectedOperationFillInDatabase checks the function
 // fillInDatabase called via doSelectedOperation function
 func TestDoSelectedOperationFillInDatabase(t *testing.T) {
 	// fill in configuration structure
-	configuration := main.ConfigStruct{}
+	configuration := cleaner.ConfigStruct{}
 
-	cliFlags := main.CliFlags{
+	cliFlags := cleaner.CliFlags{
 		ShowVersion:               false,
 		ShowAuthors:               false,
 		ShowConfiguration:         false,
@@ -330,22 +329,22 @@ func TestDoSelectedOperationFillInDatabase(t *testing.T) {
 	}
 
 	// call tested function
-	code, err := main.DoSelectedOperation(&configuration, nil, cliFlags)
+	code, err := cleaner.DoSelectedOperation(&configuration, nil, cliFlags)
 
 	// error is expected
-	assert.Error(t, err, "error is expected while calling main.vacuumDB")
+	assert.Error(t, err, "error is expected while calling cleaner.vacuumDB")
 
 	// check the status
-	assert.Equal(t, code, main.ExitStatusFillInStorageError)
+	assert.Equal(t, code, cleaner.ExitStatusFillInStorageError)
 }
 
 // TestDoSelectedOperationDefaultOperation checks the function
 // displayOldRecords called via doSelectedOperation function
 func TestDoSelectedOperationDefaultOperation(t *testing.T) {
 	// fill in configuration structure
-	configuration := main.ConfigStruct{}
+	configuration := cleaner.ConfigStruct{}
 
-	cliFlags := main.CliFlags{
+	cliFlags := cleaner.CliFlags{
 		ShowVersion:               false,
 		ShowAuthors:               false,
 		ShowConfiguration:         false,
@@ -356,13 +355,13 @@ func TestDoSelectedOperationDefaultOperation(t *testing.T) {
 	}
 
 	// call tested function
-	code, err := main.DoSelectedOperation(&configuration, nil, cliFlags)
+	code, err := cleaner.DoSelectedOperation(&configuration, nil, cliFlags)
 
 	// error is expected
-	assert.Error(t, err, "error is expected while calling main.vacuumDB")
+	assert.Error(t, err, "error is expected while calling cleaner.vacuumDB")
 
 	// check the status
-	assert.Equal(t, code, main.ExitStatusStorageError)
+	assert.Equal(t, code, cleaner.ExitStatusStorageError)
 }
 
 // TestReadClusterList checks the function readClusterList from
@@ -371,7 +370,7 @@ func TestReadClusterList(t *testing.T) {
 	// cluster list file with 8 clusters in total:
 	// 5 correct cluster names
 	// 3 incorrect cluster names
-	clusterList, improperClusterCount, err := main.ReadClusterList("tests/cluster_list.txt", "")
+	clusterList, improperClusterCount, err := cleaner.ReadClusterList("tests/cluster_list.txt", "")
 
 	// file is correct - no errors should be thrown
 	assert.NoError(t, err)
@@ -381,17 +380,17 @@ func TestReadClusterList(t *testing.T) {
 	assert.Len(t, clusterList, 5)
 
 	// finally check actual cluster names
-	assert.Contains(t, clusterList, main.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767aa"))
-	assert.Contains(t, clusterList, main.ClusterName("55d892d4-1f74-4ccf-91af-548dfc9767aa"))
-	assert.Contains(t, clusterList, main.ClusterName("5d5892d3-1f74-4ccf-91af-548dfc9767bb"))
-	assert.Contains(t, clusterList, main.ClusterName("00000000-0000-0000-0000-000000000000"))
-	assert.Contains(t, clusterList, main.ClusterName("11111111-1111-1111-1111-111111111111"))
+	assert.Contains(t, clusterList, cleaner.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767aa"))
+	assert.Contains(t, clusterList, cleaner.ClusterName("55d892d4-1f74-4ccf-91af-548dfc9767aa"))
+	assert.Contains(t, clusterList, cleaner.ClusterName("5d5892d3-1f74-4ccf-91af-548dfc9767bb"))
+	assert.Contains(t, clusterList, cleaner.ClusterName("00000000-0000-0000-0000-000000000000"))
+	assert.Contains(t, clusterList, cleaner.ClusterName("11111111-1111-1111-1111-111111111111"))
 }
 
 // TestReadClusterListNoFile checks the function readClusterList from
 // cleaner.go in case the cluster list file does not exists
 func TestReadClusterListNoFile(t *testing.T) {
-	_, _, err := main.ReadClusterListFromFile("tests/this_does_not_exists.txt")
+	_, _, err := cleaner.ReadClusterListFromFile("tests/this_does_not_exists.txt")
 
 	// in this case we expect error to be thrown
 	assert.Error(t, err)
@@ -402,7 +401,7 @@ func TestReadClusterListNoFile(t *testing.T) {
 func TestReadClusterListCLICase1(t *testing.T) {
 	// just one cluster name is specified on CLI
 	input := "5d5892d4-1f74-4ccf-91af-548dfc9767aa"
-	clusterList, improperClusterCount, err := main.ReadClusterList("tests/cluster_list.txt", input)
+	clusterList, improperClusterCount, err := cleaner.ReadClusterList("tests/cluster_list.txt", input)
 
 	// input is correct - no errors should be thrown
 	assert.NoError(t, err)
@@ -412,7 +411,7 @@ func TestReadClusterListCLICase1(t *testing.T) {
 	assert.Len(t, clusterList, 1)
 
 	// finally check actual cluster names (only one name expected)
-	assert.Contains(t, clusterList, main.ClusterName(input))
+	assert.Contains(t, clusterList, cleaner.ClusterName(input))
 }
 
 // TestReadClusterList checks the function readClusterList from
@@ -422,7 +421,7 @@ func TestReadClusterListCLICase2(t *testing.T) {
 	input := "5d5892d4-1f74-4ccf-91af-548dfc9767aa,ffffffff-1f74-4ccf-91af-548dfc9767aa"
 
 	// input is correct - no errors should be thrown
-	clusterList, improperClusterCount, err := main.ReadClusterList("tests/cluster_list.txt", input)
+	clusterList, improperClusterCount, err := cleaner.ReadClusterList("tests/cluster_list.txt", input)
 
 	// both cluster names are correct
 	assert.NoError(t, err)
@@ -432,15 +431,15 @@ func TestReadClusterListCLICase2(t *testing.T) {
 	assert.Len(t, clusterList, 2)
 
 	// finally check actual cluster names
-	assert.Contains(t, clusterList, main.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767aa"))
-	assert.Contains(t, clusterList, main.ClusterName("ffffffff-1f74-4ccf-91af-548dfc9767aa"))
+	assert.Contains(t, clusterList, cleaner.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767aa"))
+	assert.Contains(t, clusterList, cleaner.ClusterName("ffffffff-1f74-4ccf-91af-548dfc9767aa"))
 }
 
 // TestReadClusterList checks the function readClusterList from
 // cleaner.go using provided CLI arguments
 func TestReadClusterListCLICase3(t *testing.T) {
 	input := "5d5892d4-1f74-4ccf-91af-548dfc9767aa,this-is-not-correct"
-	clusterList, improperClusterCount, err := main.ReadClusterList("tests/cluster_list.txt", input)
+	clusterList, improperClusterCount, err := cleaner.ReadClusterList("tests/cluster_list.txt", input)
 
 	// just the first cluster name is correct
 	assert.NoError(t, err)
@@ -450,14 +449,14 @@ func TestReadClusterListCLICase3(t *testing.T) {
 	assert.Len(t, clusterList, 1)
 
 	// finally check actual cluster names (just one correct cluster name is expected)
-	assert.Contains(t, clusterList, main.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767aa"))
+	assert.Contains(t, clusterList, cleaner.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767aa"))
 }
 
 // TestReadClusterList checks the function readClusterList from
 // cleaner.go using provided CLI arguments
 func TestReadClusterListCLICase4(t *testing.T) {
 	input := "this-is-not-correct,this-also-is-not-correct"
-	clusterList, improperClusterCount, err := main.ReadClusterList("tests/cluster_list.txt", input)
+	clusterList, improperClusterCount, err := cleaner.ReadClusterList("tests/cluster_list.txt", input)
 
 	// both cluster names are incorrect, but the whole algorithm does not throw an error
 	assert.NoError(t, err)
@@ -474,7 +473,7 @@ func TestReadClusterListFromFile(t *testing.T) {
 	// cluster list file with 8 clusters in total:
 	// 5 correct cluster names
 	// 3 incorrect cluster names
-	clusterList, improperClusterCount, err := main.ReadClusterListFromFile("tests/cluster_list.txt")
+	clusterList, improperClusterCount, err := cleaner.ReadClusterListFromFile("tests/cluster_list.txt")
 
 	// file is correct - no errors should be thrown
 	assert.NoError(t, err)
@@ -484,18 +483,18 @@ func TestReadClusterListFromFile(t *testing.T) {
 	assert.Len(t, clusterList, 5)
 
 	// finally check actual cluster names
-	assert.Contains(t, clusterList, main.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767aa"))
-	assert.Contains(t, clusterList, main.ClusterName("55d892d4-1f74-4ccf-91af-548dfc9767aa"))
-	assert.Contains(t, clusterList, main.ClusterName("5d5892d3-1f74-4ccf-91af-548dfc9767bb"))
-	assert.Contains(t, clusterList, main.ClusterName("00000000-0000-0000-0000-000000000000"))
-	assert.Contains(t, clusterList, main.ClusterName("11111111-1111-1111-1111-111111111111"))
+	assert.Contains(t, clusterList, cleaner.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767aa"))
+	assert.Contains(t, clusterList, cleaner.ClusterName("55d892d4-1f74-4ccf-91af-548dfc9767aa"))
+	assert.Contains(t, clusterList, cleaner.ClusterName("5d5892d3-1f74-4ccf-91af-548dfc9767bb"))
+	assert.Contains(t, clusterList, cleaner.ClusterName("00000000-0000-0000-0000-000000000000"))
+	assert.Contains(t, clusterList, cleaner.ClusterName("11111111-1111-1111-1111-111111111111"))
 }
 
 // TestReadClusterListFromFileNoFile checks the function
 // readClusterListFromFile from cleaner.go in case the cluster list file does
 // not exists
 func TestReadClusterListFromFileNoFile(t *testing.T) {
-	_, _, err := main.ReadClusterListFromFile("tests/this_does_not_exists.txt")
+	_, _, err := cleaner.ReadClusterListFromFile("tests/this_does_not_exists.txt")
 
 	// file does not exist -> error should be thrown
 	assert.Error(t, err)
@@ -504,7 +503,7 @@ func TestReadClusterListFromFileNoFile(t *testing.T) {
 // TestReadClusterListFromFileEmptyFile checks the function
 // readClusterListFromFile from cleaner.go in case the special /dev/null file is to be read
 func TestReadClusterListFromFileEmptyFile(t *testing.T) {
-	clusterList, improperClusterCount, err := main.ReadClusterListFromFile("tests/empty_cluster_list.txt")
+	clusterList, improperClusterCount, err := cleaner.ReadClusterListFromFile("tests/empty_cluster_list.txt")
 
 	// it's empty so no error should be reported
 	assert.NoError(t, err)
@@ -517,7 +516,7 @@ func TestReadClusterListFromFileEmptyFile(t *testing.T) {
 // TestReadClusterListFromFileNullFile checks the function
 // readClusterListFromFile from cleaner.go in case the special /dev/null file is to be read
 func TestReadClusterListFromFileNullFile(t *testing.T) {
-	clusterList, improperClusterCount, err := main.ReadClusterListFromFile("/dev/null")
+	clusterList, improperClusterCount, err := cleaner.ReadClusterListFromFile("/dev/null")
 
 	// it's empty so no error should be reported
 	assert.NoError(t, err)
@@ -530,7 +529,7 @@ func TestReadClusterListFromFileNullFile(t *testing.T) {
 // TestReadClusterListFromCLIArgumentEmptyInput check the function
 // readClusterListFromCLIArgument from cleaner.go
 func TestReadClusterListFromCLIArgumentEmptyInput(t *testing.T) {
-	clusterList, improperClusterCount, err := main.ReadClusterListFromCLIArgument("")
+	clusterList, improperClusterCount, err := cleaner.ReadClusterListFromCLIArgument("")
 
 	// it's empty so no error should be reported
 	assert.NoError(t, err)
@@ -545,7 +544,7 @@ func TestReadClusterListFromCLIArgumentEmptyInput(t *testing.T) {
 func TestReadClusterListFromCLIArgumentOneCluster(t *testing.T) {
 	// only one (correct) cluster
 	input := "5d5892d4-1f74-4ccf-91af-548dfc9767aa"
-	clusterList, improperClusterCount, err := main.ReadClusterListFromCLIArgument(input)
+	clusterList, improperClusterCount, err := cleaner.ReadClusterListFromCLIArgument(input)
 
 	// input is correct -> no error should be thrown
 	assert.NoError(t, err)
@@ -555,7 +554,7 @@ func TestReadClusterListFromCLIArgumentOneCluster(t *testing.T) {
 	assert.Len(t, clusterList, 1)
 
 	// finally check actual cluster names (just one cluster name is expected)
-	assert.Contains(t, clusterList, main.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767aa"))
+	assert.Contains(t, clusterList, cleaner.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767aa"))
 }
 
 // TestReadClusterListFromCLIArgumentOneIncorrectCluster check the function
@@ -563,7 +562,7 @@ func TestReadClusterListFromCLIArgumentOneCluster(t *testing.T) {
 func TestReadClusterListFromCLIArgumentOneIncorrectCluster(t *testing.T) {
 	// only one (incorrect) cluster
 	input := "foo-bar-baz"
-	clusterList, improperClusterCount, err := main.ReadClusterListFromCLIArgument(input)
+	clusterList, improperClusterCount, err := cleaner.ReadClusterListFromCLIArgument(input)
 
 	assert.NoError(t, err)
 
@@ -577,7 +576,7 @@ func TestReadClusterListFromCLIArgumentOneIncorrectCluster(t *testing.T) {
 func TestReadClusterListFromCLIArgumentTwoClusters(t *testing.T) {
 	// both clusters are correct
 	input := "5d5892d4-1f74-4ccf-91af-548dfc9767aa,5d5892d4-1f74-4ccf-91af-548dfc9767bb"
-	clusterList, improperClusterCount, err := main.ReadClusterListFromCLIArgument(input)
+	clusterList, improperClusterCount, err := cleaner.ReadClusterListFromCLIArgument(input)
 
 	// input is correct -> no error should be thrown
 	assert.NoError(t, err)
@@ -587,8 +586,8 @@ func TestReadClusterListFromCLIArgumentTwoClusters(t *testing.T) {
 	assert.Len(t, clusterList, 2)
 
 	// finally check actual cluster names (just one correct cluster name is expected)
-	assert.Contains(t, clusterList, main.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767aa"))
-	assert.Contains(t, clusterList, main.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767bb"))
+	assert.Contains(t, clusterList, cleaner.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767aa"))
+	assert.Contains(t, clusterList, cleaner.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767bb"))
 }
 
 // TestReadClusterListFromCLIArgumentImproperCluster check the function
@@ -596,7 +595,7 @@ func TestReadClusterListFromCLIArgumentTwoClusters(t *testing.T) {
 func TestReadClusterListFromCLIArgumentImproperCluster(t *testing.T) {
 	// first cluster is correct, second one incorrect
 	input := "5d5892d4-1f74-4ccf-91af-548dfc9767aa,foo-bar-baz"
-	clusterList, improperClusterCount, err := main.ReadClusterListFromCLIArgument(input)
+	clusterList, improperClusterCount, err := cleaner.ReadClusterListFromCLIArgument(input)
 
 	// no error should be thrown
 	assert.NoError(t, err)
@@ -606,7 +605,7 @@ func TestReadClusterListFromCLIArgumentImproperCluster(t *testing.T) {
 	assert.Len(t, clusterList, 1)
 
 	// finally check actual cluster names (just one correct cluster name is expected)
-	assert.Contains(t, clusterList, main.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767aa"))
+	assert.Contains(t, clusterList, cleaner.ClusterName("5d5892d4-1f74-4ccf-91af-548dfc9767aa"))
 }
 
 // TestPrintSummaryTableBasicCase check the behaviour of function
@@ -625,12 +624,13 @@ func TestPrintSummaryTableBasicCase(t *testing.T) {
 
 	// try to call the tested function and capture its output
 	output, err := capture.StandardOutput(func() {
-		summary := main.Summary{
+		summary := cleaner.Summary{
 			ProperClusterEntries:   0,
 			ImproperClusterEntries: 0,
 			DeletionsForTable:      make(map[string]int),
 		}
-		main.PrintSummaryTable(summary)
+		err := cleaner.PrintSummaryTable(summary)
+		assert.NoError(t, err)
 	})
 
 	// check the captured text
@@ -656,12 +656,13 @@ func TestPrintSummaryTableProperClusterEntries(t *testing.T) {
 
 	// try to call the tested function and capture its output
 	output, err := capture.StandardOutput(func() {
-		summary := main.Summary{
+		summary := cleaner.Summary{
 			ProperClusterEntries:   42,
 			ImproperClusterEntries: 0,
 			DeletionsForTable:      make(map[string]int),
 		}
-		main.PrintSummaryTable(summary)
+		err := cleaner.PrintSummaryTable(summary)
+		assert.NoError(t, err)
 	})
 
 	// check the captured text
@@ -687,12 +688,13 @@ func TestPrintSummaryTableImproperClusterEntries(t *testing.T) {
 
 	// try to call the tested function and capture its output
 	output, err := capture.StandardOutput(func() {
-		summary := main.Summary{
+		summary := cleaner.Summary{
 			ProperClusterEntries:   0,
 			ImproperClusterEntries: 42,
 			DeletionsForTable:      make(map[string]int),
 		}
-		main.PrintSummaryTable(summary)
+		err := cleaner.PrintSummaryTable(summary)
+		assert.NoError(t, err)
 	})
 
 	// check the captured text
@@ -722,12 +724,13 @@ func TestPrintSummaryTableOneTableDeletion(t *testing.T) {
 	}
 	// try to call the tested function and capture its output
 	output, err := capture.StandardOutput(func() {
-		summary := main.Summary{
+		summary := cleaner.Summary{
 			ProperClusterEntries:   0,
 			ImproperClusterEntries: 0,
 			DeletionsForTable:      deletions,
 		}
-		main.PrintSummaryTable(summary)
+		err := cleaner.PrintSummaryTable(summary)
+		assert.NoError(t, err)
 	})
 
 	// check the captured text
@@ -773,12 +776,13 @@ func TestPrintSummaryTableTwoTablesDeletions(t *testing.T) {
 	}
 	// try to call the tested function and capture its output
 	output, err := capture.StandardOutput(func() {
-		summary := main.Summary{
+		summary := cleaner.Summary{
 			ProperClusterEntries:   0,
 			ImproperClusterEntries: 0,
 			DeletionsForTable:      deletions,
 		}
-		main.PrintSummaryTable(summary)
+		err := cleaner.PrintSummaryTable(summary)
+		assert.NoError(t, err)
 	})
 
 	// check the captured text
@@ -805,11 +809,11 @@ func TestVacuumDBPositiveCase(t *testing.T) {
 	mock.ExpectClose()
 
 	// call the tested function
-	status, err := main.VacuumDB(connection)
+	status, err := cleaner.VacuumDB(connection)
 	assert.NoError(t, err, "error not expected while calling tested function")
 
 	// check the status
-	assert.Equal(t, status, main.ExitStatusOK)
+	assert.Equal(t, status, cleaner.ExitStatusOK)
 
 	// check if DB can be closed successfully
 	checkConnectionClose(t, connection)
@@ -834,13 +838,13 @@ func TestVacuumDBNegativeCase(t *testing.T) {
 	mock.ExpectClose()
 
 	// call the tested function
-	status, err := main.VacuumDB(connection)
+	status, err := cleaner.VacuumDB(connection)
 
 	// error is expected
-	assert.Error(t, err, "error is expected while calling main.vacuumDB")
+	assert.Error(t, err, "error is expected while calling cleaner.vacuumDB")
 
 	// check the status
-	assert.Equal(t, status, main.ExitStatusPerformVacuumError)
+	assert.Equal(t, status, cleaner.ExitStatusPerformVacuumError)
 
 	// check if DB can be closed successfully
 	checkConnectionClose(t, connection)
@@ -853,66 +857,66 @@ func TestVacuumDBNegativeCase(t *testing.T) {
 // connection to DB is not established
 func TestVacuumDBNoConnection(t *testing.T) {
 	// call the tested function
-	status, err := main.VacuumDB(nil)
+	status, err := cleaner.VacuumDB(nil)
 
 	// error is expected
-	assert.Error(t, err, "error is expected while calling main.vacuumDB")
+	assert.Error(t, err, "error is expected while calling cleaner.vacuumDB")
 
 	// check the status
-	assert.Equal(t, status, main.ExitStatusPerformVacuumError)
+	assert.Equal(t, status, cleaner.ExitStatusPerformVacuumError)
 }
 
 // TestCleanupNoConnection check the function cleanup when the
 // connection to DB is not established
 func TestCleanupNoConnection(t *testing.T) {
 	// stub for structures needed to call the tested function
-	configuration := main.ConfigStruct{}
+	configuration := cleaner.ConfigStruct{}
 
-	configuration.Cleaner = main.CleanerConfiguration{
+	configuration.Cleaner = cleaner.CleanerConfiguration{
 		ClusterListFile: "tests/cluster_list.txt",
 	}
 
-	cliFlags := main.CliFlags{
+	cliFlags := cleaner.CliFlags{
 		ShowVersion:       false,
 		ShowAuthors:       false,
 		ShowConfiguration: false,
 	}
 
 	// call the tested function
-	status, err := main.Cleanup(&configuration, nil, cliFlags, main.DBSchemaOCPRecommendations)
+	status, err := cleaner.Cleanup(&configuration, nil, cliFlags, cleaner.DBSchemaOCPRecommendations)
 
 	// error is expected
-	assert.Error(t, err, "error is expected while calling main.cleanup")
+	assert.Error(t, err, "error is expected while calling cleaner.cleanup")
 
 	// check the status
-	assert.Equal(t, status, main.ExitStatusPerformCleanupError)
+	assert.Equal(t, status, cleaner.ExitStatusPerformCleanupError)
 }
 
 // TestCleanupOnReadClusterListError check the function cleanup when
 // cluster list can not be retrieved
 func TestCleanupOnReadClusterListError(t *testing.T) {
 	// stub for structures needed to call the tested function
-	configuration := main.ConfigStruct{}
+	configuration := cleaner.ConfigStruct{}
 
-	configuration.Cleaner = main.CleanerConfiguration{
+	configuration.Cleaner = cleaner.CleanerConfiguration{
 		// non-existent file
 		ClusterListFile: "tests/this_dos_not_exists.txt",
 	}
 
-	cliFlags := main.CliFlags{
+	cliFlags := cleaner.CliFlags{
 		ShowVersion:       false,
 		ShowAuthors:       false,
 		ShowConfiguration: false,
 	}
 
 	// call the tested function
-	status, err := main.Cleanup(&configuration, nil, cliFlags, main.DBSchemaOCPRecommendations)
+	status, err := cleaner.Cleanup(&configuration, nil, cliFlags, cleaner.DBSchemaOCPRecommendations)
 
 	// error is expected
-	assert.Error(t, err, "error is expected while calling main.cleanup")
+	assert.Error(t, err, "error is expected while calling cleaner.cleanup")
 
 	// check the status
-	assert.Equal(t, status, main.ExitStatusPerformCleanupError)
+	assert.Equal(t, status, cleaner.ExitStatusPerformCleanupError)
 }
 
 // TestCleanup check the function cleanup when
@@ -923,14 +927,14 @@ func TestCleanup(t *testing.T) {
 	assert.NoError(t, err, "error creating SQL mock")
 
 	// stub for structures needed to call the tested function
-	configuration := main.ConfigStruct{}
+	configuration := cleaner.ConfigStruct{}
 
-	configuration.Cleaner = main.CleanerConfiguration{
+	configuration.Cleaner = cleaner.CleanerConfiguration{
 		MaxAge:          "3 days",
 		ClusterListFile: "cluster_list.txt",
 	}
 
-	cliFlags := main.CliFlags{
+	cliFlags := cleaner.CliFlags{
 		ShowVersion:       false,
 		ShowAuthors:       false,
 		ShowConfiguration: false,
@@ -938,13 +942,13 @@ func TestCleanup(t *testing.T) {
 	}
 
 	// call the tested function
-	status, err := main.Cleanup(&configuration, connection, cliFlags, main.DBSchemaOCPRecommendations)
+	status, err := cleaner.Cleanup(&configuration, connection, cliFlags, cleaner.DBSchemaOCPRecommendations)
 
 	// error is not expected
-	assert.NoError(t, err, "error is not expected while calling main.cleanup")
+	assert.NoError(t, err, "error is not expected while calling cleaner.cleanup")
 
 	// check the status
-	assert.Equal(t, status, main.ExitStatusOK)
+	assert.Equal(t, status, cleaner.ExitStatusOK)
 }
 
 // TestCleanupPrintSummaryTable check the function cleanup when
@@ -955,14 +959,14 @@ func TestCleanupPrintSummaryTable(t *testing.T) {
 	assert.NoError(t, err, "error creating SQL mock")
 
 	// stub for structures needed to call the tested function
-	configuration := main.ConfigStruct{}
+	configuration := cleaner.ConfigStruct{}
 
-	configuration.Cleaner = main.CleanerConfiguration{
+	configuration.Cleaner = cleaner.CleanerConfiguration{
 		MaxAge:          "3 days",
 		ClusterListFile: "cluster_list.txt",
 	}
 
-	cliFlags := main.CliFlags{
+	cliFlags := cleaner.CliFlags{
 		ShowVersion:       false,
 		ShowAuthors:       false,
 		ShowConfiguration: false,
@@ -970,13 +974,13 @@ func TestCleanupPrintSummaryTable(t *testing.T) {
 	}
 
 	// call the tested function
-	status, err := main.Cleanup(&configuration, connection, cliFlags, main.DBSchemaOCPRecommendations)
+	status, err := cleaner.Cleanup(&configuration, connection, cliFlags, cleaner.DBSchemaOCPRecommendations)
 
 	// error is not expected
-	assert.NoError(t, err, "error is not expected while calling main.cleanup")
+	assert.NoError(t, err, "error is not expected while calling cleaner.cleanup")
 
 	// check the status
-	assert.Equal(t, status, main.ExitStatusOK)
+	assert.Equal(t, status, cleaner.ExitStatusOK)
 }
 
 // TestCleanupCheckSummaryTableContent check the function cleanup when
@@ -1006,14 +1010,14 @@ func TestCleanupCheckSummaryTableContent(t *testing.T) {
 	assert.NoError(t, err, "error creating SQL mock")
 
 	// stub for structures needed to call the tested function
-	configuration := main.ConfigStruct{}
+	configuration := cleaner.ConfigStruct{}
 
-	configuration.Cleaner = main.CleanerConfiguration{
+	configuration.Cleaner = cleaner.CleanerConfiguration{
 		MaxAge:          "3 days",
 		ClusterListFile: "cluster_list.txt",
 	}
 
-	cliFlags := main.CliFlags{
+	cliFlags := cleaner.CliFlags{
 		ShowVersion:       false,
 		ShowAuthors:       false,
 		ShowConfiguration: false,
@@ -1024,7 +1028,7 @@ func TestCleanupCheckSummaryTableContent(t *testing.T) {
 
 	// call the tested function
 	output, err := capture.StandardOutput(func() {
-		status, _ = main.Cleanup(&configuration, connection, cliFlags, main.DBSchemaOCPRecommendations)
+		status, _ = cleaner.Cleanup(&configuration, connection, cliFlags, cleaner.DBSchemaOCPRecommendations)
 	})
 
 	// check the captured text
@@ -1036,7 +1040,7 @@ func TestCleanupCheckSummaryTableContent(t *testing.T) {
 	}
 
 	// check the status
-	assert.Equal(t, status, main.ExitStatusOK)
+	assert.Equal(t, status, cleaner.ExitStatusOK)
 }
 
 // TestCleanupAll check the function cleanupAll when
@@ -1047,13 +1051,13 @@ func TestCleanupAll(t *testing.T) {
 	assert.NoError(t, err, "error creating SQL mock")
 
 	// stub for structures needed to call the tested function
-	configuration := main.ConfigStruct{}
+	configuration := cleaner.ConfigStruct{}
 
-	configuration.Cleaner = main.CleanerConfiguration{
+	configuration.Cleaner = cleaner.CleanerConfiguration{
 		MaxAge: "3 days",
 	}
 
-	cliFlags := main.CliFlags{
+	cliFlags := cleaner.CliFlags{
 		ShowVersion:       false,
 		ShowAuthors:       false,
 		ShowConfiguration: false,
@@ -1067,13 +1071,13 @@ func TestCleanupAll(t *testing.T) {
 	mock.ExpectClose()
 
 	// call the tested function
-	status, err := main.CleanupAll(&configuration, connection, cliFlags)
+	status, err := cleaner.CleanupAll(&configuration, connection, cliFlags)
 
 	// error is not expected
-	assert.NoError(t, err, "error is not expected while calling main.cleanupAll")
+	assert.NoError(t, err, "error is not expected while calling cleaner.cleanupAll")
 
 	// check the status
-	assert.Equal(t, status, main.ExitStatusOK)
+	assert.Equal(t, status, cleaner.ExitStatusOK)
 }
 
 // TestCleanupAllMissingMaxAge check the function cleanup fails if no MaxAge
@@ -1084,13 +1088,13 @@ func TestCleanupAllMissingMaxAge(t *testing.T) {
 	assert.NoError(t, err, "error creating SQL mock")
 
 	// stub for structures needed to call the tested function
-	configuration := main.ConfigStruct{}
+	configuration := cleaner.ConfigStruct{}
 
-	configuration.Cleaner = main.CleanerConfiguration{
+	configuration.Cleaner = cleaner.CleanerConfiguration{
 		MaxAge: "",
 	}
 
-	cliFlags := main.CliFlags{
+	cliFlags := cleaner.CliFlags{
 		ShowVersion:       false,
 		ShowAuthors:       false,
 		ShowConfiguration: false,
@@ -1098,29 +1102,29 @@ func TestCleanupAllMissingMaxAge(t *testing.T) {
 	}
 
 	// call the tested function
-	status, err := main.CleanupAll(&configuration, connection, cliFlags)
+	status, err := cleaner.CleanupAll(&configuration, connection, cliFlags)
 
 	// error is not expected
-	assert.EqualError(t, err, main.MaxAgeMissing)
+	assert.EqualError(t, err, cleaner.MaxAgeMissing)
 
 	// check the status
-	assert.Equal(t, status, main.ExitStatusPerformCleanupError)
+	assert.Equal(t, status, cleaner.ExitStatusPerformCleanupError)
 }
 
 // TestDetectMultipleRuleDisable check the function detectMultipleRuleDisable when the
 // connection to DB is not established
 func TestDetectMultipleRuleDisable(t *testing.T) {
 	// stub for CLI flags needed to call the tested function
-	cliFlags := main.CliFlags{}
+	cliFlags := cleaner.CliFlags{}
 
 	// call the tested function with null connection
-	status, err := main.DetectMultipleRuleDisable(nil, cliFlags)
+	status, err := cleaner.DetectMultipleRuleDisable(nil, cliFlags)
 
 	// error is expected
-	assert.Error(t, err, "error is expected while calling main.cleanup")
+	assert.Error(t, err, "error is expected while calling cleaner.cleanup")
 
 	// check the status
-	assert.Equal(t, status, main.ExitStatusStorageError)
+	assert.Equal(t, status, cleaner.ExitStatusStorageError)
 }
 
 // TestFillInDatabase checks the basic behaviour of
@@ -1146,9 +1150,9 @@ func TestFillInDatabase(t *testing.T) {
 
 	mock.ExpectClose()
 
-	exitCode, err := main.FillInDatabase(connection, main.DBSchemaOCPRecommendations)
+	exitCode, err := cleaner.FillInDatabase(connection, cleaner.DBSchemaOCPRecommendations)
 	assert.NoError(t, err, "error not expected while calling tested function")
-	assert.Equal(t, exitCode, main.ExitStatusOK)
+	assert.Equal(t, exitCode, cleaner.ExitStatusOK)
 
 	// check if DB can be closed successfully
 	checkConnectionClose(t, connection)
@@ -1183,9 +1187,9 @@ func TestFillInDatabaseOnError(t *testing.T) {
 
 	mock.ExpectClose()
 
-	exitCode, err := main.FillInDatabase(connection, main.DBSchemaOCPRecommendations)
+	exitCode, err := cleaner.FillInDatabase(connection, cleaner.DBSchemaOCPRecommendations)
 	assert.Error(t, err, "error is expected while calling tested function")
-	assert.Equal(t, exitCode, main.ExitStatusFillInStorageError)
+	assert.Equal(t, exitCode, cleaner.ExitStatusFillInStorageError)
 	assert.Equal(t, err, mockedError)
 
 	// check if DB can be closed successfully
@@ -1198,33 +1202,33 @@ func TestFillInDatabaseOnError(t *testing.T) {
 // TestFillInDatabaseNoConnection checks the basic behaviour of
 // fillInDatabase function when connection is not established.
 func TestFillInDatabaseNoConnection(t *testing.T) {
-	exitCode, err := main.FillInDatabase(nil, main.DBSchemaOCPRecommendations)
+	exitCode, err := cleaner.FillInDatabase(nil, cleaner.DBSchemaOCPRecommendations)
 	assert.Error(t, err, "error is expected while calling tested function")
-	assert.Equal(t, exitCode, main.ExitStatusFillInStorageError)
+	assert.Equal(t, exitCode, cleaner.ExitStatusFillInStorageError)
 
-	exitCode, err = main.FillInDatabase(nil, main.DBSchemaDVORecommendations)
+	exitCode, err = cleaner.FillInDatabase(nil, cleaner.DBSchemaDVORecommendations)
 	assert.Error(t, err, "error is expected while calling tested function")
-	assert.Equal(t, exitCode, main.ExitStatusFillInStorageError)
+	assert.Equal(t, exitCode, cleaner.ExitStatusFillInStorageError)
 
-	exitCode, err = main.FillInDatabase(nil, "")
+	exitCode, err = cleaner.FillInDatabase(nil, "")
 	assert.Error(t, err, "error is expected while calling tested function")
-	assert.Equal(t, exitCode, main.ExitStatusFillInStorageError)
+	assert.Equal(t, exitCode, cleaner.ExitStatusFillInStorageError)
 }
 
 // TestDisplayOldRecordsNoConnection checks the basic behaviour of
 // displayOldRecords function when connection is not established.
 func TestDisplayOldRecordsNoConnection(t *testing.T) {
 	// fill in configuration structure
-	configuration := main.ConfigStruct{}
-	configuration.Cleaner = main.CleanerConfiguration{
+	configuration := cleaner.ConfigStruct{}
+	configuration.Cleaner = cleaner.CleanerConfiguration{
 		MaxAge: "3 days",
 	}
 
-	cliFlags := main.CliFlags{}
+	cliFlags := cleaner.CliFlags{}
 
-	exitCode, err := main.DisplayOldRecords(&configuration, nil, cliFlags, main.DBSchemaOCPRecommendations)
+	exitCode, err := cleaner.DisplayOldRecords(&configuration, nil, cliFlags, cleaner.DBSchemaOCPRecommendations)
 	assert.Error(t, err, "error is expected while calling tested function")
-	assert.Equal(t, exitCode, main.ExitStatusStorageError)
+	assert.Equal(t, exitCode, cleaner.ExitStatusStorageError)
 }
 
 // TestDisplayOldRecordsProperConnection checks the basic behaviour of
@@ -1235,13 +1239,13 @@ func TestDisplayOldRecordsProperConnection(t *testing.T) {
 	assert.NoError(t, err, "error creating SQL mock")
 
 	// fill in configuration structure
-	configuration := main.ConfigStruct{}
-	configuration.Cleaner = main.CleanerConfiguration{
+	configuration := cleaner.ConfigStruct{}
+	configuration.Cleaner = cleaner.CleanerConfiguration{
 		MaxAge: "3 days",
 	}
 
 	// command line flags
-	cliFlags := main.CliFlags{}
+	cliFlags := cleaner.CliFlags{}
 
 	// prepare mocked result for SQL query
 	rows := sqlmock.NewRows([]string{"cluster", "reported_at", "last_checked"})
@@ -1262,27 +1266,27 @@ func TestDisplayOldRecordsProperConnection(t *testing.T) {
 	mock.ExpectClose()
 
 	// call the tested function
-	exitCode, err := main.DisplayOldRecords(&configuration, connection, cliFlags, main.DBSchemaOCPRecommendations)
+	exitCode, err := cleaner.DisplayOldRecords(&configuration, connection, cliFlags, cleaner.DBSchemaOCPRecommendations)
 
 	// and check its output
 	assert.NoError(t, err, "error is not expected while calling tested function")
-	assert.Equal(t, main.ExitStatusOK, exitCode)
+	assert.Equal(t, cleaner.ExitStatusOK, exitCode)
 }
 
 // TestDetectMultipleRuleDisablesNoConnection check the function
 // detectMultipleRuleDisable when the connection to DB is not established
 func TestDetectMultipleRuleDisablesNoConnection(t *testing.T) {
 	// command line flags
-	cliFlags := main.CliFlags{}
+	cliFlags := cleaner.CliFlags{}
 
 	// call the tested function
-	status, err := main.DetectMultipleRuleDisable(nil, cliFlags)
+	status, err := cleaner.DetectMultipleRuleDisable(nil, cliFlags)
 
 	// error is expected
-	assert.Error(t, err, "error is expected while calling main.vacuumDB")
+	assert.Error(t, err, "error is expected while calling cleaner.vacuumDB")
 
 	// check the status
-	assert.Equal(t, status, main.ExitStatusStorageError)
+	assert.Equal(t, status, cleaner.ExitStatusStorageError)
 }
 
 // TestDetectMultipleRuleDisablesProperConnection check the function
@@ -1293,7 +1297,7 @@ func TestDetectMultipleRuleDisablesProperConnection(t *testing.T) {
 	assert.NoError(t, err, "error creating SQL mock")
 
 	// command line flags
-	cliFlags := main.CliFlags{}
+	cliFlags := cleaner.CliFlags{}
 
 	// prepare mocked result for SQL query
 	rows := sqlmock.NewRows([]string{})
@@ -1306,13 +1310,13 @@ func TestDetectMultipleRuleDisablesProperConnection(t *testing.T) {
 	mock.ExpectClose()
 
 	// call the tested function
-	status, err := main.DetectMultipleRuleDisable(connection, cliFlags)
+	status, err := cleaner.DetectMultipleRuleDisable(connection, cliFlags)
 
 	// error is not expected
-	assert.NoError(t, err, "error is not expected while calling main.detectMultipleRuleDisable")
+	assert.NoError(t, err, "error is not expected while calling cleaner.detectMultipleRuleDisable")
 
 	// check the status
-	assert.Equal(t, status, main.ExitStatusOK)
+	assert.Equal(t, status, cleaner.ExitStatusOK)
 }
 
 // TestDetectMultipleRuleDisablesOnError1 check the function
@@ -1326,7 +1330,7 @@ func TestDetectMultipleRuleDisablesOnError1(t *testing.T) {
 	assert.NoError(t, err, "error creating SQL mock")
 
 	// command line flags
-	cliFlags := main.CliFlags{}
+	cliFlags := cleaner.CliFlags{}
 
 	// prepare mocked result for SQL query
 	rows := sqlmock.NewRows([]string{})
@@ -1339,14 +1343,14 @@ func TestDetectMultipleRuleDisablesOnError1(t *testing.T) {
 	mock.ExpectClose()
 
 	// call the tested function
-	status, err := main.DetectMultipleRuleDisable(connection, cliFlags)
+	status, err := cleaner.DetectMultipleRuleDisable(connection, cliFlags)
 
 	// error is expected
-	assert.Error(t, err, "error is expected while calling main.detectMultipleRuleDisable")
+	assert.Error(t, err, "error is expected while calling cleaner.detectMultipleRuleDisable")
 	assert.Equal(t, err, mockedError)
 
 	// check the status
-	assert.Equal(t, status, main.ExitStatusStorageError)
+	assert.Equal(t, status, cleaner.ExitStatusStorageError)
 }
 
 // TestDetectMultipleRuleDisablesOnError2 check the function
@@ -1360,7 +1364,7 @@ func TestDetectMultipleRuleDisablesOnError2(t *testing.T) {
 	assert.NoError(t, err, "error creating SQL mock")
 
 	// command line flags
-	cliFlags := main.CliFlags{}
+	cliFlags := cleaner.CliFlags{}
 
 	// expected queries performed by tested function
 	expectedQuery := "select cluster_id, rule_id, count\\(\\*\\) as cnt from cluster_rule_toggle group by cluster_id, rule_id having count\\(\\*\\)>1 order by cnt desc;"
@@ -1368,12 +1372,12 @@ func TestDetectMultipleRuleDisablesOnError2(t *testing.T) {
 	mock.ExpectClose()
 
 	// call the tested function
-	status, err := main.DetectMultipleRuleDisable(connection, cliFlags)
+	status, err := cleaner.DetectMultipleRuleDisable(connection, cliFlags)
 
 	// error is expected
-	assert.Error(t, err, "error is expected while calling main.detectMultipleRuleDisable")
+	assert.Error(t, err, "error is expected while calling cleaner.detectMultipleRuleDisable")
 	assert.Equal(t, err, mockedError)
 
 	// check the status
-	assert.Equal(t, status, main.ExitStatusStorageError)
+	assert.Equal(t, status, cleaner.ExitStatusStorageError)
 }
