@@ -98,7 +98,7 @@
   <table>
     <thead><tr><th class="doc"><h1>storage.go</h1></th><th class="code"></th></tr></thead>
     <tbody>
-      
+
       <tr class="section">
 	<td class="doc"></td>
 	<td class="code"><pre><code><div class="comment">/*
@@ -121,7 +121,7 @@ limitations under the License.
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>Documentation in literate-programming-style is available at:
 https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/database.html</p>
@@ -129,7 +129,7 @@ https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/da
 	<td class="code"><pre><code>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>This source file contains an implementation of interface between Go code and
 (almost any) SQL database like PostgreSQL, SQLite, or MariaDB.</p>
@@ -144,7 +144,7 @@ DataSource - specification of data source. The content of this parameter depends
 	<td class="code"><pre><code>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>Generated documentation is available at:
 https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner</p>
@@ -168,7 +168,7 @@ https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>Error messages</p>
 </td>
@@ -180,7 +180,7 @@ https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>Other messages</p>
 </td>
@@ -195,7 +195,7 @@ https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>SQL commands</p>
 </td>
@@ -221,7 +221,7 @@ https://pkg.go.dev/github.com/RedHatInsights/insights-results-aggregator-cleaner
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>initDatabaseConnection initializes driver, checks if it's supported and
 initializes connection to the storage.</p>
@@ -229,7 +229,7 @@ initializes connection to the storage.</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">initDatabaseConnection</div><div class="operator">(</div><div class="ident">configuration</div> <div class="operator">*</div><div class="ident">StorageConfiguration</div><div class="operator">)</div> <div class="operator">(</div><div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if storage configuration structure has been initialized and
 passed to this function properly</p>
@@ -247,7 +247,7 @@ passed to this function properly</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>initialize connection into selected database using the right driver</p>
 </td>
@@ -272,7 +272,7 @@ passed to this function properly</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>try to initialize connection to the storage</p>
 </td>
@@ -280,7 +280,7 @@ passed to this function properly</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if establishing a connection was successful</p>
 </td>
@@ -294,7 +294,7 @@ passed to this function properly</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>displayMultipleRuleDisable function read and displays clusters where
 multiple users have disabled some rules.</p>
@@ -306,7 +306,7 @@ multiple users have disabled some rules.</p>
 	<div class="keyword">if</div> <div class="ident">output</div> <div class="operator">!=</div> <div class="literal">&#34;&#34;</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>create output file
 disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, Severity: MEDIUM)</p>
@@ -317,7 +317,7 @@ disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, 
 		<div class="operator">}</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>an object used to write to file</p>
 </td>
@@ -327,7 +327,7 @@ disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, 
 	<div class="keyword">defer</div> <div class="keyword">func</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>output needs to be flushed at the end</p>
 </td>
@@ -342,7 +342,7 @@ disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, 
 	<div class="keyword">defer</div> <div class="keyword">func</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>file needs to be closed at the end</p>
 </td>
@@ -356,7 +356,7 @@ disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, 
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>first query to be performed</p>
 </td>
@@ -369,7 +369,7 @@ disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, 
 `</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>second query to be performed</p>
 </td>
@@ -383,7 +383,7 @@ disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, 
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>perform the first query and display results</p>
 </td>
@@ -391,7 +391,7 @@ disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, 
 		<div class="literal">&#34;cluster_rule_toggle&#34;</div><div class="operator">)</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>the first query+display function might throw some error</p>
 </td>
@@ -401,7 +401,7 @@ disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, 
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>perform second query and display results</p>
 </td>
@@ -409,7 +409,7 @@ disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, 
 		<div class="literal">&#34;cluster_user_rule_disable_feedback&#34;</div><div class="operator">)</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>second query+display function might throw some error</p>
 </td>
@@ -418,7 +418,7 @@ disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, 
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>performDisplayMultipleRuleDisable function displays cluster names and org
 ids where multiple users disabled any rule</p>
@@ -428,7 +428,7 @@ ids where multiple users disabled any rule</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>perform given query to database</p>
 </td>
@@ -439,7 +439,7 @@ ids where multiple users disabled any rule</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>iterate over all records that has been found</p>
 </td>
@@ -452,14 +452,14 @@ ids where multiple users disabled any rule</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>read one report</p>
 </td>
 	<td class="code"><pre><code>		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">rows</div><div class="operator">.</div><div class="ident">Scan</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">clusterName</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">ruleID</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">count</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>close the result set in case of any error</p>
 </td>
@@ -471,7 +471,7 @@ ids where multiple users disabled any rule</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>try to read organization ID for given cluster name</p>
 </td>
@@ -483,7 +483,7 @@ ids where multiple users disabled any rule</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>just print the report, including organization ID</p>
 </td>
@@ -496,7 +496,7 @@ ids where multiple users disabled any rule</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>export to file (if enabled)</p>
 </td>
@@ -512,7 +512,7 @@ ids where multiple users disabled any rule</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>readOrgID function tries to read organization ID for given cluster name</p>
 </td>
@@ -521,7 +521,7 @@ ids where multiple users disabled any rule</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>perform the query</p>
 </td>
@@ -533,7 +533,7 @@ ids where multiple users disabled any rule</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>and check the result (if any)</p>
 </td>
@@ -542,14 +542,14 @@ ids where multiple users disabled any rule</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>read one organization ID returned in query result</p>
 </td>
 	<td class="code"><pre><code>		<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">rows</div><div class="operator">.</div><div class="ident">Scan</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">orgID</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>proper error logging will be performed elsewhere</p>
 </td>
@@ -557,7 +557,7 @@ ids where multiple users disabled any rule</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>close the result set in case of any error</p>
 </td>
@@ -572,7 +572,7 @@ ids where multiple users disabled any rule</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>no result?</p>
 </td>
@@ -587,7 +587,7 @@ ids where multiple users disabled any rule</p>
 	<div class="keyword">if</div> <div class="ident">output</div> <div class="operator">!=</div> <div class="literal">&#34;&#34;</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>create output file
 disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, Severity: MEDIUM)</p>
@@ -598,7 +598,7 @@ disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, 
 		<div class="operator">}</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>an object used to write to file</p>
 </td>
@@ -609,7 +609,7 @@ disable G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, 
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>displayAllOldRecords function read all old records, ie. records that are
 older than the specified time duration. Those records are simply displayed.</p>
@@ -617,7 +617,7 @@ older than the specified time duration. Those records are simply displayed.</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">displayAllOldRecords</div><div class="operator">(</div><div class="ident">connection</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">,</div> <div class="ident">maxAge</div><div class="operator">,</div> <div class="ident">output</div> <div class="ident">string</div><div class="operator">)</div> <div class="ident">error</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if connection has been initialized</p>
 </td>
@@ -631,7 +631,7 @@ older than the specified time duration. Those records are simply displayed.</p>
 	<div class="keyword">defer</div> <div class="keyword">func</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>output needs to be flushed at the end</p>
 </td>
@@ -646,7 +646,7 @@ older than the specified time duration. Those records are simply displayed.</p>
 	<div class="keyword">defer</div> <div class="keyword">func</div><div class="operator">(</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>file needs to be closed at the end</p>
 </td>
@@ -660,14 +660,14 @@ older than the specified time duration. Those records are simply displayed.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>main function of this tool is ability to delete old reports</p>
 </td>
 	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">:=</div> <div class="ident">performListOfOldReports</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">,</div> <div class="ident">maxAge</div><div class="operator">,</div> <div class="ident">writer</div><div class="operator">)</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>skip next operation on first error</p>
 </td>
@@ -677,14 +677,14 @@ older than the specified time duration. Those records are simply displayed.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>but we might be interested in other tables as well, especially advisor ratings</p>
 </td>
 	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">performListOfOldRatings</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">,</div> <div class="ident">maxAge</div><div class="operator">)</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>skip next operation on first error</p>
 </td>
@@ -694,14 +694,14 @@ older than the specified time duration. Those records are simply displayed.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>also but we might be interested in other consumer errors</p>
 </td>
 	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">performListOfOldConsumerErrors</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">,</div> <div class="ident">maxAge</div><div class="operator">)</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>skip next operation on first error</p>
 </td>
@@ -735,7 +735,7 @@ older than the specified time duration. Those records are simply displayed.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>performListOfOldReports read and displays old records read from reported_at
 table</p>
@@ -745,7 +745,7 @@ table</p>
 		<div class="keyword">func</div><div class="operator">(</div><div class="ident">rows</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">Rows</div><div class="operator">,</div> <div class="ident">writer</div> <div class="operator">*</div><div class="ident">bufio</div><div class="operator">.</div><div class="ident">Writer</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">int</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>used to compute a real record age</p>
 </td>
@@ -753,7 +753,7 @@ table</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>reports count</p>
 </td>
@@ -761,7 +761,7 @@ table</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>iterate over all old records</p>
 </td>
@@ -774,14 +774,14 @@ table</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>read one old record from the report table</p>
 </td>
 	<td class="code"><pre><code>				<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">rows</div><div class="operator">.</div><div class="ident">Scan</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">clusterName</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">reported</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">lastChecked</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>close the result set in case of any error</p>
 </td>
@@ -793,7 +793,7 @@ table</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>compute the real record age</p>
 </td>
@@ -801,7 +801,7 @@ table</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare for the report</p>
 </td>
@@ -810,7 +810,7 @@ table</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>just print the report</p>
 </td>
@@ -834,7 +834,7 @@ table</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>performListOfOldRatings read and displays old Advisor ratings read from
 advisor_ratings table</p>
@@ -844,7 +844,7 @@ advisor_ratings table</p>
 		<div class="keyword">func</div><div class="operator">(</div><div class="ident">rows</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">Rows</div><div class="operator">,</div> <div class="ident">writer</div> <div class="operator">*</div><div class="ident">bufio</div><div class="operator">.</div><div class="ident">Writer</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">int</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>used to compute a real record age</p>
 </td>
@@ -852,7 +852,7 @@ advisor_ratings table</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>reports count</p>
 </td>
@@ -860,7 +860,7 @@ advisor_ratings table</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>iterate over all old records</p>
 </td>
@@ -876,14 +876,14 @@ advisor_ratings table</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>read one old record from the report table</p>
 </td>
 	<td class="code"><pre><code>				<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">rows</div><div class="operator">.</div><div class="ident">Scan</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">orgID</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">ruleFQDN</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">errorKey</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">ruleID</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">rating</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">lastUpdatedAt</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>close the result set in case of any error</p>
 </td>
@@ -895,7 +895,7 @@ advisor_ratings table</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>compute the real error age</p>
 </td>
@@ -903,7 +903,7 @@ advisor_ratings table</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare for the report</p>
 </td>
@@ -911,7 +911,7 @@ advisor_ratings table</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>just print the report</p>
 </td>
@@ -931,7 +931,7 @@ advisor_ratings table</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>performListOfOldConsumerErrors read and displays consumer errors stored in
 consumer_errors table</p>
@@ -941,7 +941,7 @@ consumer_errors table</p>
 		<div class="keyword">func</div><div class="operator">(</div><div class="ident">rows</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">Rows</div><div class="operator">,</div> <div class="ident">writer</div> <div class="operator">*</div><div class="ident">bufio</div><div class="operator">.</div><div class="ident">Writer</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">int</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>used to compute a real record age</p>
 </td>
@@ -949,7 +949,7 @@ consumer_errors table</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>reports count</p>
 </td>
@@ -957,7 +957,7 @@ consumer_errors table</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>iterate over all old records</p>
 </td>
@@ -973,14 +973,14 @@ consumer_errors table</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>read one old record from the report table</p>
 </td>
 	<td class="code"><pre><code>				<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">:=</div> <div class="ident">rows</div><div class="operator">.</div><div class="ident">Scan</div><div class="operator">(</div><div class="operator">&amp;</div><div class="ident">topic</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">partition</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">offset</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">key</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">consumedAt</div><div class="operator">,</div> <div class="operator">&amp;</div><div class="ident">message</div><div class="operator">)</div><div class="operator">;</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>close the result set in case of any error</p>
 </td>
@@ -992,7 +992,7 @@ consumer_errors table</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>compute the real error age</p>
 </td>
@@ -1000,7 +1000,7 @@ consumer_errors table</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare for the report</p>
 </td>
@@ -1008,7 +1008,7 @@ consumer_errors table</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>just print the report</p>
 </td>
@@ -1029,7 +1029,7 @@ consumer_errors table</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>deleteRecordFromTable function deletes selected records (identified by
 cluster name) from database</p>
@@ -1037,7 +1037,7 @@ cluster name) from database</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">deleteRecordFromTable</div><div class="operator">(</div><div class="ident">connection</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">,</div> <div class="ident">table</div><div class="operator">,</div> <div class="ident">key</div> <div class="ident">string</div><div class="operator">,</div> <div class="ident">clusterName</div> <div class="ident">ClusterName</div><div class="operator">)</div> <div class="operator">(</div><div class="ident">int</div><div class="operator">,</div> <div class="ident">error</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>it is not possible to use parameter for table name or a key
 disable &quot;G202 (CWE-89): SQL string concatenation (Confidence: HIGH, Severity: MEDIUM)&quot;</p>
@@ -1048,7 +1048,7 @@ disable &quot;G202 (CWE-89): SQL string concatenation (Confidence: HIGH, Severit
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>perform the SQL statement</p>
 </td>
@@ -1059,7 +1059,7 @@ disable &quot;G202 (CWE-89): SQL string concatenation (Confidence: HIGH, Severit
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>read number of affected (deleted) rows</p>
 </td>
@@ -1072,7 +1072,7 @@ disable &quot;G202 (CWE-89): SQL string concatenation (Confidence: HIGH, Severit
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>tablesAndKeys contains list of all tables together with keys used to select
 records to be deleted</p>
@@ -1104,7 +1104,7 @@ records to be deleted</p>
 	<div class="operator">}</div><div class="operator">,</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>must be at the end due to constraints</p>
 </td>
@@ -1116,7 +1116,7 @@ records to be deleted</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>performVacuumDB vacuums the whole database</p>
 </td>
@@ -1126,7 +1126,7 @@ records to be deleted</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>perform the SQL statement</p>
 </td>
@@ -1140,7 +1140,7 @@ records to be deleted</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>performCleanupInDB function cleans up all data for selected cluster names</p>
 </td>
@@ -1149,7 +1149,7 @@ records to be deleted</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>return value</p>
 </td>
@@ -1157,7 +1157,7 @@ records to be deleted</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if connection has been initialized</p>
 </td>
@@ -1168,7 +1168,7 @@ records to be deleted</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>initialize counters</p>
 </td>
@@ -1178,7 +1178,7 @@ records to be deleted</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>perform cleanup for selected cluster names</p>
 </td>
@@ -1187,7 +1187,7 @@ records to be deleted</p>
 		<div class="keyword">for</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">tableAndKey</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">tablesAndKeys</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>try to delete record from selected table</p>
 </td>
@@ -1216,7 +1216,7 @@ records to be deleted</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>fillInDatabaseByTestData function fill-in database by test data (not to be
 used against production database)</p>
@@ -1249,7 +1249,7 @@ used against production database)</p>
 				<div class="ident">Msg</div><div class="operator">(</div><div class="literal">&#34;inserting&#34;</div><div class="operator">)</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>perform the SQL statement</p>
 </td>
@@ -1257,7 +1257,7 @@ used against production database)</p>
 			<div class="keyword">if</div> <div class="ident">err</div> <div class="operator">!=</div> <div class="ident">nil</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>failure is usually ok - it might mean that
 the record with given cluster name already
@@ -1275,7 +1275,7 @@ exists</p>
 
 </code></pre></td>
       </tr>
-      
+
     </tbody>
   </table>
 </div>

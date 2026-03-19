@@ -54,13 +54,13 @@ import (
 const (
 	canNotConnectToDataStorageMessage = "Can not connect to data storage"
 	unableToCloseDBRowsHandle         = "Unable to close the DB rows handle"
-	connectionNotEstablished          = "Connection to database was not established"
+	connectionNotEstablished          = "connection to database was not established"
 	reportedMsg                       = "reported"
 	lastCheckedMsg                    = "lastChecked"
 	ageMsg                            = "age"
 	reportsCountMsg                   = "reports count"
 	maxAgeMissing                     = "max-age parameter is missing"
-	invalidSchemaMsg                  = "Invalid DB schema to be cleaned up: '%s'"
+	invalidSchemaMsg                  = "invalid DB schema to be cleaned up: '%s'"
 	affectedMsg                       = "Affected"
 )
 
@@ -425,7 +425,7 @@ func displayAllOldRecords(connection *sql.DB, maxAge, output string, schema stri
 			return err
 		}
 	default:
-		return fmt.Errorf("Invalid database schema to be investigated: '%s'", schema)
+		return fmt.Errorf("invalid database schema to be investigated: '%s'", schema)
 	}
 
 	return nil
@@ -722,7 +722,7 @@ var (
 // the maxAge value
 func deleteOldRecordsFromTable(connection *sql.DB, sqlStatement, maxAge string, dryRun bool) (int, error) {
 	if dryRun {
-		sqlStatement = strings.Replace(sqlStatement, "DELETE", "SELECT", -1)
+		sqlStatement = strings.ReplaceAll(sqlStatement, "DELETE", "SELECT")
 	}
 	result, err := connection.Exec(sqlStatement, maxAge)
 	if err != nil {
@@ -899,7 +899,7 @@ func fillInDatabaseByTestData(connection *sql.DB, schema string) error {
 	case DBSchemaDVORecommendations:
 		return fillInDVODatabaseByTestData(connection)
 	default:
-		return fmt.Errorf("Invalid DB schema '%s'", schema)
+		return fmt.Errorf("invalid DB schema '%s'", schema)
 	}
 }
 

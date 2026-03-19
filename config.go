@@ -266,21 +266,21 @@ func CheckConfiguration(config *ConfigStruct) error {
 	schema := storageCfg.Schema
 
 	if driver == "" {
-		return fmt.Errorf("Database driver is not specified in configuration")
+		return fmt.Errorf("database driver is not specified in configuration")
 	}
 
 	if schema == "" {
-		return fmt.Errorf("Database schema is not specified in configuration")
+		return fmt.Errorf("database schema is not specified in configuration")
 	}
 
 	_, found := drivers[driver]
 	if !found {
-		return fmt.Errorf("Incorrect database driver found in configuration: %s", driver)
+		return fmt.Errorf("incorrect database driver found in configuration: %s", driver)
 	}
 
 	_, found = schemas[schema]
 	if !found {
-		return fmt.Errorf("Incorrect database schema found in configuration: %s", schema)
+		return fmt.Errorf("incorrect database schema found in configuration: %s", schema)
 	}
 
 	return nil

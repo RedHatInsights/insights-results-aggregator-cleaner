@@ -65,7 +65,7 @@ const (
 	clusterListFinished          = "Cluster list finished"
 	inputWithClusterID           = "input"
 	selectingRecordsFromDatabase = "Selecting records from database"
-	connectionToDBNotEstablished = "Connection to database was not established"
+	connectionToDBNotEstablished = "connection to database was not established"
 )
 
 // Exit codes
@@ -268,9 +268,7 @@ func PrintSummaryTable(summary Summary) error {
 		strconv.Itoa(totalDeletions))
 
 	// display the whole table
-	table.Render()
-
-	return nil
+	return table.Render()
 }
 
 // vacuumDB function starts the database vacuuming operation

@@ -98,7 +98,7 @@
   <table>
     <thead><tr><th class="doc"><h1>storage_test.go</h1></th><th class="code"></th></tr></thead>
     <tbody>
-      
+
       <tr class="section">
 	<td class="doc"></td>
 	<td class="code"><pre><code><div class="comment">/*
@@ -121,7 +121,7 @@ limitations under the License.
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>Documentation in literate-programming-style is available at:
 https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/database_test.html</p>
@@ -151,7 +151,7 @@ https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/da
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>checkConnectionClose function performs mocked DB closing operation and checks
 if the connection is properly closed from unit tests.</p>
@@ -159,7 +159,7 @@ if the connection is properly closed from unit tests.</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">checkConnectionClose</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">,</div> <div class="ident">connection</div> <div class="operator">*</div><div class="ident">sql</div><div class="operator">.</div><div class="ident">DB</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>connection to mocked DB needs to be closed properly</p>
 </td>
@@ -170,7 +170,7 @@ if the connection is properly closed from unit tests.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>checkAllExpectations function checks if all database-related operations have
 been really met.</p>
@@ -178,7 +178,7 @@ been really met.</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">checkAllExpectations</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">,</div> <div class="ident">mock</div> <div class="ident">sqlmock</div><div class="operator">.</div><div class="ident">Sqlmock</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if all expectations were met</p>
 </td>
@@ -189,7 +189,7 @@ been really met.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expectOrgIDQuery mocks an expect of a repetetive query to check whether cluster
 belongs to given org</p>
@@ -197,7 +197,7 @@ belongs to given org</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">expectOrgIDQuery</div><div class="operator">(</div><div class="ident">mock</div> <div class="ident">sqlmock</div><div class="operator">.</div><div class="ident">Sqlmock</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
@@ -206,7 +206,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -216,7 +216,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expectOrgIDQueryError mocks an expect of a repetetive query to check whether cluster
 belongs to given org</p>
@@ -224,7 +224,7 @@ belongs to given org</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">expectOrgIDQueryError</div><div class="operator">(</div><div class="ident">mock</div> <div class="ident">sqlmock</div><div class="operator">.</div><div class="ident">Sqlmock</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>error to be thrown</p>
 </td>
@@ -232,7 +232,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -242,14 +242,14 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestReadOrgIDNoResults checks the function readOrgID.</p>
 </td>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestReadOrgIDNoResults</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -258,7 +258,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
@@ -266,7 +266,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -276,7 +276,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function</p>
 </td>
@@ -285,7 +285,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check the org ID returned from tested function</p>
 </td>
@@ -295,7 +295,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -303,7 +303,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -312,14 +312,14 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestReadOrgIDResults checks the function readOrgID.</p>
 </td>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestReadOrgIDResult</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -328,7 +328,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
@@ -336,7 +336,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function</p>
 </td>
@@ -345,7 +345,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check the org ID returned from tested function</p>
 </td>
@@ -355,7 +355,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -363,7 +363,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -372,14 +372,14 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestReadOrgIDOnError checks error handling in function readOrgID.</p>
 </td>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestReadOrgIDOnError</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>error to be thrown</p>
 </td>
@@ -387,7 +387,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -396,7 +396,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -406,7 +406,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function</p>
 </td>
@@ -417,7 +417,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check the org ID returned from tested function</p>
 </td>
@@ -427,7 +427,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if the error is correct</p>
 </td>
@@ -437,7 +437,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -445,7 +445,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -454,14 +454,14 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestReadOrgIDScanError checks error handling in function readOrgID.</p>
 </td>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestReadOrgIDScanError</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -470,7 +470,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
@@ -479,7 +479,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -489,7 +489,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function</p>
 </td>
@@ -498,7 +498,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check the org ID returned from tested function</p>
 </td>
@@ -506,7 +506,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -514,7 +514,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -523,7 +523,7 @@ belongs to given org</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestPerformDisplayMultipleRuleDisableNoResults checks the basic behaviour of
 performDisplayMultipleRuleDisable function.</p>
@@ -531,7 +531,7 @@ performDisplayMultipleRuleDisable function.</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestPerformDisplayMultipleRuleDisableNoResults</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -540,7 +540,7 @@ performDisplayMultipleRuleDisable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
@@ -548,7 +548,7 @@ performDisplayMultipleRuleDisable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -558,7 +558,7 @@ performDisplayMultipleRuleDisable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>first query to be performed</p>
 </td>
@@ -571,7 +571,7 @@ performDisplayMultipleRuleDisable function.</p>
 `</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function</p>
 </td>
@@ -580,7 +580,7 @@ performDisplayMultipleRuleDisable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -588,7 +588,7 @@ performDisplayMultipleRuleDisable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -597,7 +597,7 @@ performDisplayMultipleRuleDisable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestPerformDisplayMultipleRuleDisableOnError checks the error handling
 ability in performDisplayMultipleRuleDisable function.</p>
@@ -605,7 +605,7 @@ ability in performDisplayMultipleRuleDisable function.</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestPerformDisplayMultipleRuleDisableOnError</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>error to be thrown</p>
 </td>
@@ -613,7 +613,7 @@ ability in performDisplayMultipleRuleDisable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -622,7 +622,7 @@ ability in performDisplayMultipleRuleDisable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -632,7 +632,7 @@ ability in performDisplayMultipleRuleDisable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>first query to be performed</p>
 </td>
@@ -645,7 +645,7 @@ ability in performDisplayMultipleRuleDisable function.</p>
 `</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function</p>
 </td>
@@ -656,7 +656,7 @@ ability in performDisplayMultipleRuleDisable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if the error is correct</p>
 </td>
@@ -666,7 +666,7 @@ ability in performDisplayMultipleRuleDisable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -674,7 +674,7 @@ ability in performDisplayMultipleRuleDisable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -683,7 +683,7 @@ ability in performDisplayMultipleRuleDisable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestPerformDisplayMultipleRuleDisableOnScanError checks the error handling
 ability in performDisplayMultipleRuleDisable function regarding wrong values returned from query.</p>
@@ -691,7 +691,7 @@ ability in performDisplayMultipleRuleDisable function regarding wrong values ret
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestPerformDisplayMultipleRuleDisableOnScanError</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -700,7 +700,7 @@ ability in performDisplayMultipleRuleDisable function regarding wrong values ret
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
@@ -709,7 +709,7 @@ ability in performDisplayMultipleRuleDisable function regarding wrong values ret
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -718,7 +718,7 @@ ability in performDisplayMultipleRuleDisable function regarding wrong values ret
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>org_id query is not expected, as the first query should fail</p>
 </td>
@@ -727,7 +727,7 @@ ability in performDisplayMultipleRuleDisable function regarding wrong values ret
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>first query to be performed</p>
 </td>
@@ -740,14 +740,14 @@ ability in performDisplayMultipleRuleDisable function regarding wrong values ret
 `</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function</p>
 </td>
 	<td class="code"><pre><code>	<div class="ident">err</div> <div class="operator">=</div> <div class="ident">cleaner</div><div class="operator">.</div><div class="ident">PerformDisplayMultipleRuleDisable</div><div class="operator">(</div><div class="ident">connection</div><div class="operator">,</div> <div class="ident">nil</div><div class="operator">,</div> <div class="ident">query1</div><div class="operator">,</div> <div class="literal">&#34;cluster_rule_toggle&#34;</div><div class="operator">)</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>must throw error</p>
 </td>
@@ -755,7 +755,7 @@ ability in performDisplayMultipleRuleDisable function regarding wrong values ret
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -763,7 +763,7 @@ ability in performDisplayMultipleRuleDisable function regarding wrong values ret
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -772,7 +772,7 @@ ability in performDisplayMultipleRuleDisable function regarding wrong values ret
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestPerformDisplayMultipleRuleDisableResults checks the basic behaviour of
 performDisplayMultipleRuleDisable function with results returned. Contents
@@ -781,7 +781,7 @@ of generated file(s) is checked in displayMultipleRuleDisableResulsts test cases
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestPerformDisplayMultipleRuleDisableResults</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -790,7 +790,7 @@ of generated file(s) is checked in displayMultipleRuleDisableResulsts test cases
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
@@ -799,7 +799,7 @@ of generated file(s) is checked in displayMultipleRuleDisableResulsts test cases
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -808,7 +808,7 @@ of generated file(s) is checked in displayMultipleRuleDisableResulsts test cases
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
@@ -818,7 +818,7 @@ of generated file(s) is checked in displayMultipleRuleDisableResulsts test cases
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>first query to be performed</p>
 </td>
@@ -831,7 +831,7 @@ of generated file(s) is checked in displayMultipleRuleDisableResulsts test cases
 `</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function</p>
 </td>
@@ -840,7 +840,7 @@ of generated file(s) is checked in displayMultipleRuleDisableResulsts test cases
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -848,7 +848,7 @@ of generated file(s) is checked in displayMultipleRuleDisableResulsts test cases
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -857,7 +857,7 @@ of generated file(s) is checked in displayMultipleRuleDisableResulsts test cases
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestDisplayMultipleRuleDisableResultsScanError checks the basic behaviour of
 displayMultipleRuleDisable function with results returned without defining the filenames.</p>
@@ -865,7 +865,7 @@ displayMultipleRuleDisable function with results returned without defining the f
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestDisplayMultipleRuleDisableResultsScanError</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -874,7 +874,7 @@ displayMultipleRuleDisable function with results returned without defining the f
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
@@ -883,7 +883,7 @@ displayMultipleRuleDisable function with results returned without defining the f
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -892,7 +892,7 @@ displayMultipleRuleDisable function with results returned without defining the f
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>another org_id query</p>
 </td>
@@ -900,7 +900,7 @@ displayMultipleRuleDisable function with results returned without defining the f
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function without filename (only printed in logs)</p>
 </td>
@@ -909,7 +909,7 @@ displayMultipleRuleDisable function with results returned without defining the f
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -917,7 +917,7 @@ displayMultipleRuleDisable function with results returned without defining the f
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -926,7 +926,7 @@ displayMultipleRuleDisable function with results returned without defining the f
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestDisplayMultipleRuleDisableOnError checks the error handling
 ability in displayMultipleRuleDisable function.</p>
@@ -934,7 +934,7 @@ ability in displayMultipleRuleDisable function.</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestDisplayMultipleRuleDisableOnError</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>error to be thrown</p>
 </td>
@@ -942,7 +942,7 @@ ability in displayMultipleRuleDisable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -951,7 +951,7 @@ ability in displayMultipleRuleDisable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -960,7 +960,7 @@ ability in displayMultipleRuleDisable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>org_id query is not expected because first query should fail</p>
 </td>
@@ -969,7 +969,7 @@ ability in displayMultipleRuleDisable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function without filename (only printed in logs)</p>
 </td>
@@ -979,7 +979,7 @@ ability in displayMultipleRuleDisable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if the error is correct</p>
 </td>
@@ -989,7 +989,7 @@ ability in displayMultipleRuleDisable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -997,7 +997,7 @@ ability in displayMultipleRuleDisable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -1006,7 +1006,7 @@ ability in displayMultipleRuleDisable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestPerformDisplayMultipleRuleDisableScanError2 checks the basic behaviour of
 performDisplayMultipleRuleDisable function with wrong records returned from database.</p>
@@ -1014,7 +1014,7 @@ performDisplayMultipleRuleDisable function with wrong records returned from data
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestPerformDisplayMultipleRuleDisableScanError2</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -1023,7 +1023,7 @@ performDisplayMultipleRuleDisable function with wrong records returned from data
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
@@ -1032,7 +1032,7 @@ performDisplayMultipleRuleDisable function with wrong records returned from data
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -1041,7 +1041,7 @@ performDisplayMultipleRuleDisable function with wrong records returned from data
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
@@ -1051,7 +1051,7 @@ performDisplayMultipleRuleDisable function with wrong records returned from data
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>first query to be performed</p>
 </td>
@@ -1064,7 +1064,7 @@ performDisplayMultipleRuleDisable function with wrong records returned from data
 `</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function</p>
 </td>
@@ -1073,7 +1073,7 @@ performDisplayMultipleRuleDisable function with wrong records returned from data
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -1081,7 +1081,7 @@ performDisplayMultipleRuleDisable function with wrong records returned from data
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -1090,7 +1090,7 @@ performDisplayMultipleRuleDisable function with wrong records returned from data
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestDisplayMultipleRuleDisableResultsNoOutput checks the basic behaviour of
 displayMultipleRuleDisable function with results returned without defining the filenames.</p>
@@ -1098,7 +1098,7 @@ displayMultipleRuleDisable function with results returned without defining the f
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestDisplayMultipleRuleDisableResultsNoOutput</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -1107,7 +1107,7 @@ displayMultipleRuleDisable function with results returned without defining the f
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
@@ -1116,7 +1116,7 @@ displayMultipleRuleDisable function with results returned without defining the f
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -1125,7 +1125,7 @@ displayMultipleRuleDisable function with results returned without defining the f
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked org_id query result for SQL query</p>
 </td>
@@ -1133,7 +1133,7 @@ displayMultipleRuleDisable function with results returned without defining the f
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
@@ -1142,7 +1142,7 @@ displayMultipleRuleDisable function with results returned without defining the f
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -1151,7 +1151,7 @@ displayMultipleRuleDisable function with results returned without defining the f
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked org_id query result for SQL query</p>
 </td>
@@ -1159,7 +1159,7 @@ displayMultipleRuleDisable function with results returned without defining the f
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>another org_id query</p>
 </td>
@@ -1167,7 +1167,7 @@ displayMultipleRuleDisable function with results returned without defining the f
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function without filename (only printed in logs)</p>
 </td>
@@ -1176,7 +1176,7 @@ displayMultipleRuleDisable function with results returned without defining the f
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -1184,7 +1184,7 @@ displayMultipleRuleDisable function with results returned without defining the f
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -1193,7 +1193,7 @@ displayMultipleRuleDisable function with results returned without defining the f
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestDisplayMultipleRuleDisableResultsFileOutput checks the basic behaviour of
 displayMultipleRuleDisable function with results returned and checks whether
@@ -1204,7 +1204,7 @@ the files were generated correctly.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -1213,7 +1213,7 @@ the files were generated correctly.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
@@ -1222,7 +1222,7 @@ the files were generated correctly.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -1231,7 +1231,7 @@ the files were generated correctly.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked org_id query result for SQL query</p>
 </td>
@@ -1239,7 +1239,7 @@ the files were generated correctly.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
@@ -1248,7 +1248,7 @@ the files were generated correctly.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -1257,7 +1257,7 @@ the files were generated correctly.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked org_id query result for SQL query</p>
 </td>
@@ -1265,7 +1265,7 @@ the files were generated correctly.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>another org_id query</p>
 </td>
@@ -1273,7 +1273,7 @@ the files were generated correctly.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function with filename</p>
 </td>
@@ -1282,7 +1282,7 @@ the files were generated correctly.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -1290,7 +1290,7 @@ the files were generated correctly.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -1298,7 +1298,7 @@ the files were generated correctly.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check contents of the output file</p>
 </td>
@@ -1314,7 +1314,7 @@ the files were generated correctly.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>two lines must be in the file</p>
 </td>
@@ -1322,7 +1322,7 @@ the files were generated correctly.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>4 comma separated values</p>
 </td>
@@ -1331,7 +1331,7 @@ the files were generated correctly.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check elements in csv</p>
 </td>
@@ -1350,7 +1350,7 @@ the files were generated correctly.</p>
 	<div class="ident">assert</div><div class="operator">.</div><div class="ident">NoError</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>delete test file from filesystem</p>
 </td>
@@ -1360,7 +1360,7 @@ the files were generated correctly.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestDisplayMultipleRuleDisableResultsFileError checks the basic behaviour of
 displayMultipleRuleDisable function with results returned and an invalid filename</p>
@@ -1368,7 +1368,7 @@ displayMultipleRuleDisable function with results returned and an invalid filenam
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestDisplayMultipleRuleDisableResultsFileError</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -1376,7 +1376,7 @@ displayMultipleRuleDisable function with results returned and an invalid filenam
 	<div class="ident">assert</div><div class="operator">.</div><div class="ident">NoError</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">,</div> <div class="literal">&#34;error creating SQL mock&#34;</div><div class="operator">)</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
@@ -1385,7 +1385,7 @@ displayMultipleRuleDisable function with results returned and an invalid filenam
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -1394,7 +1394,7 @@ displayMultipleRuleDisable function with results returned and an invalid filenam
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked org_id query result for SQL query</p>
 </td>
@@ -1402,7 +1402,7 @@ displayMultipleRuleDisable function with results returned and an invalid filenam
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
@@ -1411,7 +1411,7 @@ displayMultipleRuleDisable function with results returned and an invalid filenam
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -1420,7 +1420,7 @@ displayMultipleRuleDisable function with results returned and an invalid filenam
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked org_id query result for SQL query</p>
 </td>
@@ -1430,7 +1430,7 @@ displayMultipleRuleDisable function with results returned and an invalid filenam
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function with invalid filename</p>
 </td>
@@ -1439,7 +1439,7 @@ displayMultipleRuleDisable function with results returned and an invalid filenam
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -1447,7 +1447,7 @@ displayMultipleRuleDisable function with results returned and an invalid filenam
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -1456,7 +1456,7 @@ displayMultipleRuleDisable function with results returned and an invalid filenam
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestPerformListOfOldReportsNoResults checks the basic behaviour of
 performListOfOldReports function.</p>
@@ -1464,7 +1464,7 @@ performListOfOldReports function.</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestPerformListOfOldReportsNoResults</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -1473,7 +1473,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
@@ -1481,7 +1481,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -1491,7 +1491,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function</p>
 </td>
@@ -1500,7 +1500,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -1508,7 +1508,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -1517,7 +1517,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestPerformListOfOldReportsResults checks the basic behaviour of
 performListOfOldReports function.</p>
@@ -1525,7 +1525,7 @@ performListOfOldReports function.</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestPerformListOfOldReportsResults</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -1534,7 +1534,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
@@ -1545,7 +1545,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -1555,7 +1555,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function</p>
 </td>
@@ -1564,7 +1564,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -1572,7 +1572,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -1581,7 +1581,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestPerformListOfOldReportsScanError checks the basic behaviour of
 performListOfOldReports function.</p>
@@ -1589,7 +1589,7 @@ performListOfOldReports function.</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestPerformListOfOldReportsScanError</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -1598,7 +1598,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
@@ -1609,7 +1609,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -1619,7 +1619,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function</p>
 </td>
@@ -1628,7 +1628,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -1636,7 +1636,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -1645,7 +1645,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestPerformListOfOldReportsDBError checks the basic behaviour of
 performListOfOldReports function.</p>
@@ -1653,7 +1653,7 @@ performListOfOldReports function.</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestPerformListOfOldReportsDBError</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>error to be thrown</p>
 </td>
@@ -1661,7 +1661,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -1670,7 +1670,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -1680,7 +1680,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function</p>
 </td>
@@ -1693,7 +1693,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -1701,7 +1701,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -1710,7 +1710,7 @@ performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestDisplayAllOldRecordsNoOutput checks the basic behaviour of
 displayAllOldRecords function without a filename defined.</p>
@@ -1718,7 +1718,7 @@ displayAllOldRecords function without a filename defined.</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestDisplayAllOldRecordsNoOutput</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -1727,7 +1727,7 @@ displayAllOldRecords function without a filename defined.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
@@ -1738,7 +1738,7 @@ displayAllOldRecords function without a filename defined.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected queries performed by tested function</p>
 </td>
@@ -1755,7 +1755,7 @@ displayAllOldRecords function without a filename defined.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function without filename (stdout)</p>
 </td>
@@ -1764,7 +1764,7 @@ displayAllOldRecords function without a filename defined.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -1772,7 +1772,7 @@ displayAllOldRecords function without a filename defined.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -1781,7 +1781,7 @@ displayAllOldRecords function without a filename defined.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestDisplayAllOldRecordsFileOutput checks the basic behaviour of
 displayAllOldRecords function without a filename defined.</p>
@@ -1791,7 +1791,7 @@ displayAllOldRecords function without a filename defined.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -1800,7 +1800,7 @@ displayAllOldRecords function without a filename defined.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
@@ -1812,7 +1812,7 @@ displayAllOldRecords function without a filename defined.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected queries performed by tested function</p>
 </td>
@@ -1829,7 +1829,7 @@ displayAllOldRecords function without a filename defined.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function without filename (stdout)</p>
 </td>
@@ -1838,7 +1838,7 @@ displayAllOldRecords function without a filename defined.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -1846,7 +1846,7 @@ displayAllOldRecords function without a filename defined.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -1854,7 +1854,7 @@ displayAllOldRecords function without a filename defined.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check contents of the output file</p>
 </td>
@@ -1870,7 +1870,7 @@ displayAllOldRecords function without a filename defined.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>two lines must be in the file</p>
 </td>
@@ -1878,7 +1878,7 @@ displayAllOldRecords function without a filename defined.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>4 comma separated values</p>
 </td>
@@ -1887,7 +1887,7 @@ displayAllOldRecords function without a filename defined.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check elements in csv</p>
 </td>
@@ -1906,7 +1906,7 @@ displayAllOldRecords function without a filename defined.</p>
 	<div class="ident">assert</div><div class="operator">.</div><div class="ident">NoError</div><div class="operator">(</div><div class="ident">t</div><div class="operator">,</div> <div class="ident">err</div><div class="operator">)</div><div class="operator"></div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>delete test file from filesystem</p>
 </td>
@@ -1916,7 +1916,7 @@ displayAllOldRecords function without a filename defined.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestDisplayAllOldRecordsWithFileError checks the basic behaviour of
 displayAllOldRecords function with file error</p>
@@ -1924,7 +1924,7 @@ displayAllOldRecords function with file error</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestDisplayAllOldRecordsWithFileError</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -1933,7 +1933,7 @@ displayAllOldRecords function with file error</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare mocked result for SQL query</p>
 </td>
@@ -1944,7 +1944,7 @@ displayAllOldRecords function with file error</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected queries performed by tested function</p>
 </td>
@@ -1961,7 +1961,7 @@ displayAllOldRecords function with file error</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function with invalid filename (&quot;/&quot;)</p>
 </td>
@@ -1970,7 +1970,7 @@ displayAllOldRecords function with file error</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -1978,7 +1978,7 @@ displayAllOldRecords function with file error</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -1987,7 +1987,7 @@ displayAllOldRecords function with file error</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestDisplayAllOldRecordsNoConnection checks the basic behaviour of
 displayAllOldRecords function when connection is not established</p>
@@ -1995,7 +1995,7 @@ displayAllOldRecords function when connection is not established</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestDisplayAllOldRecordsNoConnection</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function with invalid filename (&quot;/&quot;)</p>
 </td>
@@ -2005,7 +2005,7 @@ displayAllOldRecords function when connection is not established</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestPerformListOfOldReportsOnError checks the error handling
 ability in performListOfOldReports function.</p>
@@ -2013,7 +2013,7 @@ ability in performListOfOldReports function.</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestPerformListOfOldReportsOnError</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>error to be thrown</p>
 </td>
@@ -2021,7 +2021,7 @@ ability in performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -2030,7 +2030,7 @@ ability in performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -2040,7 +2040,7 @@ ability in performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function</p>
 </td>
@@ -2051,7 +2051,7 @@ ability in performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if the error is correct</p>
 </td>
@@ -2061,7 +2061,7 @@ ability in performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -2069,7 +2069,7 @@ ability in performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -2078,7 +2078,7 @@ ability in performListOfOldReports function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestDeleteRecordFromTable checks the basic behaviour of
 deleteRecordFromTable function.</p>
@@ -2086,7 +2086,7 @@ deleteRecordFromTable function.</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestDeleteRecordFromTable</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -2095,7 +2095,7 @@ deleteRecordFromTable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -2105,7 +2105,7 @@ deleteRecordFromTable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function</p>
 </td>
@@ -2114,7 +2114,7 @@ deleteRecordFromTable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>test number of affected rows</p>
 </td>
@@ -2124,7 +2124,7 @@ deleteRecordFromTable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -2132,7 +2132,7 @@ deleteRecordFromTable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -2141,7 +2141,7 @@ deleteRecordFromTable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestDeleteRecordFromTableOnError checks the error handling in
 deleteRecordFromTable function.</p>
@@ -2149,7 +2149,7 @@ deleteRecordFromTable function.</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestDeleteRecordFromTableOnError</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>error to be thrown</p>
 </td>
@@ -2157,7 +2157,7 @@ deleteRecordFromTable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -2166,7 +2166,7 @@ deleteRecordFromTable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -2176,7 +2176,7 @@ deleteRecordFromTable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function</p>
 </td>
@@ -2187,7 +2187,7 @@ deleteRecordFromTable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>test number of affected rows</p>
 </td>
@@ -2197,7 +2197,7 @@ deleteRecordFromTable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if the error is correct</p>
 </td>
@@ -2207,7 +2207,7 @@ deleteRecordFromTable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -2215,7 +2215,7 @@ deleteRecordFromTable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -2224,7 +2224,7 @@ deleteRecordFromTable function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestPerformVacuumDB checks the basic behaviour of
 PerformVacuumDB function.</p>
@@ -2232,7 +2232,7 @@ PerformVacuumDB function.</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestPerformVacuumDB</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -2241,7 +2241,7 @@ PerformVacuumDB function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -2255,7 +2255,7 @@ PerformVacuumDB function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call the tested function</p>
 </td>
@@ -2264,7 +2264,7 @@ PerformVacuumDB function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>test number of affected rows</p>
 </td>
@@ -2277,7 +2277,7 @@ PerformVacuumDB function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -2285,7 +2285,7 @@ PerformVacuumDB function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -2294,7 +2294,7 @@ PerformVacuumDB function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestFillInDatabaseByTestData checks the basic behaviour of
 fillInDatabaseByTestData function.</p>
@@ -2302,7 +2302,7 @@ fillInDatabaseByTestData function.</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestFillInDatabaseByTestData</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -2330,7 +2330,7 @@ fillInDatabaseByTestData function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -2338,7 +2338,7 @@ fillInDatabaseByTestData function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -2347,7 +2347,7 @@ fillInDatabaseByTestData function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestPerformCleanupInDB checks the basic behaviour of
 performCleanupInDB function.</p>
@@ -2357,7 +2357,7 @@ performCleanupInDB function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -2374,7 +2374,7 @@ performCleanupInDB function.</p>
 		<div class="keyword">for</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">tableAndKey</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">cleaner</div><div class="operator">.</div><div class="ident">TablesAndKeys</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -2383,7 +2383,7 @@ performCleanupInDB function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>two deleted rows for each cluster</p>
 </td>
@@ -2398,7 +2398,7 @@ performCleanupInDB function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check tables have correct number of deleted rows for each table</p>
 </td>
@@ -2408,7 +2408,7 @@ performCleanupInDB function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -2416,7 +2416,7 @@ performCleanupInDB function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -2425,7 +2425,7 @@ performCleanupInDB function.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestPerformCleanupInDBOnDeleteError checks the basic behaviour of
 performCleanupInDB function when error in called DeleteRecordFromTable.
@@ -2434,7 +2434,7 @@ is thrown</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestPerformCleanupInDBOnDeleteError</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>error to be thrown</p>
 </td>
@@ -2444,7 +2444,7 @@ is thrown</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>prepare new mocked connection to database</p>
 </td>
@@ -2461,7 +2461,7 @@ is thrown</p>
 		<div class="keyword">for</div> <div class="ident">_</div><div class="operator">,</div> <div class="ident">tableAndKey</div> <div class="operator">:=</div> <div class="keyword">range</div> <div class="ident">cleaner</div><div class="operator">.</div><div class="ident">TablesAndKeys</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>expected query performed by tested function</p>
 </td>
@@ -2470,7 +2470,7 @@ is thrown</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>NO deleted rows for any cluster</p>
 </td>
@@ -2485,7 +2485,7 @@ is thrown</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check tables have correct number of deleted rows for each table</p>
 </td>
@@ -2495,7 +2495,7 @@ is thrown</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check if DB can be closed successfully</p>
 </td>
@@ -2503,7 +2503,7 @@ is thrown</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check all DB expectactions happened correctly</p>
 </td>
@@ -2512,7 +2512,7 @@ is thrown</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestPerformCleanupInDBNoConnection checks the basic behaviour of
 performCleanupInDB function when connection is not established.</p>
@@ -2520,7 +2520,7 @@ performCleanupInDB function when connection is not established.</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestPerformCleanupInDBNoConnection</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>connection that is not constructed correctly</p>
 </td>
@@ -2539,7 +2539,7 @@ performCleanupInDB function when connection is not established.</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestInitDatabaseNoConfiguration checks how initDatabaseConnection function
 behave if null configuration is used</p>
@@ -2547,7 +2547,7 @@ behave if null configuration is used</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestInitDatabaseNoConfiguration</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>not initialized storage configuration</p>
 </td>
@@ -2555,7 +2555,7 @@ behave if null configuration is used</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call tested function</p>
 </td>
@@ -2563,7 +2563,7 @@ behave if null configuration is used</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check output from tested function</p>
 </td>
@@ -2573,7 +2573,7 @@ behave if null configuration is used</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestInitDatabaseWrongDriver checks how initDatabaseConnection function
 behave if configuration with wrong driver is used</p>
@@ -2581,7 +2581,7 @@ behave if configuration with wrong driver is used</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestInitDatabaseWrongDriver</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>not initialized storage configuration</p>
 </td>
@@ -2591,7 +2591,7 @@ behave if configuration with wrong driver is used</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call tested function</p>
 </td>
@@ -2599,7 +2599,7 @@ behave if configuration with wrong driver is used</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check output from tested function</p>
 </td>
@@ -2609,7 +2609,7 @@ behave if configuration with wrong driver is used</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestInitDatabaseSQLite3Driver driver checks how initDatabaseConnection function
 behave if configuration with SQLite3 driver is used</p>
@@ -2617,7 +2617,7 @@ behave if configuration with SQLite3 driver is used</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestInitDatabaseSQLite3Driver</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>properly initialized storage configuration for SQLite3</p>
 </td>
@@ -2628,7 +2628,7 @@ behave if configuration with SQLite3 driver is used</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call tested function</p>
 </td>
@@ -2636,7 +2636,7 @@ behave if configuration with SQLite3 driver is used</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check output from tested function</p>
 </td>
@@ -2646,7 +2646,7 @@ behave if configuration with SQLite3 driver is used</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>TestInitDatabasePostgreSQLDriver driver checks how initDatabaseConnection function
 behave if configuration with PostgreSQL driver is used</p>
@@ -2654,7 +2654,7 @@ behave if configuration with PostgreSQL driver is used</p>
 	<td class="code"><pre><code><div class="keyword">func</div> <div class="ident">TestInitDatabasePostgreSQLDriver</div><div class="operator">(</div><div class="ident">t</div> <div class="operator">*</div><div class="ident">testing</div><div class="operator">.</div><div class="ident">T</div><div class="operator">)</div> <div class="operator">{</div>
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>properly initialized storage configuration for PostgreSQL</p>
 </td>
@@ -2670,7 +2670,7 @@ behave if configuration with PostgreSQL driver is used</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>call tested function
 (open may just validate its arguments without creating a connection to the database)</p>
@@ -2679,7 +2679,7 @@ behave if configuration with PostgreSQL driver is used</p>
 
 </code></pre></td>
       </tr>
-      
+
       <tr class="section">
 	<td class="doc"><p>check output from tested function</p>
 </td>
@@ -2689,7 +2689,7 @@ behave if configuration with PostgreSQL driver is used</p>
 
 </code></pre></td>
       </tr>
-      
+
     </tbody>
   </table>
 </div>

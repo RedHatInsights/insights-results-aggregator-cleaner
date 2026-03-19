@@ -1,6 +1,7 @@
 SHELL := /bin/bash
 
-.PHONY: default clean build fmt lint vet cyclo ineffassign shellcheck errcheck goconst gosec abcgo style run test test-postgres cover integration_tests rest_api_tests sqlite_db license before_commit help godoc install_docgo install_addlicense
+.PHONY: default clean build build-cover shellcheck abcgo lint style run test cover coverage \
+    license before_commit help function_list install_addlicense
 
 SOURCES:=$(shell find . -name '*.go')
 BINARY:=insights-results-aggregator-cleaner
@@ -19,15 +20,16 @@ build-cover:	${SOURCES}  ## Build binary with code coverage detection support
 ${BINARY}: ${SOURCES}
 	./build.sh
 
+shellcheck: ## Run shellcheck checker
+	pre-commit run --all-files shellcheck
+
 abcgo: ## Run ABC metrics checker
-	@echo "Run ABC metrics checker"
-	./abcgo.sh ${VERBOSE}
+	pre-commit run --all-files abcgo
 
-golangci-lint: install_golangci_lint
-	golangci-lint run
-	glangci-lint fmt
+lint: ## Run lint checker
+	pre-commit run --all-files golangci-lint-full
 
-style: shellcheck abcgo golangci-lint
+style: shellcheck abcgo lint
 
 run: ${BINARY} ## Build the project and executes the binary
 	./$^
@@ -44,7 +46,7 @@ coverage: ## Display test coverage in terminal
 license: install_addlicense
 	addlicense -c "Red Hat, Inc" -l "apache" -v ./
 
-before_commit: style test test-postgres integration_tests openapi-check license ## Checks done before commit
+before_commit: style test integration_tests openapi-check license ## Checks done before commit
 	./check_coverage.sh
 
 help: ## Show this help screen
@@ -66,11 +68,3 @@ docs/packages/%.html: %.go
 
 install_addlicense:
 	[[ `command -v addlicense` ]] || go install github.com/google/addlicense
-
-install_golangci_lint:
-	@if [ "$$(uname)" = "Darwin" ]; then \
-		brew install golangci-lint; \
-		brew upgrade golangci-lint; \
-	else \
-		go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.0.2; \
-	fi
