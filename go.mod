@@ -48,7 +48,7 @@ require (
 	github.com/eapache/queue v1.1.0 // indirect
 	github.com/fatih/color v1.19.0 // indirect
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
-	github.com/getkin/kin-openapi v0.137.0 // indirect
+	github.com/getkin/kin-openapi v0.138.0 // indirect
 	github.com/getsentry/sentry-go v0.46.2 // indirect
 	github.com/getsentry/sentry-go/zerolog v0.46.2 // indirect
 	github.com/go-openapi/jsonpointer v0.23.1 // indirect
@@ -100,8 +100,8 @@ require (
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/crypto v0.50.0 // indirect
 	golang.org/x/net v0.53.0 // indirect
-	golang.org/x/sys v0.43.0 // indirect
-	golang.org/x/text v0.36.0 // indirect
+	golang.org/x/sys v0.44.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/h2non/gock.v1 v1.1.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
