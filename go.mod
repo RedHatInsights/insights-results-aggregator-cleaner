@@ -20,18 +20,18 @@ require (
 require (
 	github.com/IBM/sarama v1.50.1 // indirect
 	github.com/RedHatInsights/insights-results-types v1.23.5 // indirect
-	github.com/aws/aws-sdk-go-v2 v1.41.10 // indirect
-	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.11 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.41.11 // indirect
+	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.12 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.32.21 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.20 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.26 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.26 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.26 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.27 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.27 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.27 // indirect
-	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.74.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.74.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.10 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.26 // indirect
-	github.com/aws/aws-sdk-go-v2/service/signin v1.1.2 // indirect
+	github.com/aws/aws-sdk-go-v2/service/signin v1.1.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.31.0 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.36.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.43.0 // indirect
@@ -84,7 +84,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/prometheus/client_golang v1.23.2 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
-	github.com/prometheus/common v0.68.0 // indirect
+	github.com/prometheus/common v0.68.1 // indirect
 	github.com/prometheus/procfs v0.20.1 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20250401214520-65e299d6c5c9 // indirect
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
