@@ -18,7 +18,7 @@ require (
 )
 
 require (
-	github.com/IBM/sarama v1.50.2 // indirect
+	github.com/IBM/sarama v1.50.3 // indirect
 	github.com/RedHatInsights/insights-results-types v1.23.5 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.42.0 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.13 // indirect
