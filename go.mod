@@ -47,7 +47,7 @@ require (
 	github.com/eapache/go-resiliency v1.7.0 // indirect
 	github.com/fatih/color v1.19.0 // indirect
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
-	github.com/getkin/kin-openapi v0.142.0 // indirect
+	github.com/getkin/kin-openapi v0.144.0 // indirect
 	github.com/getsentry/sentry-go v0.48.0 // indirect
 	github.com/getsentry/sentry-go/zerolog v0.48.0 // indirect
 	github.com/go-openapi/jsonpointer v1.0.0 // indirect
