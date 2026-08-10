@@ -1,10 +1,18 @@
 # AGENTS.md
 
+Facts below are taken from this repository (paths cited) or from the required team-info skill link. Do not treat uncited operational guesses as source of truth.
+
 ## Project Overview
 
-CLI/cron job that finds and deletes obsolete Insights Results Aggregator data — typically clusters with reports older than a configured max age (Insights Operator gone or disabled). Default invocation **lists** old clusters only; deletion requires explicit `-cleanup` / `-cleanup-all` flags. Shares the aggregator Postgres DB (`ocp_recommendations` or `dvo_recommendations` schema).
+Simple service that identifies clusters with very old data in the Insights Results Aggregator database (e.g. Insights Operator disabled / cluster gone) and can prune that data. By default it only **displays** such clusters; deletion needs explicit flags. (Source: [README.md](./README.md) Description + Default operation / Data cleanup.)
 
-**Tech Stack**: Go 1.25 (`go.mod`), PostgreSQL (`lib/pq`; sqlite3 supported for local), Viper + TOML config, zerolog, insights-operator-utils, Clowder CronJob (`deploy/clowdapp.yaml`).
+**Tech Stack** (sources: `go.mod` `require`, [deploy/clowdapp.yaml](./deploy/clowdapp.yaml)):
+
+- Go `1.25.0`
+- Postgres via `github.com/lib/pq`; also `github.com/mattn/go-sqlite3`
+- Config: `github.com/spf13/viper`, `github.com/BurntSushi/toml`
+- Logging: `github.com/rs/zerolog`; utils: `github.com/RedHatInsights/insights-operator-utils`
+- Deployed as a ClowdApp **job** (cron schedule) in `deploy/clowdapp.yaml`
 
 ## Team context
 
@@ -17,27 +25,27 @@ Before working here, **load and follow the team-info skill** (Shared Standards, 
 
 Do **not** duplicate team-wide rules in this file. Keep this AGENTS.md limited to **this repository**.
 
-**Related repos** (from team-info):
+**Related repos**:
 
-- [insights-results-aggregator](https://github.com/RedHatInsights/insights-results-aggregator) — owns the DB this tool cleans
-- [insights-behavioral-spec](https://github.com/RedHatInsights/insights-behavioral-spec) — BDD (`cleaner_tests.sh`)
+- [insights-results-aggregator](https://github.com/RedHatInsights/insights-results-aggregator) — DB this tool cleans (README Description; team-info EDP table)
+- [insights-behavioral-spec](https://github.com/RedHatInsights/insights-behavioral-spec) — BDD via `cleaner_tests.sh` ([README.md](./README.md) BDD tests)
 
 ## Repository Structure
 
 ```text
 .
-├── cleaner.go          # main, CLI flags, operation dispatch
-├── storage.go          # SQL list/delete/fill/vacuum
-├── config.go           # Viper load + env overrides
-├── types.go            # ClusterName, CliFlags, Summary, TableAndKey types
-├── config.toml         # local default config
-├── cluster_list.txt    # cluster UUIDs for -cleanup
+├── cleaner.go          # main, flags, doSelectedOperation (cleaner.go)
+├── storage.go          # SQL list/delete/fill/vacuum (storage.go)
+├── config.go           # LoadConfiguration / Viper (config.go)
+├── types.go            # ClusterName, CliFlags, Summary, TableAndKey (types.go)
+├── config.toml         # default local config (config.toml)
+├── cluster_list.txt    # default cluster list file name (config.toml cluster_list_file)
 ├── deploy/clowdapp.yaml
-├── docs/               # GitHub Pages sources
+├── docs/               # Pages sources (README Documentation)
 ├── tests/              # sample configs / cluster lists
-├── docker-compose.yaml # local Postgres
+├── docker-compose.yaml # postgres:13.9 + related services
 ├── unit-tests.sh
-├── Makefile
+├── Makefile            # BINARY:=insights-results-aggregator-cleaner
 └── *_test.go
 ```
 
@@ -45,52 +53,48 @@ Do **not** duplicate team-wide rules in this file. Keep this AGENTS.md limited t
 
 ### Setup
 
-- Go toolchain from `go.mod` (currently `go 1.25.0`)
-- Optional local DB: `podman-compose up -d` (see README), then `./insights-results-aggregator-cleaner -fill-in-db`
+- Toolchain: `go 1.25.0` in `go.mod`
+- Local DB: README says `podman-compose up -d`, then `./insights-results-aggregator-cleaner -fill-in-db` ([README.md](./README.md) Test data generation). Compose file present: [docker-compose.yaml](./docker-compose.yaml).
 
 ### Running Tests
 
-- `make test` → `./unit-tests.sh` (`go test` with 2m timeout, coverage profile)
-- BDD: clone [insights-behavioral-spec](https://github.com/RedHatInsights/insights-behavioral-spec) and run `cleaner_tests.sh`
+- `make test` runs `./unit-tests.sh` ([Makefile](./Makefile)); script runs `go test -v -timeout 2m -coverprofile coverage.out` ([unit-tests.sh](./unit-tests.sh))
+- BDD: clone insights-behavioral-spec and run `cleaner_tests.sh` ([README.md](./README.md) BDD tests)
 
 ### Code Quality
 
-- `make lint` — golangci-lint via pre-commit
-- `make style` — shellcheck + abcgo + lint
-- `make before_commit` — style + test + … (see note below)
-
-Note: `before_commit` lists `integration_tests` and `openapi-check`, which are **not** defined as Makefile targets in this tree — expect that target to fail until those exist or are removed. Prefer `make style` + `make test` (+ `./check_coverage.sh` if needed).
+- `make lint` → `pre-commit run --all-files golangci-lint-full` ([Makefile](./Makefile))
+- `make style` → `shellcheck` + `abcgo` + `lint` ([Makefile](./Makefile))
+- `make before_commit` is defined as `style test integration_tests openapi-check license` ([Makefile](./Makefile)), but **`integration_tests` and `openapi-check` are not defined** as targets in this Makefile — the target as written will fail. Prefer `make style` and `make test`. Coverage helper: [check_coverage.sh](./check_coverage.sh) (referenced by `before_commit`).
 
 ### Building and Running
 
-- `make build` → `./insights-results-aggregator-cleaner`
-- `make run` — build and execute (default: list old records)
-- Useful flags: `-show-configuration`, `-cleanup`, `-cleanup-all`, `-dry-run` (default **true**, **only for `-cleanup-all`**), `-max-age`, `-clusters`, `-fill-in-db`, `-vacuum`, `-summary`
+- `make build` / `make run` ([Makefile](./Makefile)); binary name `insights-results-aggregator-cleaner`
+- Flags defined in `cleaner.go` `main` / printed by `-h`, including: `-cleanup`, `-cleanup-all`, `-dry-run` (default **true**; help text: applies to cleanup-all), `-max-age`, `-clusters`, `-fill-in-db`, `-vacuum`, `-summary`, `-show-configuration`, `-output`, …
 
 ## Key Architectural Patterns
 
 ### Data flow
 
-1. Load config from `config.toml` or `INSIGHTS_RESULTS_CLEANER_CONFIG_FILE`, overridable by `INSIGHTS_RESULTS_CLEANER__*` env vars; connect to aggregator DB (`schema` = `ocp_recommendations` or `dvo_recommendations`).
-2. Default path: query old reports / related rows by `max_age` and log (or write) cluster IDs — **no deletes**.
-3. Explicit cleanup:
-   - `-cleanup`: **always deletes** rows for clusters in `cluster_list.txt` and/or `-clusters` (schema-scoped table list). **`-dry-run` does not apply.**
-   - `-cleanup-all`: age-based work via `tablesToDeleteOCP` **and** `tablesToDeleteDVO` (both schemas — not limited by `storage.schema`). With `-dry-run=true` (CLI default), SQL `DELETE` is rewritten to `SELECT` so nothing is removed.
-4. Deployed as ClowdApp CronJob `insights-aggregator-cleaner` / job `cleaner`: command is `-dry-run=${DRY_RUN} -cleanup-all=${CLEANUP_ALL}`. Template parameter defaults are `DRY_RUN=true`, `CLEANUP_ALL=true`, `MAX_AGE=90 days` — so **template default is dry-run**. Stage/prod may override `DRY_RUN` via app-interface; confirm there before assuming deletes run. DB via shared Clowder app `ccx-insights-results`. ClowdApp sets `SCHEMA=ocp_recommendations` for env, but `-cleanup-all` still touches DVO delete statements in code.
+1. Config from `config.toml` (or file named by `INSIGHTS_RESULTS_CLEANER_CONFIG_FILE`), with `INSIGHTS_RESULTS_CLEANER_` env prefix / `__` nested overrides ([config.go](./config.go), [docs/index.md](./docs/index.md), [README.md](./README.md) Configuration). Storage `schema` is `ocp_recommendations` or `dvo_recommendations` ([docs/index.md](./docs/index.md); constants in [storage.go](./storage.go)).
+2. Default operation: list old records only — no delete ([README.md](./README.md) Default operation; `doSelectedOperation` default → `displayOldRecords` in [cleaner.go](./cleaner.go)).
+3. Cleanup modes ([cleaner.go](./cleaner.go), [storage.go](./storage.go)):
+   - `-cleanup`: `performCleanupInDB` deletes by cluster list from file and/or `-clusters`; schema selects `tablesAndKeysInOCPDatabase` or `tablesAndKeysInDVODatabase`. **No `DryRun` argument on this path.**
+   - `-cleanup-all`: `performCleanupAllInDB` iterates `allTablesToDelete` (`tablesToDeleteOCP` **appended with** `tablesToDeleteDVO`) — not filtered by `storage.schema`. If `dryRun`, `deleteOldRecordsFromTable` replaces `DELETE` with `SELECT`.
+4. Deploy job ([deploy/clowdapp.yaml](./deploy/clowdapp.yaml)): ClowdApp `insights-aggregator-cleaner`, job `cleaner`, command `./insights-results-aggregator-cleaner -dry-run=${DRY_RUN} -cleanup-all=${CLEANUP_ALL}`, `sharedDbAppName: ccx-insights-results`, env `INSIGHTS_RESULTS_CLEANER__STORAGE__SCHEMA=ocp_recommendations`. Template parameter **defaults**: `DRY_RUN=true`, `CLEANUP_ALL=true`, `MAX_AGE=90 days`, `JOB_SCHEDULE=0 12 * * *`.
 
 ### Components
 
-- `cleaner.go`: CLI + `doSelectedOperation` dispatch (`cleanup`, `cleanupAll`, `displayOldRecords`, …)
-- `storage.go`: connection, list/delete SQL, fill-in test data, vacuum
-- `config.go`: `LoadConfiguration`
-- `deploy/clowdapp.yaml`: schedule (default `0 12 * * *`), `MAX_AGE`, `DRY_RUN`, `CLEANUP_ALL`
+- [cleaner.go](./cleaner.go) — CLI + `doSelectedOperation`
+- [storage.go](./storage.go) — DB connection and SQL operations
+- [config.go](./config.go) — `LoadConfiguration`
+- [deploy/clowdapp.yaml](./deploy/clowdapp.yaml) — CronJob parameters above
 
 ### Configuration
 
-- File: `config.toml` — `[storage]`, `[logging]`, `[cleaner]` (`max_age`, `cluster_list_file`), `[sentry]`
-- Config path env: `INSIGHTS_RESULTS_CLEANER_CONFIG_FILE`
-- Overrides: `INSIGHTS_RESULTS_CLEANER__STORAGE__*`, `__LOGGING__*`, `__CLEANER__MAX_AGE`, …
-- Details: [GitHub Pages](https://redhatinsights.github.io/insights-results-aggregator-cleaner/) / [docs/index.md](./docs/index.md)
+- [config.toml](./config.toml): `[storage]`, `[logging]`, `[cleaner]` (`max_age`, `cluster_list_file`), `[sentry]`
+- Env list and schema/driver notes: [README.md](./README.md) / [docs/index.md](./docs/index.md)
+- Pages: https://redhatinsights.github.io/insights-results-aggregator-cleaner/
 
 ## Working with this Repository
 
@@ -98,80 +102,77 @@ Note: `before_commit` lists `integration_tests` and `openapi-check`, which are *
 
 ## Code Conventions
 
-- Follow team-info Go standards; CONTRIBUTING asks for Effective Go commentary on exported APIs and `make before_commit` when it works.
-- Flat `package main` — logic lives in `cleaner.go` / `storage.go` / `config.go`, not subpackages.
-- Schema-specific table lists: extend `tablesAndKeysIn*` (per-cluster cleanup) and/or `tablesToDelete*` (age-based cleanup-all) in `storage.go`.
+- CONTRIBUTING: Effective Go commentary for end-user methods; run checks before commit ([CONTRIBUTING.md](./CONTRIBUTING.md)). Language-wide rules: team-info.
+- All application `.go` files use `package main` (no internal packages).
+- Per-cluster table order: `report` is last in `tablesAndKeysInOCPDatabase` with comment `must be at the end due to constraints` ([storage.go](./storage.go)).
 
 ## Important Notes
 
 ### Dependencies
 
-- Direct: toml, viper, pq, sqlite3, zerolog, insights-operator-utils, app-common-go, uuid, tablewriter, testify, go-sqlmock
+See direct `require (` block in [go.mod](./go.mod) (toml, go-sqlmock, insights-operator-utils, uuid, pq, sqlite3, tablewriter, app-common-go, zerolog, viper, testify, go-capture).
 
 ### Testing
 
-- Unit tests use `go-sqlmock` extensively (`storage_test.go`, `cleaner_test.go`)
-- BDD scenarios live in insights-behavioral-spec (not this repo)
-- README “Database tables affected” may lag code — trust `tablesAndKeysIn*` / `tablesToDelete*` in `storage.go` (e.g. code includes `report_info`, README may not)
+- Unit tests import `github.com/DATA-DOG/go-sqlmock` (e.g. [storage_test.go](./storage_test.go))
+- BDD: [README.md](./README.md) BDD tests → insights-behavioral-spec
+- Table lists for cleanup: code in [storage.go](./storage.go) (`tablesAndKeysIn*`, `tablesToDelete*`). README section “Database tables affected by this service” does not list `report_info`, which **is** in `tablesAndKeysInOCPDatabase` — prefer the Go lists when extending cleanup.
 
 ### Monitoring
 
-- Optional Sentry via config / ClowdApp secret `insights-results-aggregator-cleaner-dsn`
-- No HTTP metrics server in this binary (batch/CLI job)
+- Sentry: `[sentry]` in [config.toml](./config.toml); ClowdApp wires secret `insights-results-aggregator-cleaner-dsn` ([deploy/clowdapp.yaml](./deploy/clowdapp.yaml))
 
 ## Common Tasks
 
 ### Add or change which tables are cleaned
 
-1. For **per-cluster** `-cleanup`: update `tablesAndKeysInOCPDatabase` or `tablesAndKeysInDVODatabase` in `storage.go` (table + key column; keep `report` last for FK order).
-2. For **age-based** `-cleanup-all`: add SQL constants and entries in `tablesToDeleteOCP` / `tablesToDeleteDVO`.
-3. Mirror behavior in `storage_test.go` (existing cleanup tests are the pattern).
-4. Update README “Database tables affected” if the list of tables changes.
+1. Per-cluster `-cleanup`: edit `tablesAndKeysInOCPDatabase` / `tablesAndKeysInDVODatabase` in [storage.go](./storage.go) (keep `report` last as noted there).
+2. Age-based `-cleanup-all`: add SQL + entries in `tablesToDeleteOCP` / `tablesToDeleteDVO` in [storage.go](./storage.go).
+3. Extend tests in [storage_test.go](./storage_test.go) (existing `TestPerformCleanup*` patterns).
+4. Update README “Database tables affected by this service” if you change the set ([README.md](./README.md)); CONTRIBUTING asks for docs on user-visible behavior changes.
 
-### Run a safe dry-run cleanup-all locally
+### Run a dry-run cleanup-all locally
 
-1. Point `config.toml` (or env) at a non-prod DB.
+1. Point config/env at a non-prod DB.
 2. `make build`
-3. `./insights-results-aggregator-cleaner -cleanup-all -dry-run=true -max-age="90 days"` (`-dry-run` defaults true; confirmed in binary `-h`)
-4. Only set `-dry-run=false` when age-based deletion is intentional.
-5. Do **not** use `-cleanup` expecting a dry-run — that path deletes immediately for listed clusters.
+3. `./insights-results-aggregator-cleaner -cleanup-all -dry-run=true -max-age="90 days"` — `-dry-run` defaults true (`cleaner.go` / `-h`); dry-run path in `deleteOldRecordsFromTable` ([storage.go](./storage.go)).
+4. `-cleanup` does not take dry-run into account (`cleanup` → `performCleanupInDB` only).
 
 ## Pull Request Guidelines
 
 ### Before Creating a PR
 
-- Run `make style` and `make test` (prefer these over broken `make before_commit` until Makefile deps are fixed)
+- Prefer `make style` and `make test` (see Makefile note above). CONTRIBUTING still mentions `make before_commit`.
 - Also follow team-info Pull Request Requirements and Testing
 
 ### Repo-specific checklist
 
-- Document user-visible CLI or cleanup-table changes in README / Pages sources under `docs/`
+- CONTRIBUTING: include docs for behavior / end-user capability changes ([CONTRIBUTING.md](./CONTRIBUTING.md))
 
 ## Deployment Information
 
-- Configs: `deploy/clowdapp.yaml` (CronJob; image under `obsint-processing-tenant/.../insights-results-aggregator-cleaner`)
-- ClowdApp name: `insights-aggregator-cleaner`; shared DB: `ccx-insights-results`
-- Defaults in template: `DRY_RUN=true`, `CLEANUP_ALL=true`, `MAX_AGE=90 days`, schedule `0 12 * * *` (noon)
-- Environments and promotion: see team-info Deployment Flow; check app-interface SaaS params if real deletes are expected in an env
-- Local compose: `docker-compose.yaml` / README fill-in-db flow
+- [deploy/clowdapp.yaml](./deploy/clowdapp.yaml): image default `quay.io/redhat-services-prod/obsint-processing-tenant/insights-results-aggregator-cleaner/insights-results-aggregator-cleaner`; ClowdApp name `insights-aggregator-cleaner`; `sharedDbAppName: ccx-insights-results`
+- Template defaults: `DRY_RUN=true`, `CLEANUP_ALL=true`, `MAX_AGE=90 days`, `JOB_SCHEDULE=0 12 * * *`
+- Stage/prod promotion process: team-info Deployment Flow (not defined in this repo)
+- Local: [docker-compose.yaml](./docker-compose.yaml) + README fill-in-db
 
 ## Security Considerations
 
 - Follow team-info Security
-- Credentials via config/env (never commit real secrets); production uses Clowder DB binding + optional Sentry DSN secret
-- `-cleanup-all` is safe by default (`-dry-run=true`); `-cleanup` has no dry-run and deletes immediately
-- `-fill-in-db` is for non-prod only
+- `-fill-in-db`: README — “Don't use it on production, of course.”
+- `-dry-run` default true for cleanup-all (`cleaner.go`); `-cleanup` always deletes listed clusters (no dry-run in that function path)
+- Sentry DSN via optional K8s secret in ClowdApp (see Monitoring)
 
 ## Debugging Tips
 
-- `-show-configuration` to verify resolved storage/schema/max_age
-- `-output <file>` to capture old-cluster listing
-- Exit codes: `0` ok, `1` storage error, `2` fill-in failed, `3` cleanup failed
-- Package docs on Pages: [cleaner](https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/cleaner.html), [storage](https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/storage.html)
+- `-show-configuration`, `-output` ([cleaner.go](./cleaner.go) flags)
+- Exit codes in [cleaner.go](./cleaner.go) (`ExitStatus*` iota): `0` OK, `1` storage, `2` fill-in, `3` cleanup, `4` vacuum. README Exit status documents `0`–`3` only.
+- Generated package docs: https://redhatinsights.github.io/insights-results-aggregator-cleaner/packages/cleaner.html and `…/storage.html` ([README.md](./README.md) Documentation for source files)
 
 ## External References
 
-- [README](./README.md) — CLI usage, DB schema notes, Makefile overview
-- [GitHub Pages](https://redhatinsights.github.io/insights-results-aggregator-cleaner/) — configuration and usage
-- [insights-results-aggregator](https://github.com/RedHatInsights/insights-results-aggregator) — DB owner
-- [insights-behavioral-spec](https://github.com/RedHatInsights/insights-behavioral-spec) — BDD for this service
+- [README.md](./README.md)
+- https://redhatinsights.github.io/insights-results-aggregator-cleaner/
+- [docs/index.md](./docs/index.md)
+- [insights-results-aggregator](https://github.com/RedHatInsights/insights-results-aggregator)
+- [insights-behavioral-spec](https://github.com/RedHatInsights/insights-behavioral-spec)
