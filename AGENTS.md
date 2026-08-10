@@ -1,7 +1,5 @@
 # AGENTS.md
 
-Facts below are taken from this repository (paths cited) or from the required team-info skill link. Do not treat uncited operational guesses as source of truth.
-
 ## Project Overview
 
 Simple service that identifies clusters with very old data in the Insights Results Aggregator database (e.g. Insights Operator disabled / cluster gone) and can prune that data. By default it only **displays** such clusters; deletion needs explicit flags. (Source: [README.md](./README.md) Description + Default operation / Data cleanup.)
