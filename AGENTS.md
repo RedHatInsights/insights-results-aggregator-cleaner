@@ -29,7 +29,7 @@ Do **not** duplicate team-wide rules in this file. Keep this AGENTS.md limited t
 ├── cleaner.go          # main, CLI flags, operation dispatch
 ├── storage.go          # SQL list/delete/fill/vacuum
 ├── config.go           # Viper load + env overrides
-├── types.go            # ClusterName, CliFlags, cleanup table maps
+├── types.go            # ClusterName, CliFlags, Summary, TableAndKey types
 ├── config.toml         # local default config
 ├── cluster_list.txt    # cluster UUIDs for -cleanup
 ├── deploy/clowdapp.yaml
@@ -65,7 +65,7 @@ Note: `before_commit` lists `integration_tests` and `openapi-check`, which are *
 
 - `make build` → `./insights-results-aggregator-cleaner`
 - `make run` — build and execute (default: list old records)
-- Useful flags: `-show-configuration`, `-cleanup`, `-cleanup-all`, `-dry-run` (default **true**), `-max-age`, `-clusters`, `-fill-in-db`, `-vacuum`, `-summary`
+- Useful flags: `-show-configuration`, `-cleanup`, `-cleanup-all`, `-dry-run` (default **true**, **only for `-cleanup-all`**), `-max-age`, `-clusters`, `-fill-in-db`, `-vacuum`, `-summary`
 
 ## Key Architectural Patterns
 
@@ -74,9 +74,9 @@ Note: `before_commit` lists `integration_tests` and `openapi-check`, which are *
 1. Load config from `config.toml` or `INSIGHTS_RESULTS_CLEANER_CONFIG_FILE`, overridable by `INSIGHTS_RESULTS_CLEANER__*` env vars; connect to aggregator DB (`schema` = `ocp_recommendations` or `dvo_recommendations`).
 2. Default path: query old reports / related rows by `max_age` and log (or write) cluster IDs — **no deletes**.
 3. Explicit cleanup:
-   - `-cleanup`: delete by cluster list (`cluster_list.txt` and/or `-clusters`) via `tablesAndKeysInOCPDatabase` / `tablesAndKeysInDVODatabase`
-   - `-cleanup-all`: age-based deletes via `tablesToDeleteOCP` + `tablesToDeleteDVO`; **dry-run defaults to true** (SELECT instead of DELETE)
-4. Deployed as ClowdApp CronJob `insights-aggregator-cleaner` / job `cleaner` with `-dry-run` / `-cleanup-all` from template params; DB via shared Clowder app `ccx-insights-results`.
+   - `-cleanup`: **always deletes** rows for clusters in `cluster_list.txt` and/or `-clusters` (schema-scoped table list). **`-dry-run` does not apply.**
+   - `-cleanup-all`: age-based work via `tablesToDeleteOCP` **and** `tablesToDeleteDVO` (both schemas — not limited by `storage.schema`). With `-dry-run=true` (CLI default), SQL `DELETE` is rewritten to `SELECT` so nothing is removed.
+4. Deployed as ClowdApp CronJob `insights-aggregator-cleaner` / job `cleaner`: command is `-dry-run=${DRY_RUN} -cleanup-all=${CLEANUP_ALL}`. Template parameter defaults are `DRY_RUN=true`, `CLEANUP_ALL=true`, `MAX_AGE=90 days` — so **template default is dry-run**. Stage/prod may override `DRY_RUN` via app-interface; confirm there before assuming deletes run. DB via shared Clowder app `ccx-insights-results`. ClowdApp sets `SCHEMA=ocp_recommendations` for env, but `-cleanup-all` still touches DVO delete statements in code.
 
 ### Components
 
@@ -112,6 +112,7 @@ Note: `before_commit` lists `integration_tests` and `openapi-check`, which are *
 
 - Unit tests use `go-sqlmock` extensively (`storage_test.go`, `cleaner_test.go`)
 - BDD scenarios live in insights-behavioral-spec (not this repo)
+- README “Database tables affected” may lag code — trust `tablesAndKeysIn*` / `tablesToDelete*` in `storage.go` (e.g. code includes `report_info`, README may not)
 
 ### Monitoring
 
@@ -131,8 +132,9 @@ Note: `before_commit` lists `integration_tests` and `openapi-check`, which are *
 
 1. Point `config.toml` (or env) at a non-prod DB.
 2. `make build`
-3. `./insights-results-aggregator-cleaner -cleanup-all -dry-run=true -max-age="90 days"` (dry-run is already default true)
-4. Only set `-dry-run=false` when deletion is intentional.
+3. `./insights-results-aggregator-cleaner -cleanup-all -dry-run=true -max-age="90 days"` (`-dry-run` defaults true; confirmed in binary `-h`)
+4. Only set `-dry-run=false` when age-based deletion is intentional.
+5. Do **not** use `-cleanup` expecting a dry-run — that path deletes immediately for listed clusters.
 
 ## Pull Request Guidelines
 
@@ -149,15 +151,16 @@ Note: `before_commit` lists `integration_tests` and `openapi-check`, which are *
 
 - Configs: `deploy/clowdapp.yaml` (CronJob; image under `obsint-processing-tenant/.../insights-results-aggregator-cleaner`)
 - ClowdApp name: `insights-aggregator-cleaner`; shared DB: `ccx-insights-results`
-- Defaults in template: `DRY_RUN=true`, `CLEANUP_ALL=true`, `MAX_AGE=90 days`, schedule noon UTC
-- Environments and promotion: see team-info Deployment Flow
+- Defaults in template: `DRY_RUN=true`, `CLEANUP_ALL=true`, `MAX_AGE=90 days`, schedule `0 12 * * *` (noon)
+- Environments and promotion: see team-info Deployment Flow; check app-interface SaaS params if real deletes are expected in an env
 - Local compose: `docker-compose.yaml` / README fill-in-db flow
 
 ## Security Considerations
 
 - Follow team-info Security
 - Credentials via config/env (never commit real secrets); production uses Clowder DB binding + optional Sentry DSN secret
-- Prefer dry-run before enabling deletes; `-fill-in-db` is for non-prod only
+- `-cleanup-all` is safe by default (`-dry-run=true`); `-cleanup` has no dry-run and deletes immediately
+- `-fill-in-db` is for non-prod only
 
 ## Debugging Tips
 
